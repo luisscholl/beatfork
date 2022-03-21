@@ -47,7 +47,7 @@ const Credits = () => {
 
   return (
     <div className="Credits" data-testid="Credits">
-      {window.location.pathname === "play" && (
+      {window.location.pathname === "/play" && (
         <button
           type="button"
           className="back-button"
