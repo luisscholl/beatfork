@@ -14,7 +14,7 @@ ReactDOM.render(
     <RecoilRoot>
       <Router>
         <Routes>
-          <Route path="/play" element={<App />} />
+          <Route path="/" element={<App />} />
           <Route path="/credits" element={<Credits />} />
           <Route path="/calibration" element={<CalibrationScene />} />
         </Routes>
