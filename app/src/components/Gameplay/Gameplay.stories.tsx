@@ -21,7 +21,7 @@ export default {
   }
 } as ComponentMeta<typeof Gameplay>;
 
-import testLevel from '../../../public/levels/Für Elise/data.json';
+import testLevel from '../../../public/levels/Ryan Andersen - One and Only/One and Only.json';
 
 const Template: ComponentStory<typeof Gameplay> = (args) => <Gameplay {...args} />;
 
