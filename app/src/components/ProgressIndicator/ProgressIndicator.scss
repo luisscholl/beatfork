@@ -1,0 +1,26 @@
+.ProgressIndicator {
+  progress {
+    width: 240px;
+    height: 20px;
+    border: 5px solid black;
+    border-radius: 0;
+    margin-left: -11, 5%;
+    box-shadow: 1px 1px 4px rgb(0 0 0 / 30%);
+  }
+
+  progress::-webkit-progress-bar {
+    background-color: white;
+  }
+
+  progress::-webkit-progress-value {
+    background-color: rgb(245 162 84);
+  }
+
+  progress::-moz-progress-bar {
+    background-color: rgb(245 162 84);
+  }
+
+  progress::-moz-progress-value {
+    background-color: white;
+  }
+}

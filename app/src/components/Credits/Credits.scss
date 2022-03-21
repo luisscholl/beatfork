@@ -1,0 +1,29 @@
+.Credits {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+
+  .back-button {
+    flex-shrink: 1;
+    top: 0;
+    left: 0;
+    margin: 1rem;
+  }
+
+  .wrapper {
+    background: #353535;
+    color: white;
+    padding: 1rem;
+    max-width: 22cm;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    pre {
+      width: 100%;
+      white-space: pre-wrap;
+    }
+  }
+}

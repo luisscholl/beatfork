@@ -1,0 +1,35 @@
+.CalibrationScene {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 100%;
+
+  .player-feedback {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    #playerHologram_canvas, .video-capture {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #playerHologram_canvas {
+      z-index:0;
+    }
+
+    .video-capture {
+      z-index: 1;
+    }
+  }
+
+  .instruction-canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}

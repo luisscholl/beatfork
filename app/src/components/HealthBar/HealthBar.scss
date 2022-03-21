@@ -1,0 +1,21 @@
+.HealthBar {
+  progress {
+    width: 360px;
+    height: 40px;
+    border-radius: 0;
+    border: 5px solid black;
+    box-shadow: 1px 1px 4px rgb(0 0 0 / 30%);
+  }
+
+  progress::-webkit-progress-bar {
+    background-color: white;
+  }
+
+  progress::-webkit-progress-value {
+    background-color: rgb(71 219 58);
+  }
+
+  progress::-moz-progress-bar {
+    background-color: rgb(71 219 58);
+  }
+}
