@@ -568,7 +568,7 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
           isColliding(rightFoot.current, curr);
 
         if (collisionDetected) {
-          currHealth = health - 0.1;
+          currHealth = health - 1;
           setHealth(currHealth);
         }
       }
