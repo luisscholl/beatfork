@@ -18,6 +18,7 @@ const App = () => {
     const levelPaths = [
       "/levels/Rolemusic - La la triororiro/La La Triororiro.json",
       "/levels/Ryan Andersen - One and Only/One and Only.json",
+      "/levels/Andy G. Cohen - Sprocket/Sprocket.json",
     ];
     const levelsData = levelPaths.map((path) =>
       fetch(path).then((response) => response.json())
