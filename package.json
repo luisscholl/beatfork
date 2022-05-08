@@ -1,30 +1,33 @@
 {
   "name": "sg",
+  "private": true,
   "version": "1.0.0",
   "description": "This is a rhythm game created as part of the Serious Games course at Technische Universität Darmstadt.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "cd app && npm i",
-    "start": "concurrently -n app,web \"cd app && npm start\" \"cd web && serve\"",
+    "postinstall": "cd app && npm i && cd .. && npm i -g generate-react-cli",
+    "start": "concurrently -n app,web,api-doc \"cd app && npm start\" \"cd web && serve\" \"npm run api-doc-viewer\"",
     "build": "node scripts/generate-credits && cd app && npm run build",
     "deploy": "scp -r app/build/ licht:~/beatfork_play && ssh licht \"sudo rsync beatfork_play/ /var/www/html/beatfork/ -r --delete && rm -r beatfork_play\"",
-    "bd": "npm run build && npm run deploy"
+    "bd": "npm run build && npm run deploy",
+    "api-doc-viewer": "redocly preview-docs documentation/openapi.yaml"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/luisscholl/sg.git"
   },
   "author": "",
-  "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/luisscholl/sg/issues"
   },
   "homepage": "https://github.com/luisscholl/sg#readme",
   "devDependencies": {
+    "@redocly/cli": "^1.0.0-beta.96",
     "concurrently": "^7.0.0",
     "fs-extra": "^10.0.1",
     "license-checker": "^25.0.1",
+    "run-script-os": "^1.1.6",
     "serve": "^13.0.2",
     "sync-fetch": "^0.3.1"
   }
