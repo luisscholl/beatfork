@@ -156,6 +156,10 @@ paths:
                         bpm:
                           type: number
                           example: 111
+                        length:
+                          type: number
+                          minimum: 1
+                          example: 221
                         published:
                           type: boolean
                           example: true
@@ -231,6 +235,9 @@ paths:
                 bpm:
                   type: number
                   example: 111
+                length:
+                  type: number
+                  minimum: 1
                 published:
                   type: boolean
                   example: true
@@ -315,6 +322,9 @@ paths:
                   bpm:
                     type: number
                     example: 111
+                  length:
+                    type: number
+                    minimum: 1
                   published:
                     type: boolean
                     example: true
@@ -409,6 +419,9 @@ paths:
                 bpm:
                   type: number
                   example: 111
+                length:
+                  type: number
+                  minimum: 1
                 published:
                   type: boolean
                   example: true
