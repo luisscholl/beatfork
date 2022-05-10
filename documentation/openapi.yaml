@@ -161,6 +161,21 @@ paths:
                           example: true
                         rating:
                           $ref: "#/components/schemas/Rating"
+                        versions:
+                          type: object
+                          properties:
+                            self:
+                              type: string
+                              minLength: 1
+                              example: https://<<API URL>>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE/1
+                            difficulty:
+                              type: integer
+                              minimum: 1
+                              maximum: 20
+                            id:
+                              type: integer
+                              minimum: 1
+                              example: 1
                         artists:
                           type: array
                           items:
@@ -220,12 +235,25 @@ paths:
                     minLength: 1
                     example: https://<API URL>/artists/5E7798E6-9A48-44AC-A672-F8B853AF70CA
                   minLength: 0
-                objects:
+                versions:
                   type: array
                   items:
-                    anyOf:
-                      - $ref: "#/components/schemas/Collectible"
-                      - $ref: "#/components/schemas/Obstacle"
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        minimum: 1
+                        example: 1
+                      difficulty:
+                        type: integer
+                        minimum: 1
+                        maximum: 20
+                      objects:
+                        type: array
+                        items:
+                          anyOf:
+                            - $ref: "#/components/schemas/Collectible"
+                            - $ref: "#/components/schemas/Obstacle"
                 audioLinks:
                   type: array
                   items:
@@ -266,6 +294,10 @@ paths:
               schema:
                 type: object
                 properties:
+                  self:
+                    type: string
+                    minLength: 1
+                    example: "https//<API URL>/A80F7A98-C02F-4A85-B13F-DCDF70035BDE"
                   id:
                     type: string
                     minLength: 1
@@ -315,12 +347,29 @@ paths:
                         type: string
                         minLength: 1
                         example: Atlas
-                  objects:
+                  versions:
                     type: array
                     items:
-                      anyOf:
-                        - $ref: "#/components/schemas/Collectible"
-                        - $ref: "#/components/schemas/Obstacle"
+                      type: object
+                      properties:
+                        self:
+                          type: string
+                          minLength: 1
+                          example: https://<<API URL>>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE/1
+                        id:
+                          type: integer
+                          minimum: 1
+                          example: 1
+                        difficulty:
+                          type: integer
+                          minimum: 1
+                          maximum: 20
+                        objects:
+                          type: array
+                          items:
+                            anyOf:
+                              - $ref: "#/components/schemas/Collectible"
+                              - $ref: "#/components/schemas/Obstacle"
         403:
           description: User must be level author or admin.
         404:
@@ -356,14 +405,27 @@ paths:
                   items:
                     type: string
                     minLength: 1
-                    example: https://<API URL>/artists/5E7798E6-9A48-44AC-A672-F8B853AF70CA
+                    example: 5E7798E6-9A48-44AC-A672-F8B853AF70CA
                   minLength: 0
-                objects:
+                versions:
                   type: array
                   items:
-                    anyOf:
-                      - $ref: "#/components/schemas/Collectible"
-                      - $ref: "#/components/schemas/Obstacle"
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        minimum: 1
+                        example: 1
+                      difficulty:
+                        type: integer
+                        minimum: 1
+                        maximum: 20
+                      objects:
+                        type: array
+                        items:
+                          anyOf:
+                            - $ref: "#/components/schemas/Collectible"
+                            - $ref: "#/components/schemas/Obstacle"
                 audioLinks:
                   type: array
                   items:
@@ -401,6 +463,48 @@ paths:
           description: Level not found.
         451:
           description: Audio links to domains on block list not allowed.
+  /levels/{levelId}/{versionId}:
+    get:
+      description: Get a level version by level and version id
+      parameters:
+        - in: path
+          name: levelId
+          schema:
+            type: string
+          required: true
+          description: UUID of the level
+        - in: path
+          name: versionId
+          schema:
+            type: integer
+          required: true
+          description: ID of the level
+      responses:
+        200:
+          description: Level
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  self:
+                    type: string
+                    minLength: 1
+                    example: "https://<<API URL>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE"
+                  id:
+                    type: integer
+                    minimum: 1
+                    example: 1
+                  difficulty:
+                    type: integer
+                    minimum: 1
+                    maximum: 20
+                  objects:
+                    type: array
+                    items:
+                      anyOf:
+                        - $ref: "#/components/schemas/Collectible"
+                        - $ref: "#/components/schemas/Obstacle"
 components:
   schemas:
     Vector3D:
