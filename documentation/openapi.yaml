@@ -209,6 +209,12 @@ paths:
                               type: string
                               minLength: 1
                               example: Atlas
+                        audioLinks:
+                          type: array
+                          items:
+                            description: Link to a music shop for buying the audio file. Domain may not be on block list.
+                            type: string
+                            minLength: 1
     post:
       description: Upload a new level
       requestBody:
@@ -370,6 +376,12 @@ paths:
                             anyOf:
                               - $ref: "#/components/schemas/Collectible"
                               - $ref: "#/components/schemas/Obstacle"
+                  audioLinks:
+                    type: array
+                    items:
+                      description: Link to a music shop for buying the audio file. Domain may not be on block list.
+                      type: string
+                      minLength: 1
         403:
           description: User must be level author or admin.
         404:
@@ -478,10 +490,10 @@ paths:
           schema:
             type: integer
           required: true
-          description: ID of the level
+          description: ID of the version
       responses:
         200:
-          description: Level
+          description: Level Version
           content:
             application/json:
               schema:
