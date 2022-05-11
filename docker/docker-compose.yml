@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile
+    ports:
+      - "443:443"
+  mongo:
+    image: "mongo:5.0.8-focal"
+    restart: always
+    volumes:
+      - ~/dbdata:/data/db
+volumes:
+  mongodata:
+
+
