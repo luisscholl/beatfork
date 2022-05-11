@@ -30,19 +30,19 @@ paths:
             maximum: 2000
             default: 20
         - name: title
-          description: Fuzzy search for levels by title.
+          description: Search for levels by title.
           in: query
           schema:
             type: string
             minLength: 1
         - name: author
-          description: Fuzzy search for levels by author.
+          description: Search for levels by author.
           in: query
           schema:
             type: string
             minLength: 1
         - name: artist
-          description: Fuzzy search for levels by artist.
+          description: Search for levels by artist.
           in: query
           schema:
             type: string
