@@ -105,6 +105,7 @@ paths:
             - length
             - personalBest
             - alphabetical
+            default: rating
         - name: direction
           description: In which direction the levels are ordered
           in: query
@@ -113,6 +114,8 @@ paths:
             enum:
             - ascending
             - descending
+            default:
+              ascending
       responses:
         200:
           description: Levels
@@ -273,6 +276,12 @@ paths:
                     description: Link to a music shop for buying the audio file. Domain may not be on block list.
                     type: string
                     minLength: 1
+              required:
+              - title
+              - bpm
+              - length
+              - published
+              - versions
       responses:
         200:
           description: Ok
