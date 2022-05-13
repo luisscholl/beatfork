@@ -144,10 +144,6 @@ paths:
                     items:
                       type: object
                       properties:
-                        self:
-                          type: string
-                          minLength: 1
-                          example: https://<<API URL>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE
                         id:
                           type: string
                           minLength: 1
@@ -171,10 +167,6 @@ paths:
                         versions:
                           type: object
                           properties:
-                            self:
-                              type: string
-                              minLength: 1
-                              example: https://<<API URL>>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE/1
                             difficulty:
                               type: integer
                               minimum: 1
@@ -188,10 +180,10 @@ paths:
                           items:
                             type: object
                             properties:
-                              self:
+                              id:
                                 type: string
                                 minLength: 1
-                                example: https://<API URL>/artists/5E7798E6-9A48-44AC-A672-F8B853AF70CA
+                                example: A80F7A98-C02F-4A85-B13F-DCDF70035BDE
                               name:
                                 type: string
                                 minLength: 1
@@ -204,10 +196,6 @@ paths:
                         author:
                           type: object
                           properties:
-                            self:
-                              type: string
-                              minLength: 1
-                              example: https://<API URL>/users/2005F616-F913-45E1-9540-E9646A67219C
                             id:
                               type: string
                               minLength: 1
@@ -249,7 +237,7 @@ paths:
                   items:
                     type: string
                     minLength: 1
-                    example: https://<API URL>/artists/5E7798E6-9A48-44AC-A672-F8B853AF70CA
+                    example: 5E7798E6-9A48-44AC-A672-F8B853AF70CA
                   minLength: 0
                 versions:
                   type: array
@@ -316,10 +304,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  self:
-                    type: string
-                    minLength: 1
-                    example: "https//<API URL>/A80F7A98-C02F-4A85-B13F-DCDF70035BDE"
                   id:
                     type: string
                     minLength: 1
@@ -344,10 +328,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        self:
+                        id:
                           type: string
                           minLength: 1
-                          example: https://<API URL>/artists/5E7798E6-9A48-44AC-A672-F8B853AF70CA
+                          example:  A80F7A98-C02F-4A85-B13F-DCDF70035BDE
                         name:
                           type: string
                           minLength: 1
@@ -360,10 +344,6 @@ paths:
                   author:
                     type: object
                     properties:
-                      self:
-                        type: string
-                        minLength: 1
-                        example: https://<API URL>/users/2005F616-F913-45E1-9540-E9646A67219C
                       id:
                         type: string
                         minLength: 1
@@ -377,10 +357,6 @@ paths:
                     items:
                       type: object
                       properties:
-                        self:
-                          type: string
-                          minLength: 1
-                          example: https://<<API URL>>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE/1
                         id:
                           type: integer
                           minimum: 1
@@ -521,10 +497,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  self:
-                    type: string
-                    minLength: 1
-                    example: "https://<<API URL>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE"
                   id:
                     type: integer
                     minimum: 1
