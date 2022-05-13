@@ -3,23 +3,29 @@ import ReactDOM from "react-dom";
 import "./index.scss";
 import { RecoilRoot } from "recoil";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "react-oidc-context";
 import App from "./components/App/App";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import reportWebVitals from "./reportWebVitals";
 import Credits from "./components/Credits/Credits";
 import CalibrationScene from "./components/CalibrationScene/CalibrationScene";
+import "@fontsource/ubuntu";
+import oidcConfig from "./config/config.json";
 
 ReactDOM.render(
   <React.StrictMode>
-    <RecoilRoot>
-      <Router>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/credits" element={<Credits />} />
-          <Route path="/calibration" element={<CalibrationScene />} />
-        </Routes>
-      </Router>
-    </RecoilRoot>
+    {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+    <AuthProvider {...(oidcConfig as any)}>
+      <RecoilRoot>
+        <Router>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/credits" element={<Credits />} />
+            <Route path="/calibration" element={<CalibrationScene />} />
+          </Routes>
+        </Router>
+      </RecoilRoot>
+    </AuthProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

@@ -1,0 +1,91 @@
+.LevelDifficulty {
+  & > div {
+    span {
+      display: inline-block;
+      background-color: rgb(51 50 52);
+      width: 1rem;
+      height: 1.5rem;
+      margin: 0.15rem;
+    }
+
+    .difficulty1 {
+      background-color: var(--difficulty-color-1);
+    }
+
+    .difficulty2 {
+      background-color: var(--difficulty-color-2);
+    }
+
+    .difficulty3 {
+      background-color: var(--difficulty-color-3);
+    }
+
+    .difficulty4 {
+      background-color: var(--difficulty-color-4);
+    }
+
+    .difficulty5 {
+      background-color: var(--difficulty-color-5);
+    }
+
+    .difficulty6 {
+      background-color: var(--difficulty-color-6);
+    }
+
+    .difficulty7 {
+      background-color: var(--difficulty-color-7);
+    }
+
+    .difficulty8 {
+      background-color: var(--difficulty-color-8);
+    }
+
+    .difficulty9 {
+      background-color: var(--difficulty-color-9);
+    }
+
+    .difficulty10 {
+      background-color: var(--difficulty-color-10);
+    }
+
+    .difficulty11 {
+      background-color: var(--difficulty-color-11);
+    }
+
+    .difficulty12 {
+      background-color: var(--difficulty-color-12);
+    }
+
+    .difficulty13 {
+      background-color: var(--difficulty-color-13);
+    }
+
+    .difficulty14 {
+      background-color: var(--difficulty-color-14);
+    }
+
+    .difficulty15 {
+      background-color: var(--difficulty-color-15);
+    }
+
+    .difficulty16 {
+      background-color: var(--difficulty-color-16);
+    }
+
+    .difficulty17 {
+      background-color: var(--difficulty-color-17);
+    }
+
+    .difficulty18 {
+      background-color: var(--difficulty-color-18);
+    }
+
+    .difficulty19 {
+      background-color: var(--difficulty-color-19);
+    }
+
+    .difficulty20 {
+      background-color: var(--difficulty-color-20);
+    }
+  }
+}

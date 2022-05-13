@@ -6,6 +6,12 @@ import Editor from "../Editor/Editor";
 import "./App.scss";
 import { viewState } from "../../atoms/viewState";
 import Credits from "../Credits/Credits";
+import About from "../About/About";
+import MyLevels from "../MyLevels/MyLevels";
+import Browse from "../Browse/Browse";
+import Home from "../Home/Home";
+import Profile from "../Profile/Profile";
+import NavBar from "../NavBar/NavBar";
 
 const App = () => {
   const [view, setView] = useRecoilState(viewState);
@@ -30,11 +36,8 @@ const App = () => {
 
   return (
     <div className="App" data-testid="App">
-      <link
-        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-        rel="stylesheet"
-      />
-      {view.view === "main-menu" && (
+      <NavBar />
+      {/* view.view === "main-menu" && (
         // Note: We need the user to interact before with the page, because autoplay is disabled otherwise
         <div className="centered">
           <div className="title">BeatFork</div>
@@ -78,11 +81,16 @@ const App = () => {
             Credits
           </button>
         </div>
-      )}
+          ) */}
+      {view.view === "about" && <About />}
+      {view.view === "home" && <Browse />}
+      {view.view === "browse" && <Browse />}
+      {view.view === "my-levels" && <Browse />}
+      {view.view === "profile" && <Profile />}
       {view.view === "gameplay" && (
         <Gameplay level={view.level} debug={!!process.env.REACT_APP_DEBUG} />
       )}
-      {view.view === "level-select" && (
+      {/* view.view === "level-select" && (
         <div>
           <button
             type="button"
@@ -119,7 +127,7 @@ const App = () => {
             </button>
           </div>
         </div>
-      )}
+            ) */}
       {view.view === "level-editor" && <Editor />}
       {view.view === "options" && (
         <div>
@@ -127,7 +135,9 @@ const App = () => {
             type="button"
             className="back-button"
             onClick={() => {
-              setView({ view: "main-menu" });
+              setView({
+                view: "browse" /* todo: Return to where they were before going to options */,
+              });
             }}
           >
             BACK
@@ -154,7 +164,9 @@ const App = () => {
             type="button"
             className="menu-button"
             onClick={() => {
-              setView({ view: "main-menu" });
+              setView({
+                view: "browse" /* todo: return user to where they were before gameplay */,
+              });
             }}
           >
             Menu
@@ -183,7 +195,9 @@ const App = () => {
             type="button"
             className="menu-button"
             onClick={() => {
-              setView({ view: "main-menu" });
+              setView({
+                view: "browse" /* todo: return user to were they were before gameplay */,
+              });
             }}
           >
             Menu

@@ -45,6 +45,7 @@
         "caseSensitive": false
       }
     ],
+    "@typescript-eslint/no-empty-interface": "warn",
     "no-use-before-define": "off",
     "prettier/prettier": [
       "error",

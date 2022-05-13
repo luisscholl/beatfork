@@ -52,7 +52,9 @@ const Credits = () => {
           type="button"
           className="back-button"
           onClick={() => {
-            setView({ view: "main-menu" });
+            setView({
+              view: "browse" /* todo: return to where user was before they navigated to credits */,
+            });
           }}
         >
           BACK

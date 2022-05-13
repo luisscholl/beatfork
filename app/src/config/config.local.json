@@ -1,0 +1,9 @@
+{
+  "authority": "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_6DDUa0u27",
+  "client_id": "7rmn70095hfblmhfrllcbrunke",
+  "redirect_uri": "http://localhost:4200",
+  "revokeTokenTypes": [
+    "refresh_token"
+  ],
+  "automaticSilentRenew": false
+}

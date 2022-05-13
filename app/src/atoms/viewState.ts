@@ -1,16 +1,17 @@
 /* eslint-disable prettier/prettier */
 import { atom } from "recoil";
 import Level from "../models/Level";
+import LevelPartial from "../models/LevelPartial";
 
 export const viewState = atom({
   key: "view",
   default: {
-    view: "main-menu",
+    view: "browse",
   } as
     | {
       view:
-      | "main-menu"
-      | "level-select"
+      | "about"
+      | "profile"
       | "level-editor"
       | "options"
       | "credits"
@@ -22,5 +23,12 @@ export const viewState = atom({
       view: "level-completed";
       score: number;
       level: Level;
+    }
+    | {
+      view:
+      | "home"
+      | "browse"
+      | "my-levels";
+      level?: LevelPartial | Level
     },
 });

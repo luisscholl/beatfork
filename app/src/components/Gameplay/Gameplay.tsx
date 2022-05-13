@@ -270,7 +270,7 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
 
   const collectibles: Array<Collectible & { pristine: boolean }> =
     useMemo(() => {
-      return level.objects
+      return level.versions[0].objects
         .filter((e: Collectible | Obstacle) => e.type === "Collectible")
         .map((e) => {
           return {
@@ -280,7 +280,7 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
         }) as Array<Collectible & { pristine: boolean }>;
     }, [level]);
   const obstacles: Array<Obstacle & { pristine: boolean }> = useMemo(() => {
-    return level.objects
+    return level.versions[0].objects
       .filter((e: Collectible | Obstacle) => e.type === "Obstacle")
       .map((e) => {
         return {
@@ -299,20 +299,23 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
     Array<ReactElement<any>>
   >([]);
   useEffect(() => {
-    if (level.objects[0].type === "Obstacle") {
+    if (level.versions[0].objects[0].type === "Obstacle") {
       clippedObjectsThree.current.push(
         <GameplayObstacle
           key={0}
           position={{
-            x: level.objects[0].position.x,
-            y: level.objects[0].position.y,
-            z: -level.objects[0].position.z * settings.gamePlaytimeScaleFactor,
+            x: level.versions[0].objects[0].position.x,
+            y: level.versions[0].objects[0].position.y,
+            z:
+              -level.versions[0].objects[0].position.z *
+              settings.gamePlaytimeScaleFactor,
           }}
           dimensions={{
-            x: level.objects[0].dimensions.x,
-            y: level.objects[0].dimensions.y,
+            x: level.versions[0].objects[0].dimensions.x,
+            y: level.versions[0].objects[0].dimensions.y,
             z:
-              -level.objects[0].dimensions.z * settings.gamePlaytimeScaleFactor,
+              -level.versions[0].objects[0].dimensions.z *
+              settings.gamePlaytimeScaleFactor,
           }}
         />
       );

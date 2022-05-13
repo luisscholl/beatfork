@@ -1,0 +1,32 @@
+@use "../../styles/colors.scss";
+
+.NavBar {
+  background-color: var(--navbar-bg-color);
+  padding: 0.15rem 0 0.3rem;
+  display: flex;
+  justify-content: space-evenly;
+
+  button {
+    font-family: Ubuntu, sans-serif;
+    font-size: 2rem;
+    color: var(--navbar-text-color);
+    background-color: transparent;
+    border: none;
+    caret-color: transparent;
+
+    &::after {
+      content: "";
+      background-color: var(--navbar-text-color);
+      height: 0.1rem;
+      display: block;
+      width: 0;
+      margin-left: 50%;
+      transition: width 0.3s ease, margin-left 0.3s ease;
+    }
+
+    &.active::after {
+      width: 100%;
+      margin-left: 0;
+    }
+  }
+}
