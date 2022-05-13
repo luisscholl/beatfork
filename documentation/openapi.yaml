@@ -165,16 +165,18 @@ paths:
                         rating:
                           $ref: "#/components/schemas/Rating"
                         versions:
-                          type: object
-                          properties:
-                            difficulty:
-                              type: integer
-                              minimum: 1
-                              maximum: 20
-                            id:
-                              type: integer
-                              minimum: 1
-                              example: 1
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              difficulty:
+                                type: integer
+                                minimum: 1
+                                maximum: 20
+                              id:
+                                type: integer
+                                minimum: 1
+                                example: 1
                         artists:
                           type: array
                           items:
