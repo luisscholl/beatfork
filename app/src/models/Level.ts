@@ -3,7 +3,6 @@ import LevelVersion from "./LevelVersion";
 import User from "./User";
 
 export default interface Level {
-  self: string;
   id: string;
   title: string;
   bpm: number; // bpm is insufficient

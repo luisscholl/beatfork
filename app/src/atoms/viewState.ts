@@ -29,6 +29,7 @@ export const viewState = atom({
       | "home"
       | "browse"
       | "my-levels";
-      level?: LevelPartial | Level
+      level?: LevelPartial | Level;
+      version?: string;
     },
 });

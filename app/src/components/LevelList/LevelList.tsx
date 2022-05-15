@@ -22,7 +22,6 @@ const LevelList = () => {
     setLevels((old) => [
       ...old,
       {
-        self: "test",
         id: generateUUID(),
         title: `${view.view} ${Math.random()}`,
         published: true,
@@ -30,36 +29,30 @@ const LevelList = () => {
         bpm: 120,
         artists: [
           {
-            self: "test",
             id: "test",
             name: "Dj Test",
             website: "www.test.de",
           },
         ],
         author: {
-          self: "test",
           id: "test",
           username: "Max Mustermann",
         },
         versions: [
           {
-            self: "test",
-            id: 1,
+            id: "1",
             difficulty: 1,
           },
           {
-            self: "test",
-            id: 2,
+            id: "2",
             difficulty: 20,
           },
           {
-            self: "test",
-            id: 3,
+            id: "3",
             difficulty: 13,
           },
           {
-            self: "test",
-            id: 4,
+            id: "4",
             difficulty: 7,
           },
         ],
