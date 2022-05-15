@@ -14,24 +14,16 @@ const LevelMeta = () => {
   return (
     <div className="LevelMeta" data-testid="LevelMeta">
       <h2>{_level.title}</h2>
-      <h3>
-        <span>
-          Artist<small>(s)</small>
-        </span>
+      <div className="table">
+        <span>Artist(s)</span>
         <span>{_level.artists.map((artist) => artist.name).join("\n")}</span>
-      </h3>
-      <h3>
-        <span>Author</span>
-        <span>{_level.author.username}</span>
-      </h3>
-      <h3>
         <span>BPM</span>
         <span>{_level.bpm}</span>
-      </h3>
-      <h3>
+        <span>Mapper</span>
+        <span>{_level.author.username}</span>
         <span>Length</span>
         <span>{`${Math.floor(_level.length / 60)}:${_level.length % 60}`}</span>
-      </h3>
+      </div>
     </div>
   );
 };
