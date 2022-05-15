@@ -1,6 +1,8 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useAuth } from "react-oidc-context";
 import { useRecoilState } from "recoil";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { viewState } from "../../atoms/viewState";
 import "./NavBar.scss";
 
@@ -41,12 +43,14 @@ const NavBar = () => {
       {auth.isLoading && <div>Loading...</div>}
       {auth.error && <div>Oops... {auth.error.message}</div>}
       {auth.isAuthenticated && (
-        <div>
-          Hello {auth.user?.profile.sub}{" "}
-          <button type="button" onClick={() => auth.removeUser()}>
-            Log out
-          </button>
-        </div>
+        <button
+          type="button"
+          className={view.view === "profile" ? "active" : ""}
+          onClick={() => setView({ view: "profile" })}
+        >
+          {auth.user?.profile["cognito:username"]}{" "}
+          <FontAwesomeIcon icon={faUser} />
+        </button>
       )}
       {auth.activeNavigator !== "signinSilent" &&
         auth.activeNavigator !== "signinRedirect" &&

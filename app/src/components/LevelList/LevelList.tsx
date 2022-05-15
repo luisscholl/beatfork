@@ -105,14 +105,20 @@ const LevelList = () => {
         type="button"
         key={key}
         style={style}
-        onClick={() =>
+        className={
+          ((view as any).level && (view as any).level.id) ===
+          (levels[index] && levels[index].id)
+            ? "active"
+            : "inactive"
+        }
+        onClick={(event) => {
           setView((old) => ({
             view: view.view as "home" | "browse" | "my-levels",
             level: levels[index],
-          }))
-        }
+          }));
+        }}
       >
-        {content}
+        <div>{content}</div>
       </button>
     );
   };
