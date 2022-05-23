@@ -3,7 +3,7 @@ import "./SearchBar.scss";
 
 const SearchBar = () => (
   <div className="SearchBar" data-testid="SearchBar">
-    SearchBar Component
+    <input type="text" placeholder="Search..." />
   </div>
 );
 

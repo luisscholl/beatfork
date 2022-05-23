@@ -1,6 +1,7 @@
 .Browse {
-  display: flex;
-  flex-grow: 1;
+  display: grid;
+  height: 100%;
+  grid-template-columns: 1fr 1fr 2fr;
 
   & > * {
     flex-grow: 1;

@@ -22,6 +22,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+*:focus-visible {
+  outline: 1px solid var(--outline-color);
+}
+
+button {
+  caret-color: transparent;
+}
+
 code {
   font-family:
     source-code-pro,
