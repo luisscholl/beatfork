@@ -1,13 +1,13 @@
 .Browse {
   display: flex;
-  height: 100%;
+  flex-grow: 1;
 
   & > * {
     flex-grow: 1;
-    height: 100%;
   }
 
-  & > :nth-child(2) {
+  & > :nth-child(2),
+  & > :nth-child(3) {
     display: flex;
     flex-direction: column;
   }

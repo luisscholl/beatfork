@@ -1,5 +1,9 @@
 .LevelActions {
   margin: 0.25rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
 
   button {
     width: calc(100% - 0.5rem);
@@ -10,11 +14,12 @@
     background-color: var(--level-actions-bg-color);
     color: var(--level-actions-text-color);
     caret-color: transparent;
+    cursor: grab;
 
     svg {
       margin-right: 0.5rem;
 
-      path: {
+      path {
         fill: var(--level-actions-text-color);
       }
     }
@@ -24,8 +29,26 @@
       color: var(--level-actions-play-text-color, --level-actions-text-color);
 
       svg {
-        path: {
+        path {
           fill: var(--level-actions-play-text-color);
+        }
+      }
+    }
+
+    &:hover {
+      background-color: var(--level-actions-hover-bg-color);
+      color: var(--level-actions-hover-text-color);
+
+      svg path {
+        fill: var(--level-actions-hover-text-color);
+      }
+
+      &.play {
+        background-color: var(--level-actions-hover-play-bg-color, --level-actions-hover-bg-color);
+        color: var(--level-actions-hover-play-text-color, --level-actions-hover-text-color);
+
+        svg path {
+          fill: var(--level-actions-hover-play-text-color);
         }
       }
     }

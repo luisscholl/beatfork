@@ -5,205 +5,258 @@
   grid-template-columns: max-content max-content max-content;
   background-color: var(--level-difficulty-bg-color);
   margin: 0.5rem;
+  margin-top: 0;
   padding: 0.5rem 0.75rem;
 
-  button {
-    border-radius: 0;
-    border: none;
-    background: transparent;
-    text-align: left;
-  }
+  .row-wrapper {
+    display: contents;
 
-  .number {
-    font-size: 1.5rem;
-    text-align: right;
-    padding-right: 0.5rem;
-    margin-top: -0.1rem;
-
-    &.difficulty1 {
-      color: var(--difficulty-color-1);
+    * {
+      cursor: grab;
     }
 
-    &.difficulty2 {
-      color: var(--difficulty-color-2);
+    button {
+      border-radius: 0;
+      border: none;
+      background: transparent;
+      text-align: left;
+      transition: 0.3s brightness ease, 0.05s transform ease;
+
+      span {
+        transition: 0.3s brightness ease, 0.05s transform ease;
+      }
     }
 
-    &.difficulty3 {
-      color: var(--difficulty-color-3);
-    }
-
-    &.difficulty4 {
-      color: var(--difficulty-color-4);
-    }
-
-    &.difficulty5 {
-      color: var(--difficulty-color-5);
-    }
-
-    &.difficulty6 {
-      color: var(--difficulty-color-6);
-    }
-
-    &.difficulty7 {
-      color: var(--difficulty-color-7);
-    }
-
-    &.difficulty8 {
-      color: var(--difficulty-color-8);
-    }
-
-    &.difficulty9 {
-      color: var(--difficulty-color-9);
-    }
-
-    &.difficulty10 {
-      color: var(--difficulty-color-10);
-    }
-
-    &.difficulty11 {
-      color: var(--difficulty-color-11);
-    }
-
-    &.difficulty12 {
-      color: var(--difficulty-color-12);
-    }
-
-    &.difficulty13 {
-      color: var(--difficulty-color-13);
-    }
-
-    &.difficulty14 {
-      color: var(--difficulty-color-14);
-    }
-
-    &.difficulty15 {
-      color: var(--difficulty-color-15);
-    }
-
-    &.difficulty16 {
-      color: var(--difficulty-color-16);
-    }
-
-    &.difficulty17 {
-      color: var(--difficulty-color-17);
-    }
-
-    &.difficulty18 {
-      color: var(--difficulty-color-18);
-    }
-
-    &.difficulty19 {
-      color: var(--difficulty-color-19);
-    }
-
-    &.difficulty20 {
-      color: var(--difficulty-color-20);
-    }
-  }
-
-  .boxes {
-    span {
-      display: inline-block;
-      background-color: var(--level-difficulty-empty-box-color);
-      width: 1rem;
-      height: 1.5rem;
-      margin: 0.15rem;
+    .number {
+      font-size: 1.5rem;
+      text-align: right;
+      padding-right: 0.5rem;
+      margin-top: -0.1rem;
 
       &.difficulty1 {
-        background-color: var(--difficulty-color-1);
+        color: var(--difficulty-color-1);
       }
 
       &.difficulty2 {
-        background-color: var(--difficulty-color-2);
+        color: var(--difficulty-color-2);
       }
 
       &.difficulty3 {
-        background-color: var(--difficulty-color-3);
+        color: var(--difficulty-color-3);
       }
 
       &.difficulty4 {
-        background-color: var(--difficulty-color-4);
+        color: var(--difficulty-color-4);
       }
 
       &.difficulty5 {
-        background-color: var(--difficulty-color-5);
+        color: var(--difficulty-color-5);
       }
 
       &.difficulty6 {
-        background-color: var(--difficulty-color-6);
+        color: var(--difficulty-color-6);
       }
 
       &.difficulty7 {
-        background-color: var(--difficulty-color-7);
+        color: var(--difficulty-color-7);
       }
 
       &.difficulty8 {
-        background-color: var(--difficulty-color-8);
+        color: var(--difficulty-color-8);
       }
 
       &.difficulty9 {
-        background-color: var(--difficulty-color-9);
+        color: var(--difficulty-color-9);
       }
 
       &.difficulty10 {
-        background-color: var(--difficulty-color-10);
+        color: var(--difficulty-color-10);
       }
 
       &.difficulty11 {
-        background-color: var(--difficulty-color-11);
+        color: var(--difficulty-color-11);
       }
 
       &.difficulty12 {
-        background-color: var(--difficulty-color-12);
+        color: var(--difficulty-color-12);
       }
 
       &.difficulty13 {
-        background-color: var(--difficulty-color-13);
+        color: var(--difficulty-color-13);
       }
 
       &.difficulty14 {
-        background-color: var(--difficulty-color-14);
+        color: var(--difficulty-color-14);
       }
 
       &.difficulty15 {
-        background-color: var(--difficulty-color-15);
+        color: var(--difficulty-color-15);
       }
 
       &.difficulty16 {
-        background-color: var(--difficulty-color-16);
+        color: var(--difficulty-color-16);
       }
 
       &.difficulty17 {
-        background-color: var(--difficulty-color-17);
+        color: var(--difficulty-color-17);
       }
 
       &.difficulty18 {
-        background-color: var(--difficulty-color-18);
+        color: var(--difficulty-color-18);
       }
 
       &.difficulty19 {
-        background-color: var(--difficulty-color-19);
+        color: var(--difficulty-color-19);
       }
 
       &.difficulty20 {
-        background-color: var(--difficulty-color-20);
+        color: var(--difficulty-color-20);
+      }
+    }
+
+    .boxes {
+      span {
+        display: inline-block;
+        background-color: var(--level-difficulty-empty-box-color);
+        width: 1rem;
+        height: 1.5rem;
+        margin: 0.15rem;
+
+        &.difficulty1 {
+          background-color: var(--difficulty-color-1);
+        }
+
+        &.difficulty2 {
+          background-color: var(--difficulty-color-2);
+        }
+
+        &.difficulty3 {
+          background-color: var(--difficulty-color-3);
+        }
+
+        &.difficulty4 {
+          background-color: var(--difficulty-color-4);
+        }
+
+        &.difficulty5 {
+          background-color: var(--difficulty-color-5);
+        }
+
+        &.difficulty6 {
+          background-color: var(--difficulty-color-6);
+        }
+
+        &.difficulty7 {
+          background-color: var(--difficulty-color-7);
+        }
+
+        &.difficulty8 {
+          background-color: var(--difficulty-color-8);
+        }
+
+        &.difficulty9 {
+          background-color: var(--difficulty-color-9);
+        }
+
+        &.difficulty10 {
+          background-color: var(--difficulty-color-10);
+        }
+
+        &.difficulty11 {
+          background-color: var(--difficulty-color-11);
+        }
+
+        &.difficulty12 {
+          background-color: var(--difficulty-color-12);
+        }
+
+        &.difficulty13 {
+          background-color: var(--difficulty-color-13);
+        }
+
+        &.difficulty14 {
+          background-color: var(--difficulty-color-14);
+        }
+
+        &.difficulty15 {
+          background-color: var(--difficulty-color-15);
+        }
+
+        &.difficulty16 {
+          background-color: var(--difficulty-color-16);
+        }
+
+        &.difficulty17 {
+          background-color: var(--difficulty-color-17);
+        }
+
+        &.difficulty18 {
+          background-color: var(--difficulty-color-18);
+        }
+
+        &.difficulty19 {
+          background-color: var(--difficulty-color-19);
+        }
+
+        &.difficulty20 {
+          background-color: var(--difficulty-color-20);
+        }
+      }
+    }
+
+    .icon-wrapper {
+      width: 2.5rem;
+      height: 2.5rem;
+      margin: -0.5rem 0 -0.5rem -0.5rem;
+      padding-top: 0.5rem;
+
+      svg {
+        display: none;
+        width: 100%;
+        height: 100%;
+
+        path {
+          transition: fill 0.3s ease;
+        }
+      }
+    }
+
+    &:hover {
+      & > button.number,
+      & > button > span:not(.grey) {
+        /* todo: Think about using explicit hover colors instead as brightness !== perceived brightness */
+        filter: brightness(1.2);
+        transform: translateY(-2px);
+      }
+
+      .icon-wrapper svg {
+        display: block;
+
+        path {
+          fill: var(--level-difficulty-hover-icon-color);
+        }
+      }
+    }
+
+    &.active {
+      .icon-wrapper svg {
+        display: block;
+
+        path {
+          fill: var(--level-difficulty-icon-color);
+        }
       }
     }
   }
 
-  .icon-wrapper {
-    width: 2.5rem;
-    height: 2.5rem;
-    margin: -0.5rem 0 -0.5rem -0.5rem;
-    padding-top: 0.5rem;
+  // Very experimental feature
+  &:has(.row-wrapper:hover) {
+    .row-wrapper.active svg path {
+      fill: transparent;
+    }
 
-    svg {
-      width: 100%;
-      height: 100%;
-
-      path {
-        fill: var(--level-difficulty-icon-color);
-      }
+    .row-wrapper.active:hover svg path {
+      fill: var(--level-difficulty-icon-color);
     }
   }
 }

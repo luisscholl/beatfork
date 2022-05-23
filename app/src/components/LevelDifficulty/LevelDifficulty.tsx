@@ -28,7 +28,12 @@ const LevelDifficulty = () => {
   return (
     <div className="LevelDifficulty" data-testid="LevelDifficulty">
       {_versions.map((version) => (
-        <>
+        <div
+          key={version.id}
+          className={`row-wrapper ${
+            (view as any).version === version.id ? "active" : ""
+          }`}
+        >
           <button
             type="button"
             onClick={() => setView({ ...view, version: version.id } as any)}
@@ -52,11 +57,9 @@ const LevelDifficulty = () => {
             ))}
           </button>
           <div className="icon-wrapper">
-            {(view as any).version === version.id && (
-              <FontAwesomeIcon icon={faCaretLeft} />
-            )}
+            <FontAwesomeIcon icon={faCaretLeft} />
           </div>
-        </>
+        </div>
       ))}
     </div>
   );
