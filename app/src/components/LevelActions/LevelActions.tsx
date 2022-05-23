@@ -1,5 +1,7 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useRecoilState } from "recoil";
+import { faEdit, faList, faPlay } from "@fortawesome/free-solid-svg-icons";
 import { viewState } from "../../atoms/viewState";
 import "./LevelActions.scss";
 
@@ -11,8 +13,14 @@ const LevelActions = () => {
   return (
     <div className="LevelActions" data-testid="LevelActions">
       <div className="columns">
-        <button type="button">Add to playlist</button>
-        <button type="button">Edit</button>
+        <button type="button">
+          <FontAwesomeIcon icon={faList} />
+          Add to playlist
+        </button>
+        <button type="button">
+          <FontAwesomeIcon icon={faEdit} />
+          Edit
+        </button>
       </div>
       <button
         type="button"
@@ -25,6 +33,7 @@ const LevelActions = () => {
           })
         }
       >
+        <FontAwesomeIcon icon={faPlay} />
         Play
       </button>
     </div>

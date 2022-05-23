@@ -11,9 +11,23 @@
     color: var(--level-actions-text-color);
     caret-color: transparent;
 
+    svg {
+      margin-right: 0.5rem;
+
+      path: {
+        fill: var(--level-actions-text-color);
+      }
+    }
+
     &.play {
       background-color: var(--level-actions-play-bg-color, --level-actions-bg-color);
       color: var(--level-actions-play-text-color, --level-actions-text-color);
+
+      svg {
+        path: {
+          fill: var(--level-actions-play-text-color);
+        }
+      }
     }
   }
 
