@@ -18,11 +18,13 @@ export const viewState = atom({
     } | {
       view: "gameplay" | "game-over";
       level: Level;
+      version: string;
     }
     | {
       view: "level-completed";
       score: number;
       level: Level;
+      version: string;
     }
     | {
       view:

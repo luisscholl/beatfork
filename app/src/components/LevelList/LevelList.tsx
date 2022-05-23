@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { generateUUID } from "three/src/math/MathUtils";
 import { AutoSizer, InfiniteLoader, List } from "react-virtualized";
@@ -14,6 +14,22 @@ const LevelList = () => {
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(true);
 
+  const hardCodedLevels = useRef<Level[]>([]);
+
+  useEffect(() => {
+    const levelPaths = [
+      // "/levels/Rolemusic - La la triororiro/La La Triororiro.json",
+      "/levels/Ryan Andersen - One and Only/One and Only.json",
+      // "/levels/Andy G. Cohen - Sprocket/Sprocket.json",
+    ];
+    const levelsData = levelPaths.map((path) =>
+      fetch(path).then((response) => response.json())
+    );
+    Promise.allSettled(levelsData).then((values) => {
+      hardCodedLevels.current = values.map((e) => (e as any).value) as any;
+    });
+  }, []);
+
   const scrollParentRef = useRef(null);
 
   const loadNextPage = async () => {
@@ -21,44 +37,49 @@ const LevelList = () => {
     setIsNextPageLoading(true);
     setLevels((old) => [
       ...old,
-      {
-        id: generateUUID(),
-        title: `${view.view} ${Math.random()}`,
-        published: true,
-        rating: 0.7,
-        bpm: 120,
-        artists: [
-          {
-            id: "test",
-            name: "Dj Test",
-            website: "www.test.de",
+      hardCodedLevels.current.length > 0 && hardCodedLevels.current[0].id
+        ? {
+            ...hardCodedLevels.current[0],
+            id: generateUUID(),
+          }
+        : {
+            id: generateUUID(),
+            title: `${view.view} ${Math.random()}`,
+            published: true,
+            rating: 0.7,
+            bpm: 120,
+            artists: [
+              {
+                id: "test",
+                name: "Dj Test",
+                website: "www.test.de",
+              },
+            ],
+            author: {
+              id: "test",
+              username: "Max Mustermann",
+            },
+            versions: [
+              {
+                id: "1",
+                difficulty: 1,
+              },
+              {
+                id: "2",
+                difficulty: 20,
+              },
+              {
+                id: "3",
+                difficulty: 13,
+              },
+              {
+                id: "4",
+                difficulty: 7,
+              },
+            ],
+            audio: "test",
+            length: 201,
           },
-        ],
-        author: {
-          id: "test",
-          username: "Max Mustermann",
-        },
-        versions: [
-          {
-            id: "1",
-            difficulty: 1,
-          },
-          {
-            id: "2",
-            difficulty: 20,
-          },
-          {
-            id: "3",
-            difficulty: 13,
-          },
-          {
-            id: "4",
-            difficulty: 7,
-          },
-        ],
-        audio: "test",
-        length: 201,
-      },
     ]);
     setIsNextPageLoading(false);
   };

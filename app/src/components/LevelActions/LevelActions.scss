@@ -1,1 +1,24 @@
-.LevelActions {}
+.LevelActions {
+  margin: 0.25rem;
+
+  button {
+    width: calc(100% - 0.5rem);
+    border: none;
+    margin: 0.25rem;
+    font-size: 1rem;
+    padding: 0.5rem;
+    background-color: var(--level-actions-bg-color);
+    color: var(--level-actions-text-color);
+    caret-color: transparent;
+
+    &.play {
+      background-color: var(--level-actions-play-bg-color, --level-actions-bg-color);
+      color: var(--level-actions-play-text-color, --level-actions-text-color);
+    }
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

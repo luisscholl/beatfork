@@ -5,11 +5,20 @@ import { faCaretLeft } from "@fortawesome/free-solid-svg-icons";
 import { viewState } from "../../atoms/viewState";
 import LevelVersionPartial from "../../models/LevelVersionPartial";
 import "./LevelDifficulty.scss";
+import Level from "../../models/Level";
+import LevelPartial from "../../models/LevelPartial";
 
 const LevelDifficulty = () => {
   const [view, setView] = useRecoilState(viewState);
 
   if (!(view as any).level) return null;
+  if (!(view as any).version)
+    setView((old) => {
+      return {
+        ...old,
+        version: ((view as any).level as LevelPartial | Level).versions[0].id,
+      };
+    });
 
   let _versions = JSON.parse(
     JSON.stringify((view as any).level.versions)

@@ -19,20 +19,20 @@ const App = () => {
   const [gameRunning, setGameRunning] = useState(true);
 
   const appWrapper = useRef<HTMLDivElement>();
-
-  useEffect(() => {
-    const levelPaths = [
-      "/levels/Rolemusic - La la triororiro/La La Triororiro.json",
-      "/levels/Ryan Andersen - One and Only/One and Only.json",
-      "/levels/Andy G. Cohen - Sprocket/Sprocket.json",
-    ];
-    const levelsData = levelPaths.map((path) =>
-      fetch(path).then((response) => response.json())
-    );
-    Promise.allSettled(levelsData).then((values) => {
-      setLevels(values.map((e) => (e as any).value) as any);
-    });
-  }, []);
+  //
+  //  useEffect(() => {
+  //    const levelPaths = [
+  //      "/levels/Rolemusic - La la triororiro/La La Triororiro.json",
+  //      "/levels/Ryan Andersen - One and Only/One and Only.json",
+  //      "/levels/Andy G. Cohen - Sprocket/Sprocket.json",
+  //    ];
+  //    const levelsData = levelPaths.map((path) =>
+  //      fetch(path).then((response) => response.json())
+  //    );
+  //    Promise.allSettled(levelsData).then((values) => {
+  //      setLevels(values.map((e) => (e as any).value) as any);
+  //    });
+  //  }, []);
 
   return (
     <div className="App" data-testid="App">
@@ -152,8 +152,12 @@ const App = () => {
             type="button"
             className="menu-button"
             onClick={() =>
-              setView((old) => {
-                return { view: "gameplay", level: (old as any).level };
+              setView((old: any) => {
+                return {
+                  view: "gameplay",
+                  level: old.level,
+                  version: old.version,
+                };
               })
             }
           >
@@ -183,8 +187,12 @@ const App = () => {
             type="button"
             className="menu-button"
             onClick={() => {
-              setView((old) => {
-                return { view: "gameplay", level: (old as any).level };
+              setView((old: any) => {
+                return {
+                  view: "gameplay",
+                  level: old.level,
+                  version: old.version,
+                };
               });
             }}
           >

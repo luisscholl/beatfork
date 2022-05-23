@@ -347,9 +347,9 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
     const musicEndedHandler = () => {
       setView((old: any) => {
         return {
+          ...old,
           view: "level-completed",
           score,
-          level: old.level,
         };
       });
     };
@@ -371,8 +371,8 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
     music.current.pause();
     setView((old: any) => {
       return {
+        ...old,
         view: "game-over",
-        level: old.level,
       };
     });
   }, [health]);
