@@ -1,1 +1,5 @@
-.SearchCriteria {}
+.SearchCriteria {
+  margin: 0.5rem;
+  background-color: var(--search-criteria-bg-color);
+  color: var(--search-criteria-text-color);
+}

@@ -33,5 +33,16 @@ export const viewState = atom({
       | "my-levels";
       level?: LevelPartial | Level;
       version?: string;
+      showPlaylists: boolean;
+      searchCriteria: {
+        minDifficulty: number;
+        maxDifficulty: number;
+        minLength: number;
+        maxLength: number;
+        minPersonalBest: number;
+        maxPersonalBest: number;
+        minRating: number;
+        maxRating: number;
+      }
     },
 });
