@@ -59,3 +59,9 @@ for linting in .scss files. With the extension stylelint will be run automatical
 ## Documentation
 
 Documentation, which does not naturally fit into a comment goes into the documentation folder.
+
+## COPYING
+
+All source files except files in the /app/src/vendors folder are licensed under the license in LICENSE.txt file. (We plan to remove the vendor folder in the future. We are currently waiting on this pull request being approved and the corresponding npm package being updated: https://github.com/developergovindgupta/multi-range-slider-react/pull/1)
+
+For running, building and deploying the project, further dependencies are installed using the installation script. We try to list all their licenses in the LICENSE-3RD-PARTY.txt. We try to maintain compatibility with the Apache 2.0 license for all our dependencies.

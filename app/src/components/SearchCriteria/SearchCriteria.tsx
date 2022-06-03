@@ -1,13 +1,38 @@
-import React from "react";
+import React, { useCallback } from "react";
 import "./SearchCriteria.scss";
-import MultiRangeSlider from "multi-range-slider-react";
 import { useRecoilState } from "recoil";
+import MultiRangeSlider from "../../vendor/components/MultiRangeSlider/MultiRangeSlider";
 import { viewState } from "../../atoms/viewState";
+import { searchCriteriaState } from "../../atoms/searchCriteriaState";
 
 const SearchCriteria = () => {
-  // todo: Extract search criteria state to own atom?
   const [view, setView] = useRecoilState(viewState);
-  console.log(view);
+  const [searchCriteria, setSearchCritera] =
+    useRecoilState(searchCriteriaState);
+
+  const wrapperFormatter = useCallback((val: number) => {
+    return <div>{val}</div>;
+  }, []);
+
+  const secondsMinutesFormatter = useCallback((seconds: number) => {
+    return `${Math.round(seconds / 60)}min`;
+  }, []);
+
+  const secondsMinutesAndSecondsFormatter = useCallback((seconds: number) => {
+    return (
+      <div>{`${Math.round(seconds / 60)}:${Math.round(seconds % 60)
+        .toString()
+        .padStart(2, "0")}`}</div>
+    );
+  }, []);
+
+  const percentageFormatter = useCallback((percentage: number) => {
+    return `${percentage}%`;
+  }, []);
+
+  const percentageWrapperFormatter = useCallback((percentage: number) => {
+    return <div>{`${percentage}%`}</div>;
+  }, []);
 
   return (
     <div className="SearchCriteria" data-testid="SearchCriteria">
@@ -17,17 +42,22 @@ const SearchCriteria = () => {
       <div className="row">
         Difficulty
         <MultiRangeSlider
-          minValue={0}
-          maxValue={0}
+          min={1}
+          max={20}
+          step={1}
+          ruler={false}
+          label
+          minValue={searchCriteria.minDifficulty}
+          maxValue={searchCriteria.maxDifficulty}
+          minValueFormatter={wrapperFormatter}
+          maxValueFormatter={wrapperFormatter}
           onChange={(e) =>
-            setView((old) => {
+            setSearchCritera((old) => {
               return {
                 ...old,
-                searchCriteria: {
-                  minDifficulty: e.minValue,
-                  maxDifficulty: e.maxValue,
-                },
-              } as any;
+                minDifficulty: e.minValue,
+                maxDifficulty: e.maxValue,
+              };
             })
           }
         />
@@ -35,17 +65,49 @@ const SearchCriteria = () => {
       <div className="row">
         Length
         <MultiRangeSlider
-          minValue={0}
-          maxValue={0}
+          min={0}
+          max={300}
+          step={1}
+          ruler={false}
+          label
+          minValue={searchCriteria.minLength}
+          maxValue={searchCriteria.maxLength}
+          minFormatter={secondsMinutesFormatter}
+          maxFormatter={secondsMinutesFormatter}
+          minValueFormatter={secondsMinutesAndSecondsFormatter}
+          maxValueFormatter={secondsMinutesAndSecondsFormatter}
           onChange={(e) =>
-            setView((old) => {
+            setSearchCritera((old) => {
               return {
                 ...old,
-                searchCriteria: {
-                  minLength: e.minValue,
-                  maxLength: e.maxValue,
-                },
-              } as any;
+                minLength: e.minValue,
+                maxLength: e.maxValue,
+              };
+            })
+          }
+        />
+      </div>
+      <div className="row">
+        Personal Best
+        <MultiRangeSlider
+          min={0}
+          max={100}
+          step={1}
+          ruler={false}
+          label
+          minValue={searchCriteria.minPersonalBest}
+          maxValue={searchCriteria.maxPersonalBest}
+          minFormatter={percentageFormatter}
+          maxFormatter={percentageFormatter}
+          minValueFormatter={percentageWrapperFormatter}
+          maxValueFormatter={percentageWrapperFormatter}
+          onChange={(e) =>
+            setSearchCritera((old) => {
+              return {
+                ...old,
+                minPersonalBest: e.minValue,
+                maxPersonalBest: e.maxValue,
+              };
             })
           }
         />
