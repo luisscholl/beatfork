@@ -21,7 +21,7 @@ paths:
             type: integer
             minimum: 1
             default: 1
-        - name: pagesize
+        - name: pageSize
           description: Indicates how many levels shall be returned. The upper limit for one page is 2000 levels.
           in: query
           schema:
@@ -105,6 +105,7 @@ paths:
             - length
             - personalBest
             - alphabetical
+            default: length
         - name: direction
           description: In which direction the levels are ordered
           in: query
@@ -113,6 +114,8 @@ paths:
             enum:
             - ascending
             - descending
+            default:
+              ascending
       responses:
         200:
           description: Levels
@@ -141,10 +144,6 @@ paths:
                     items:
                       type: object
                       properties:
-                        self:
-                          type: string
-                          minLength: 1
-                          example: https://<<API URL>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE
                         id:
                           type: string
                           minLength: 1
@@ -166,29 +165,27 @@ paths:
                         rating:
                           $ref: "#/components/schemas/Rating"
                         versions:
-                          type: object
-                          properties:
-                            self:
-                              type: string
-                              minLength: 1
-                              example: https://<<API URL>>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE/1
-                            difficulty:
-                              type: integer
-                              minimum: 1
-                              maximum: 20
-                            id:
-                              type: integer
-                              minimum: 1
-                              example: 1
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              difficulty:
+                                type: integer
+                                minimum: 1
+                                maximum: 20
+                              id:
+                                type: integer
+                                minimum: 1
+                                example: 1
                         artists:
                           type: array
                           items:
                             type: object
                             properties:
-                              self:
+                              id:
                                 type: string
                                 minLength: 1
-                                example: https://<API URL>/artists/5E7798E6-9A48-44AC-A672-F8B853AF70CA
+                                example: A80F7A98-C02F-4A85-B13F-DCDF70035BDE
                               name:
                                 type: string
                                 minLength: 1
@@ -201,10 +198,6 @@ paths:
                         author:
                           type: object
                           properties:
-                            self:
-                              type: string
-                              minLength: 1
-                              example: https://<API URL>/users/2005F616-F913-45E1-9540-E9646A67219C
                             id:
                               type: string
                               minLength: 1
@@ -246,7 +239,7 @@ paths:
                   items:
                     type: string
                     minLength: 1
-                    example: https://<API URL>/artists/5E7798E6-9A48-44AC-A672-F8B853AF70CA
+                    example: 5E7798E6-9A48-44AC-A672-F8B853AF70CA
                   minLength: 0
                 versions:
                   type: array
@@ -273,6 +266,12 @@ paths:
                     description: Link to a music shop for buying the audio file. Domain may not be on block list.
                     type: string
                     minLength: 1
+              required:
+              - title
+              - bpm
+              - length
+              - published
+              - versions
       responses:
         200:
           description: Ok
@@ -307,10 +306,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  self:
-                    type: string
-                    minLength: 1
-                    example: "https//<API URL>/A80F7A98-C02F-4A85-B13F-DCDF70035BDE"
                   id:
                     type: string
                     minLength: 1
@@ -335,10 +330,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        self:
+                        id:
                           type: string
                           minLength: 1
-                          example: https://<API URL>/artists/5E7798E6-9A48-44AC-A672-F8B853AF70CA
+                          example:  A80F7A98-C02F-4A85-B13F-DCDF70035BDE
                         name:
                           type: string
                           minLength: 1
@@ -351,10 +346,6 @@ paths:
                   author:
                     type: object
                     properties:
-                      self:
-                        type: string
-                        minLength: 1
-                        example: https://<API URL>/users/2005F616-F913-45E1-9540-E9646A67219C
                       id:
                         type: string
                         minLength: 1
@@ -368,10 +359,6 @@ paths:
                     items:
                       type: object
                       properties:
-                        self:
-                          type: string
-                          minLength: 1
-                          example: https://<<API URL>>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE/1
                         id:
                           type: integer
                           minimum: 1
@@ -512,10 +499,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  self:
-                    type: string
-                    minLength: 1
-                    example: "https://<<API URL>/levels/A80F7A98-C02F-4A85-B13F-DCDF70035BDE"
                   id:
                     type: integer
                     minimum: 1

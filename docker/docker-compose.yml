@@ -6,6 +6,10 @@ services:
       dockerfile: ../docker/Dockerfile
     ports:
       - "443:443"
+    environment:
+      USER_POOL_ID: $USER_POOL_ID
+      CLIENT_ID: $CLIENT_ID
+      MONGO_URI: $MONGO_URI
   mongo:
     image: "mongo:5.0.8-focal"
     restart: always
