@@ -115,6 +115,7 @@ const SearchCriteria = () => {
         <label
           htmlFor="show-playlists"
           className={searchCriteria.showPlaylists ? "checked" : ""}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         >
           <input
             type="checkbox"
@@ -126,9 +127,12 @@ const SearchCriteria = () => {
               });
             }}
           />
-          <FontAwesomeIcon
-            icon={searchCriteria.showPlaylists ? faCheckSquare : faSquare}
-          />
+          <FontAwesomeIcon icon={faSquare} />
+          {searchCriteria.showPlaylists && (
+            <span className="check">
+              <FontAwesomeIcon icon={faCheckSquare} />
+            </span>
+          )}
           Show Playlists
         </label>
       </div>

@@ -109,19 +109,31 @@
       color: var(--search-criteria-text-color);
 
       input[type="checkbox"] {
-        display: none;
+        margin: 0;
+        width: 1rem;
+        margin-right: -1rem;
+        z-index: 0;
+        position: relative;
+        transform: translateY(-0.05rem);
       }
 
       svg {
+        z-index: 1;
+        position: relative;
         margin-right: 0.5rem;
+        width: 1rem;
 
         path {
           fill: var(--search-criteria-checkbox-color);
         }
       }
 
-      &.checked svg path {
-        fill: var(--search-criteria-checkbox-checked-color);
+      &.checked span.check svg {
+        margin-left: -1.5rem;
+
+        path {
+          fill: var(--search-criteria-checkbox-checked-color);
+        }
       }
     }
   }
