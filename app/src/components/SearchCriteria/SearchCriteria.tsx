@@ -1,6 +1,8 @@
-import React, { useCallback } from "react";
+import React, { ChangeEvent, useCallback } from "react";
 import "./SearchCriteria.scss";
 import { useRecoilState } from "recoil";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheckSquare, faSquare } from "@fortawesome/free-solid-svg-icons";
 import MultiRangeSlider from "../../vendor/components/MultiRangeSlider/MultiRangeSlider";
 import { viewState } from "../../atoms/viewState";
 import { searchCriteriaState } from "../../atoms/searchCriteriaState";
@@ -36,9 +38,6 @@ const SearchCriteria = () => {
 
   return (
     <div className="SearchCriteria" data-testid="SearchCriteria">
-      <div className="row">
-        <input type="checkbox" /> Playlists
-      </div>
       <div className="row">
         Difficulty
         <MultiRangeSlider
@@ -111,6 +110,27 @@ const SearchCriteria = () => {
             })
           }
         />
+      </div>
+      <div className="row">
+        <label
+          htmlFor="show-playlists"
+          className={searchCriteria.showPlaylists ? "checked" : ""}
+        >
+          <input
+            type="checkbox"
+            id="show-playlists"
+            checked={searchCriteria.showPlaylists}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setSearchCritera((old) => {
+                return { ...old, showPlaylists: e.target.checked };
+              });
+            }}
+          />
+          <FontAwesomeIcon
+            icon={searchCriteria.showPlaylists ? faCheckSquare : faSquare}
+          />
+          Show Playlists
+        </label>
       </div>
     </div>
   );
