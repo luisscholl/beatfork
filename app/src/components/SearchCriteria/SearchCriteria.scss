@@ -30,6 +30,12 @@
         }
 
         .thumb {
+          z-index: 1;
+
+          &:hover {
+            z-index: 2;
+          }
+
           &::before {
             border: none;
             box-shadow: none;
@@ -62,6 +68,7 @@
               border-radius: 0.2rem;
               padding: 0.2rem 0.4rem;
               align-items: center;
+              z-index: 1;
 
               // todo: Add ability to set limits by double clicking and entering value
               // pointer-events: all;
