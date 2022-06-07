@@ -79,10 +79,10 @@ router.get('/', async (req, res, next) => {
         $regex: author,
         $options: 'i'
       },
-      'artists.name': {
+      ...(artist !== '' && {'artists.name': {
         $regex: artist,
         $options: 'i'
-      },
+      }}),
       length: {
         $gte: minLength,
         ...(maxLength > 0 && { $lte: maxLength })
