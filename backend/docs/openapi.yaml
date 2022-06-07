@@ -95,7 +95,7 @@ paths:
             minimum: 0
             maximum: 1
         - name: orderBy 
-          description: By what attribute the levels are ordered.
+          description: By what attribute the levels are ordered. If levels are sorted ascending by difficulty, they are sorted by their easiest version. If levels are sorted descending by difficulty, they are sorted by their most difficult version.
           in: query
           schema:
             type: string
@@ -104,10 +104,10 @@ paths:
             - difficulty
             - length
             - personalBest
-            - alphabetical
-            default: length
+            - title
+            default: title
         - name: direction
-          description: In which direction the levels are ordered
+          description: In which direction the levels are ordered.
           in: query
           schema:
             type: string

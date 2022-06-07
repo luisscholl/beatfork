@@ -57,7 +57,8 @@ router.get('/', async (req, res, next) => {
 
   const currentPage = req.query.hasOwnProperty('currentPage') ? req.query.currentPage : 1
   const pageSize = req.query.hasOwnProperty('pageSize') ? req.query.pageSize : 20
-  const orderBy = 'length' // no rating yet so use length in the meantime (also change in openapi.yaml)
+  // no rating or personalBest yet so use title as defailt in the meantime (also change in openapi.yaml)
+  const orderBy = req.query.hasOwnProperty('orderBy') && req.query.orderBy !== 'personalBest' && req.query.orderBy !== 'rating' ? req.query.orderBy : 'title'
   const direction = req.query.hasOwnProperty('direction') && req.query.direction === 'descending' ? -1 : 1
   const minDifficulty = req.query.hasOwnProperty('minDifficulty') ? req.query.minDifficulty : 1
   const maxDifficulty = req.query.hasOwnProperty('maxDifficulty') ? req.query.maxDifficulty : 20
@@ -70,91 +71,122 @@ router.get('/', async (req, res, next) => {
   const author = req.query.hasOwnProperty('author') ? req.query.author : ''
   const artist = req.query.hasOwnProperty('artist') ? req.query.artist : ''
 
-  const aggregationPipeline = [
-    {
-      $match: {
-        ...(title !== '' && { $text: { $search: title } }),
-        'author.username': {
-          $regex: author,
-          $options: 'i'
-        },
-        'artists.name': {
-          $regex: artist,
-          $options: 'i'
-        },
-        length: {
-          $gte: minLength,
-          ...(maxLength > 0 && { $lte: maxLength })
-        },
-        'versions.difficulty': {
-          $gte: minDifficulty,
-          $lte: maxDifficulty
-        }
-      }
-    },
-    {
-      $facet: {
-        statistics: [
-          {
-            $count: 'totalLevels'
-          },
-          {
-            $project: {
-              totalPages: {
-                $ceil: {
-                  $divide: [
-                    '$totalLevels',
-                    pageSize
-                  ]
-                }
-              },
-              _id: false,
-              currentPage: {
-                $literal: currentPage
-              },
-              pageSize: {
-                $literal: pageSize
-              }
-            }
-          }
-        ],
-        levels: [
-          {
-            $sort: {
-              [orderBy]: direction,
-              _id: 1 // we need to sort on at least one unique field for skip and limit
-            }
-          },
-          {
-            $skip: (currentPage - 1) * pageSize
-          },
-          {
-            $limit: pageSize
-          },
-          {
-            $unset: ['versions.objects', '_id']
-          }
-        ]
-      }
-    },
-    {
-      $project: {
-        statistics: {
-          $ifNull: [
-            {
-              $first: '$statistics'
-            },
-            {
-              totalPages: 0,
-              currentPage: currentPage,
-              pageSize: pageSize
-            }
-          ]
-        },
-        levels: true
+  const aggregationPipeline = [];
+  aggregationPipeline.push({
+    $match: {
+      ...(title !== '' && { $text: { $search: title } }),
+      'author.username': {
+        $regex: author,
+        $options: 'i'
+      },
+      'artists.name': {
+        $regex: artist,
+        $options: 'i'
+      },
+      length: {
+        $gte: minLength,
+        ...(maxLength > 0 && { $lte: maxLength })
+      },
+      'versions.difficulty': {
+        $gte: minDifficulty,
+        $lte: maxDifficulty
       }
     }
-  ]
+  })
+  if (orderBy === 'difficulty') {
+    if (direction === 1) {
+      aggregationPipeline.push({
+        $addFields: {
+          difficulty: {
+            $reduce: {
+              input: '$versions',
+              initialValue: 20,
+              in: { '$min': ['$$value', '$$this.difficulty'] }
+            }
+          }
+        }
+      })
+    } else {
+      aggregationPipeline.push({
+        $addFields: {
+          difficulty: {
+            $reduce: {
+              input: '$versions',
+              initialValue: 1,
+              in: { '$max': ['$$value', '$$this.difficulty'] }
+            }
+          }
+        }
+      })
+    }
+  }
+  aggregationPipeline.push({
+    $facet: {
+      statistics: [
+        {
+          $count: 'totalLevels'
+        },
+        {
+          $project: {
+            totalPages: {
+              $ceil: {
+                $divide: [
+                  '$totalLevels',
+                  pageSize
+                ]
+              }
+            },
+            _id: false,
+            currentPage: {
+              $literal: currentPage
+            },
+            pageSize: {
+              $literal: pageSize
+            }
+          }
+        }
+      ],
+      levels: [
+        {
+          $sort: {
+            [orderBy]: direction,
+            _id: 1 // we need to sort on at least one unique field for skip and limit
+          }
+        },
+        {
+          $skip: (currentPage - 1) * pageSize
+        },
+        {
+          $limit: pageSize
+        },
+        {
+          $project: {
+            'versions.objects': 0,
+            _id: 0,
+            ...(orderBy === 'difficulty' && { difficulty: 0 })
+          }
+        }
+      ]
+    }
+  })
+  aggregationPipeline.push({
+    $project: {
+      statistics: {
+        $ifNull: [
+          {
+            $first: '$statistics'
+          },
+          {
+            totalPages: 0,
+            currentPage: currentPage,
+            pageSize: pageSize
+          }
+        ]
+      },
+      levels: true
+    }
+  })
+
 
   const levels = await req.app.locals.db.collection('levels').aggregate(aggregationPipeline).toArray()
   res.json(levels[0])
