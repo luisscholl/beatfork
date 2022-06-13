@@ -8,10 +8,10 @@ describe("<EditorSideBarCollectible />", () => {
   test("it should mount", () => {
     render(<EditorSideBarCollectible type={CollectibleType.All} />);
 
-    const EditorSideBarCollectible = screen.getByTestId(
+    const editorSideBarCollectible = screen.getByTestId(
       "EditorSideBarCollectible"
     );
 
-    expect(EditorSideBarCollectible).toBeInTheDocument();
+    expect(editorSideBarCollectible).toBeInTheDocument();
   });
 });

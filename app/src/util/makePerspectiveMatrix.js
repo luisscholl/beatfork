@@ -1,4 +1,4 @@
-import multiplyMatrices from "./multiplyMatrices.js";
+import multiplyMatrices from "./multiplyMatrices";
 
 /**
  * This function returns the dot-product between two 3x3 matrices (flattened to 9x1)

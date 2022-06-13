@@ -88,7 +88,8 @@
     "jsx-a11y/media-has-caption": "off",
     "react/jsx-key": "warn",
     "jsx-a11y/click-events-have-key-events": "warn",
-    "jsx-a11y/no-static-element-interactions": "warn"
+    "jsx-a11y/no-static-element-interactions": "warn",
+    "no-prototype-builtins": "off"
   },
   "settings": {
     "import/resolver": {
@@ -104,6 +105,9 @@
           "src/"
         ]
       }
+    },
+    "react": {
+      "version": "17.0.2"
     }
   },
   "overrides": [

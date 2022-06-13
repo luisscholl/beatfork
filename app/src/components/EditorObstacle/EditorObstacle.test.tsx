@@ -7,8 +7,8 @@ describe("<EditorObstacle />", () => {
   test("it should mount", () => {
     render(<EditorObstacle />);
 
-    const EditorObstacle = screen.getByTestId("EditorObstacle");
+    const editorObstacle = screen.getByTestId("EditorObstacle");
 
-    expect(EditorObstacle).toBeInTheDocument();
+    expect(editorObstacle).toBeInTheDocument();
   });
 });
