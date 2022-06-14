@@ -473,8 +473,6 @@ paths:
           description: User must be level author or admin.
         404:
           description: Level not found.
-        451:
-          description: Audio links to domains on block list not allowed.
   /levels/{levelId}/{versionId}:
     get:
       description: Get a level version by level and version id
@@ -513,6 +511,8 @@ paths:
                       anyOf:
                         - $ref: "#/components/schemas/Collectible"
                         - $ref: "#/components/schemas/Obstacle"
+        403:
+          description: User must be level author or admin.
 components:
   schemas:
     Vector3D:
