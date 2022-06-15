@@ -5,10 +5,10 @@ import ProgressIndicator from "./ProgressIndicator";
 
 describe("<ProgressIndicator />", () => {
   test("it should mount", () => {
-    render(<ProgressIndicator />);
+    render(<ProgressIndicator max={100} />);
 
-    const ProgressIndicator = screen.getByTestId("ProgressIndicator");
+    const progressIndicator = screen.getByTestId("ProgressIndicator");
 
-    expect(ProgressIndicator).toBeInTheDocument();
+    expect(progressIndicator).toBeInTheDocument();
   });
 });

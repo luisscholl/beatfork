@@ -7,18 +7,28 @@ Its goal is to motivate people to do light exercise on a daily basis at a low co
 ## Setting Up a Development Environment
 
 1. Clone the repository
-2. Install Node.js v16.12.0
-3. Install Docker
-4. Start Docker Daemon
-5. ```npm install```
+2. Install Docker
+3. Start Docker
+4. Install Node.js v16.12.0
+5. ```cd app && npm install && npm i -g generate-react-cli```
 6. (optional) Install ESLint and Stylelint plugin for VS Code
 7. (optional) Install OpenAPI (Swagger) Editor plugin for VS Code
 
 ## Developing
 
-Start the development server to view the app:
+Start everything:
+
+1. (Windows) Start Docker Desktop
+2. `npm start`
+
+Start the development server to view the frontend:
 
 ```npm start```
+
+Start the backend server for development:
+
+1. (Windows) Start Docker Desktop
+2. ```cd backend && npm start```
 
 Start the storybook server for developing components in isolation:
 
@@ -36,11 +46,11 @@ REACT_APP_DEBUG=true
 
 ### Linting
 
-If you did not install the VS Code ESLint extensions, run from app
+If you did not install the VS Code ESLint extensions, run
 
-```cd app && npx eslint src/**/* --fix```
+```npx eslint . --fix --ext .js,.mjs,.jsx,.ts,.tsx```
 
-for linting in .ts and .tsx files. With the extension eslint will be run automatically on save.
+for linting in .js, .jsx, .ts and .tsx files. With the extension eslint will be run automatically on save.
 
 If you did not install the VS Code Stylelint extension, run from app
 

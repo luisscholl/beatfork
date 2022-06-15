@@ -1,0 +1,4 @@
+*.svg
+*.scss
+**/stories/**
+**/node_modules/
