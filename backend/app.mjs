@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 import { middleware } from "express-openapi-validator";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import cors from "cors";
-import { verifyJWT } from "./middleware/jwtVerifier.mjs";
+import verifyJWT from "./middleware/jwtVerifier.mjs";
 import levels from "./routers/levels.mjs";
 import "dotenv/config";
 
