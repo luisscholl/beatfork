@@ -88,12 +88,7 @@
     "@types/node": "^16.11.12",
     "@types/react": "^17.0.33",
     "@types/react-fontawesome": "^1.6.5",
-<<<<<<< HEAD
     "@types/react-virtualized": "^9.21.21",
-    "@typescript-eslint/eslint-plugin": "^5.2.0",
-    "@typescript-eslint/parser": "^5.2.0",
-=======
->>>>>>> backend-tooling
     "cpy-cli": "^4.1.0",
     "css-loader": "^5.2.6",
     "move-file-cli": "^3.0.0",
