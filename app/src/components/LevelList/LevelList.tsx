@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { generateUUID } from "three/src/math/MathUtils";
 import { AutoSizer, InfiniteLoader, List } from "react-virtualized";
+import { useAuth } from "react-oidc-context";
 import { viewState } from "../../atoms/viewState";
 import Level from "../../models/Level";
 import "./LevelList.scss";
@@ -9,79 +10,38 @@ import LevelListStories from "./LevelList.stories";
 import LevelPartial from "../../models/LevelPartial";
 
 const LevelList = () => {
+  const auth = useAuth();
   const [view, setView] = useRecoilState(viewState);
   const [levels, setLevels] = useState<LevelPartial[]>([]);
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(true);
 
-  const hardCodedLevels = useRef<Level[]>([]);
-
-  useEffect(() => {
-    const levelPaths = [
-      // "/levels/Rolemusic - La la triororiro/La La Triororiro.json",
-      "/levels/Ryan Andersen - One and Only/One and Only.json",
-      // "/levels/Andy G. Cohen - Sprocket/Sprocket.json",
-    ];
-    const levelsData = levelPaths.map((path) =>
-      fetch(path).then((response) => response.json())
-    );
-    Promise.allSettled(levelsData).then((values) => {
-      hardCodedLevels.current = values.map((e) => (e as any).value) as any;
-    });
-  }, []);
+  const lastPage = useRef<number>(0);
 
   const scrollParentRef = useRef(null);
 
   const loadNextPage = async () => {
-    if (isNextPageLoading) return;
     setIsNextPageLoading(true);
-    setLevels((old) => [
-      ...old,
-      hardCodedLevels.current.length > 0 && hardCodedLevels.current[0].id
-        ? {
-            ...hardCodedLevels.current[0],
-            id: generateUUID(),
-          }
-        : {
-            id: generateUUID(),
-            title: `${view.view} ${Math.random()}`,
-            published: true,
-            rating: 0.7,
-            bpm: 120,
-            artists: [
-              {
-                id: "test",
-                name: "Dj Test",
-                website: "www.test.de",
-              },
-            ],
-            author: {
-              id: "test",
-              username: "Max Mustermann",
-            },
-            versions: [
-              {
-                id: "1",
-                difficulty: 1,
-              },
-              {
-                id: "2",
-                difficulty: 20,
-              },
-              {
-                id: "3",
-                difficulty: 13,
-              },
-              {
-                id: "4",
-                difficulty: 7,
-              },
-            ],
-            audio: "test",
-            length: 201,
-          },
-    ]);
-    setIsNextPageLoading(false);
+    const token = auth.user?.id_token;
+    console.log(token);
+    console.log(auth);
+    lastPage.current += 1;
+    return fetch(
+      `${process.env.REACT_APP_API_URL}/levels?currentPage=${lastPage.current}`,
+      {
+        headers: {
+          ...(token ? { Authorization: `${token}` } : {}),
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((results) => {
+        setLevels((old) => [...old, ...results.levels]);
+        setIsNextPageLoading(false);
+        if (results.statistics.currentPage === results.statistics.totalPages) {
+          setHasNextPage(false);
+        }
+      });
   };
 
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
@@ -137,6 +97,48 @@ const LevelList = () => {
     );
   };
 
+  const test = () => {
+    const token = auth.user?.id_token;
+    return fetch(`${process.env.REACT_APP_API_URL}/levels`, {
+      headers: {
+        ...(token ? { Authorization: `${token}` } : {}),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: "One and Only",
+        bpm: 111,
+        length: 3,
+        published: true,
+        artistIds: ["A80F7A98-C02F-4A85-B13F-DCDF70035BDE"],
+        versions: [
+          {
+            id: 1,
+            difficulty: 1,
+            objects: [
+              {
+                type: "Collectible",
+                collectibleType: 1,
+                position: {
+                  x: 0.4041569099545159,
+                  y: 0.26385379945425225,
+                  z: 5.818181818181818,
+                },
+                measure: 0,
+                beat: 0,
+              },
+            ],
+          },
+        ],
+        audioLinks: ["string"],
+      }),
+      method: "POST",
+    })
+      .then((response) => response.json())
+      .then((results) => {
+        console.log(results);
+      });
+  };
+
   return (
     <div
       className="LevelList"
@@ -145,6 +147,9 @@ const LevelList = () => {
         scrollParentRef.current = ref;
       }}
     >
+      <button type="button" onClick={test} style={{ color: "white" }}>
+        Test
+      </button>
       <InfiniteLoader
         isRowLoaded={isRowLoaded}
         loadMoreRows={loadMoreRows as any}

@@ -18,6 +18,9 @@ const jwtVerifier = CognitoJwtVerifier.create({
   tokenUse: "id",
   clientId: process.env.CLIENT_ID,
 });
+console.log("----");
+console.log(jwtVerifier);
+console.log("----");
 
 app.use(cors());
 app.use(json());

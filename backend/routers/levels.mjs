@@ -9,6 +9,15 @@ const artists = {
     name: "Ryan Anderson",
     website: "https://www.ryanandersenmusic.com",
   },
+  "B80F7A98-C02F-4A85-B13F-DCDF70035BDE": {
+    id: "B80F7A98-C02F-4A85-B13F-DCDF70035BDE",
+    name: "Andy G. Cohen",
+    website: "https://www.youtube.com/channel/UCJJBHPNXpLBcOPb5qFpy4wA",
+  },
+  "C80F7A98-C02F-4A85-B13F-DCDF70035BDE": {
+    id: "C80F7A98-C02F-4A85-B13F-DCDF70035BDE",
+    name: "Fast Ballerz",
+  },
 };
 
 // Helpers used by multiple methods
