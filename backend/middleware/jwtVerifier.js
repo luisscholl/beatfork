@@ -10,7 +10,6 @@ const verifyJWT = async function (req, res, next) {
     req.app.locals.authorized = false;
     console.log("user couldn't be authenticated: " + err)
   }
-  delete req.app.locals.jwtVerifier
   next()
 }
 
