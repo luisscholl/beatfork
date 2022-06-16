@@ -4,13 +4,13 @@ const verifyJWT = async function (req, res, next) {
     const payload = await req.app.locals.jwtVerifier.verify(
       req.header("authorization")
     );
-    req.app.locals.authorized = true;
-    req.app.locals.username = "";
-    req.app.locals.username = payload["cognito:username"];
-    req.app.locals.userId = payload.sub;
+    res.app.locals.authenticated = true;
+    res.app.locals.username = "";
+    res.app.locals.username = payload["cognito:username"];
+    res.app.locals.userId = payload.sub;
     console.log(`user is ${req.app.locals.username}`);
   } catch (err) {
-    req.app.locals.authorized = false;
+    res.app.locals.authenticated = false;
     console.log(`user couldn't be authenticated: ${err}`);
   }
   next();

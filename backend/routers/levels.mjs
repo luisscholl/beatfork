@@ -24,7 +24,7 @@ const artists = {
 
 const checkAuthenticated = function (error) {
   return async (req, res, next) => {
-    if (!req.app.locals.authenticated) {
+    if (!res.app.locals.authenticated) {
       const notAuthenticated = new Error();
       notAuthenticated.status = 401;
       notAuthenticated.errors = error;
@@ -40,7 +40,7 @@ const checkAuthenticated = function (error) {
 const checkNoDuplicateVersionIds = function (error) {
   return async (req, res, next) => {
     const versionIds = {};
-    for (version of req.body.versions) {
+    for (const version of req.body.versions) {
       if (versionIds.hasOwnProperty(version.id)) {
         const duplicateVersionId = new Error();
         duplicateVersionId.status = 400;
@@ -59,7 +59,7 @@ const checkNoDuplicateVersionIds = function (error) {
 const setArtists = function () {
   return async (req, res, next) => {
     req.body.artists = [];
-    for (artistId of req.body.artistIds) {
+    for (const artistId of req.body.artistIds) {
       if (artists.hasOwnProperty(artistId)) {
         req.body.artists.push(artists[artistId]);
       } else {
@@ -79,8 +79,8 @@ const setArtists = function () {
 const setAuthor = function () {
   return async (req, res, next) => {
     req.body.author = {
-      id: req.app.locals.userId,
-      username: req.app.locals.username,
+      id: res.app.locals.userId,
+      username: res.app.locals.username,
     };
     next();
   };
@@ -109,7 +109,7 @@ const checkAuthorized = function (error, message) {
       levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
       return next(levelNotFound);
     }
-    if (oldLevel.author.id !== req.app.locals.userId) {
+    if (oldLevel.author.id !== res.app.locals.userId) {
       const userNotAuthorized = new Error();
       userNotAuthorized.status = 403;
       userNotAuthorized.errors = error;
@@ -199,9 +199,9 @@ router.get("/", async (req, res, next) => {
   aggregationPipeline.push({
     $match: {
       ...(title !== "" && { $text: { $search: title } }),
-      ...(!req.app.locals.authenticated && { published: true }),
-      ...(req.app.locals.authenticated && {
-        $or: [{ published: true }, { "author.id": req.app.locals.userId }],
+      ...(!res.app.locals.authenticated && { published: true }),
+      ...(res.app.locals.authenticated && {
+        $or: [{ published: true }, { "author.id": res.app.locals.userId }],
       }),
       "author.username": {
         $regex: author,
@@ -319,7 +319,7 @@ router.get("/", async (req, res, next) => {
     },
   });
 
-  const levels = await req.app.locals.db
+  const levels = await res.app.locals.db
     .collection("levels")
     .aggregate(aggregationPipeline)
     .toArray();
@@ -349,8 +349,8 @@ router.get("/:levelId", async (req, res, next) => {
   if (
     !(
       level.published ||
-      (req.app.locals.authenticated &&
-        req.app.locals.userId === level.author.id)
+      (res.app.locals.authenticated &&
+        res.app.locals.userId === level.author.id)
     )
   ) {
     const userNotAuthorized = new Error();
