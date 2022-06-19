@@ -11,7 +11,7 @@
     "build": "node scripts/generate-credits && cd app && npm run build",
     "deploy": "scp -r app/build/ licht:~/beatfork_play && ssh licht \"sudo rsync beatfork_play/ /var/www/html/beatfork/ -r --delete && rm -r beatfork_play\"",
     "bd": "npm run build && npm run deploy",
-    "api-doc-viewer": "redocly preview-docs documentation/openapi.yaml"
+    "api-doc-viewer": "redocly preview-docs backend/docs/openapi.yaml"
   },
   "repository": {
     "type": "git",
