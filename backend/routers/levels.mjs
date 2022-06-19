@@ -22,9 +22,9 @@ const artists = {
 
 // Helpers used by multiple methods
 
-const checkAuthenticated = function (error) {
+function checkAuthenticated(error) {
   return async (req, res, next) => {
-    if (!res.app.locals.authenticated) {
+    if (!res.locals.authenticated) {
       const notAuthenticated = new Error();
       notAuthenticated.status = 401;
       notAuthenticated.errors = error;
@@ -35,9 +35,9 @@ const checkAuthenticated = function (error) {
     next();
     return null;
   };
-};
+}
 
-const checkNoDuplicateVersionIds = function (error) {
+function checkNoDuplicateVersionIds() {
   return async (req, res, next) => {
     const versionIds = {};
     for (const version of req.body.versions) {
@@ -54,9 +54,9 @@ const checkNoDuplicateVersionIds = function (error) {
     next();
     return null;
   };
-};
+}
 
-const setArtists = function () {
+function setArtists() {
   return async (req, res, next) => {
     req.body.artists = [];
     for (const artistId of req.body.artistIds) {
@@ -74,19 +74,29 @@ const setArtists = function () {
     next();
     return null;
   };
-};
+}
 
-const setAuthor = function () {
+function setAuthor() {
   return async (req, res, next) => {
     req.body.author = {
-      id: res.app.locals.userId,
-      username: res.app.locals.username,
+      id: res.locals.userId,
+      username: res.locals.username,
     };
     next();
   };
-};
+}
 
-const checkAuthorized = function (error, message) {
+function keepAuthor() {
+  return async (req, res, next) => {
+    req.body.author = {
+      id: res.locals.authorId,
+      username: res.locals.authorName,
+    };
+    next();
+  };
+}
+
+function getAuthor() {
   return async (req, res, next) => {
     let query;
     try {
@@ -99,7 +109,7 @@ const checkAuthorized = function (error, message) {
       levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
       return next(levelNotFound);
     }
-    const oldLevel = await req.app.locals.db
+    const oldLevel = await res.app.locals.db
       .collection("levels")
       .findOne(query);
     if (!oldLevel) {
@@ -109,7 +119,20 @@ const checkAuthorized = function (error, message) {
       levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
       return next(levelNotFound);
     }
-    if (oldLevel.author.id !== res.app.locals.userId) {
+    res.locals.authorId = oldLevel.author.id;
+    res.locals.authorName = oldLevel.author.username;
+    next();
+    return null;
+  };
+}
+
+function checkAuthorized(error, message) {
+  return async (req, res, next) => {
+    if (res.locals.admin) {
+      next();
+      return null;
+    }
+    if (res.locals.authorId !== res.locals.userId) {
       const userNotAuthorized = new Error();
       userNotAuthorized.status = 403;
       userNotAuthorized.errors = error;
@@ -119,7 +142,7 @@ const checkAuthorized = function (error, message) {
     next();
     return null;
   };
-};
+}
 
 // TODO: only return unpublished levels to their autor
 
@@ -130,7 +153,7 @@ router.post(
   setArtists(),
   setAuthor(),
   async (req, res, next) => {
-    const result = await req.app.locals.db
+    const result = await res.app.locals.db
       .collection("levels")
       .insertOne(req.body);
     if (result.acknowledged) {
@@ -146,11 +169,9 @@ router.post(
   }
 );
 
-router.get("/", async (req, res, next) => {
+router.get("/", async (req, res) => {
   // create the index for text search on title if it doesn't exist already
-  const result = await req.app.locals.db
-    .collection("levels")
-    .createIndex({ title: "text" });
+  await res.app.locals.db.collection("levels").createIndex({ title: "text" });
 
   const currentPage = req.query.hasOwnProperty("currentPage")
     ? req.query.currentPage
@@ -182,6 +203,7 @@ router.get("/", async (req, res, next) => {
   const maxLength = req.query.hasOwnProperty("maxLength")
     ? req.query.maxLength
     : 0;
+  /*
   const minPersonalBest = req.query.hasOwnProperty("minPersonalBest")
     ? req.query.minPersonalBest
     : 0; // tracking of personal bests not implemented
@@ -191,6 +213,7 @@ router.get("/", async (req, res, next) => {
   const minRating = req.query.hasOwnProperty("minRating")
     ? req.query.minRating
     : 0; // tracking of ratings not implemented
+  */
   const title = req.query.hasOwnProperty("title") ? req.query.title : "";
   const author = req.query.hasOwnProperty("author") ? req.query.author : "";
   const artist = req.query.hasOwnProperty("artist") ? req.query.artist : "";
@@ -199,10 +222,11 @@ router.get("/", async (req, res, next) => {
   aggregationPipeline.push({
     $match: {
       ...(title !== "" && { $text: { $search: title } }),
-      ...(!res.app.locals.authenticated && { published: true }),
-      ...(res.app.locals.authenticated && {
-        $or: [{ published: true }, { "author.id": res.app.locals.userId }],
-      }),
+      ...(!res.locals.authenticated && { published: true }),
+      ...(res.locals.authenticated &&
+        !res.locals.admin && {
+          $or: [{ published: true }, { "author.id": res.locals.userId }],
+        }),
       "author.username": {
         $regex: author,
         $options: "i",
@@ -338,7 +362,7 @@ router.get("/:levelId", async (req, res, next) => {
     levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
     return next(levelNotFound);
   }
-  const level = await req.app.locals.db.collection("levels").findOne(query);
+  const level = await res.app.locals.db.collection("levels").findOne(query);
   if (!level) {
     const levelNotFound = new Error();
     levelNotFound.status = 404;
@@ -349,8 +373,9 @@ router.get("/:levelId", async (req, res, next) => {
   if (
     !(
       level.published ||
-      (res.app.locals.authenticated &&
-        res.app.locals.userId === level.author.id)
+      res.locals.admin(
+        res.locals.authenticated && res.locals.userId === level.author.id
+      )
     )
   ) {
     const userNotAuthorized = new Error();
@@ -372,11 +397,12 @@ router.put(
   checkAuthenticated("Levels can only be updated by authenticated users"),
   checkNoDuplicateVersionIds(),
   setArtists(),
-  setAuthor(),
+  getAuthor(),
   checkAuthorized(
     "Levels can only be updated by authorized users",
     "The given user isn't authorized to update this level"
   ),
+  keepAuthor(),
   async (req, res, next) => {
     let query;
     try {
@@ -389,7 +415,7 @@ router.put(
       levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
       return next(levelNotFound);
     }
-    const result = await req.app.locals.db
+    const result = await res.app.locals.db
       .collection("levels")
       .replaceOne(query, req.body);
     if (!result.acknowledged || !result.matchedCount === 1) {
@@ -406,6 +432,7 @@ router.put(
 
 router.delete(
   "/:levelId",
+  getAuthor(),
   checkAuthenticated("Levels can only be deleted by authenticated users"),
   checkAuthorized(
     "Levels can only be deleted by authorized users",
@@ -423,7 +450,7 @@ router.delete(
       levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
       return next(levelNotFound);
     }
-    const result = await req.app.locals.db
+    const result = await res.app.locals.db
       .collection("levels")
       .deleteOne(query);
     if (!result.acknowledged || !result.matchedCount === 1) {
@@ -474,7 +501,7 @@ router.get("/:levelId/:versionId", async (req, res, next) => {
       "author.id": true,
     },
   });
-  const levels = await req.app.locals.db
+  const levels = await res.app.locals.db
     .collection("levels")
     .aggregate(aggregationPipeline)
     .toArray();
@@ -489,8 +516,8 @@ router.get("/:levelId/:versionId", async (req, res, next) => {
   if (
     !(
       level.published ||
-      (req.app.locals.authenticated &&
-        req.app.locals.userId === level.author.id)
+      res.locals.admin ||
+      (res.locals.authenticated && res.locals.userId === level.author.id)
     )
   ) {
     const userNotAuthorized = new Error();

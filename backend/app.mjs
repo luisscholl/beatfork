@@ -9,19 +9,20 @@ import "dotenv/config";
 
 const app = express();
 
-const appPort = 443;
+const appPort = process.env.PORT;
 
 const mongoClient = new MongoClient(process.env.MONGO_URI);
 
 const jwtVerifier = CognitoJwtVerifier.create({
   userPoolId: process.env.USER_POOL_ID,
-  tokenUse: "id",
+  tokenUse: "access",
   clientId: process.env.CLIENT_ID,
 });
 console.log("----");
 console.log(jwtVerifier);
 console.log("----");
 
+app.disable("etag");
 app.use(cors());
 app.use(json());
 app.use(verifyJWT);
