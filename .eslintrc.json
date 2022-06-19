@@ -24,6 +24,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "no-continue": "off",
     "no-restricted-syntax": [
       "error",
       {

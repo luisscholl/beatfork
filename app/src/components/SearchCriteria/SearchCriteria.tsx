@@ -45,10 +45,26 @@ const SearchCriteria = () => {
       <div className="row">
         <label htmlFor="order-by">
           Order By
-          <select name="Order By" id="oder-by">
+          <select
+            name="Order By"
+            id="oder-by"
+            onChange={(e) =>
+              setSearchCritera((old) => {
+                return {
+                  ...old,
+                  orderBy: e.target.value as
+                    | "rating"
+                    | "difficulty"
+                    | "length"
+                    | "title"
+                    | "personalBest",
+                };
+              })
+            }
+          >
             <option value="rating">Rating</option>
             <option value="difficulty">Difficulty</option>
-            <option value="alphabetical">Alphabetical</option>
+            <option value="title">Alphabetical</option>
             <option value="length">Length</option>
             {auth.isAuthenticated && (
               <option value="personalBest">Personal Best</option>
@@ -56,7 +72,17 @@ const SearchCriteria = () => {
           </select>
         </label>
         <label htmlFor="order-direction">
-          <select name="order-direction">
+          <select
+            name="order-direction"
+            onChange={(e) =>
+              setSearchCritera((old) => {
+                return {
+                  ...old,
+                  direction: e.target.value as "ascending" | "descending",
+                };
+              })
+            }
+          >
             <option value="ascending">Ascending</option>
             <option value="descending">Descending</option>
           </select>

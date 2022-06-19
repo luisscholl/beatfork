@@ -14,7 +14,11 @@ export const searchCriteriaState = atom({
     minPersonalBest: 0,
     maxPersonalBest: 100,
     minRating: 0,
-    maxRating: 0
+    orderBy: "rating",
+    direction: "ascending",
+    title: "",
+    author: "",
+    artist: ""
   } as {
     showPlaylists: boolean;
     minDifficulty: number;
@@ -24,6 +28,10 @@ export const searchCriteriaState = atom({
     minPersonalBest: number;
     maxPersonalBest: number;
     minRating: number;
-    maxRating: number;
+    orderBy: "rating" | "difficulty" | "length" | "title" | "personalBest";
+    direction: "ascending" | "descending";
+    title: string;
+    author: string;
+    artist: string;
   }
 });
