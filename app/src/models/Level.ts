@@ -14,7 +14,7 @@ export default interface Level {
   artists: Artist[];
   author: User;
   versions: LevelVersion[];
-  audio: string; // URL
+  audioLinks: string[]; // URL
   length: number;
   // todo: styling?
   // todo: difficulty

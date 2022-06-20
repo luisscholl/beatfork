@@ -330,7 +330,6 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
   const landmarkDebugCanvas = useRef<
     typeof LandmarkDebugCanvas & { draw: (results: any) => void }
   >(null);
-  const [duration, setDuration] = useState<number>(1);
   const pointsByCollectible = 100;
   // Scoring Variables
   // todo: Determine whether it should be replaced with useRef -> Probably yes, because physics function is recreated on change
@@ -354,13 +353,10 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
       });
     };
     music.current.once("end", musicEndedHandler);
-    music.current.once("load", () => {
-      setDuration(music.current.duration());
-    });
     return () => {
       music.current.off();
     };
-  }, [level.id, level.audio, mediaPipeReady, score]);
+  }, [level.id, mediaPipeReady, score]);
 
   useEffect(() => {
     if (health > 0) return;
@@ -379,17 +375,22 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
 
   useEffect(() => {
     if (!mediaPipeReady) return null;
-    music.current = new Howl({ src: [level.audio] });
+    for (const audio of level.audioLinks) {
+      if (audio.startsWith("/")) {
+        music.current = new Howl({ src: audio });
+        break;
+      }
+    }
+    if (!music.current) alert("Audio could not be loaded."); // todo
     music.current.play();
     t0.current = 0;
     tLast.current = t0.current;
     animationFrameRequest.current = requestAnimationFrame(animate);
-    setDuration(music.current.duration());
     return () => {
       if (animationFrameRequest.current)
         cancelAnimationFrame(animationFrameRequest.current);
     };
-  }, [level.id, level.audio, mediaPipeReady]);
+  }, [level.id, mediaPipeReady]);
 
   useEffect(() => {
     physicsIntervalId.current = window.setInterval(physics, 1000 / 60);
@@ -582,7 +583,7 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
     <div className="Gameplay" data-testid="Gameplay" ref={gameplayWrapper}>
       <div className="UI">
         <div className="ProgressIndicator-wrapper">
-          <ProgressIndicator ref={progressIndicator} max={duration} />
+          <ProgressIndicator ref={progressIndicator} max={level.length} />
         </div>
         <div className="HealthBar-wrapper">
           <HealthBar current={health} max={100} />
