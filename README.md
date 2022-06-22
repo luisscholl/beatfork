@@ -72,6 +72,8 @@ Documentation, which does not naturally fit into a comment goes into the documen
 
 ## COPYING
 
-All source files except files in the /app/audio folder and the /app/src/vendors folder are licensed under the license in LICENSE.txt file. (We plan to remove the vendor folder in the future. We are currently waiting on this pull request being approved and the corresponding npm package being updated: https://github.com/developergovindgupta/multi-range-slider-react/pull/1) See LICENSE-SONGS.txt for a list of the used songs, their licenses and attribution to their authors.
+All source files except files in the /app/legal folder, the /app/audio folder and the /app/src/vendors folder are licensed under the Apache License, Version 2.0. The full text of the license may be found in the LICENSE.txt file. (We plan to remove the vendor folder in the future. We are currently waiting on this pull request being approved and the corresponding npm package being updated: https://github.com/developergovindgupta/multi-range-slider-react/pull/1) See LICENSE-SONGS.txt for a list of the used songs, their licenses and attribution to their authors.
+
+All files in the /app/legal folder are licensed under the Creative Commons Attribution-ShareAlike 4.0 International Public License.
 
 For running, building and deploying the project, further dependencies are installed using the installation script. We try to list all their licenses in the LICENSE-3RD-PARTY.txt. We try to maintain compatibility with the Apache 2.0 license for all our dependencies.
