@@ -15,7 +15,7 @@ export const searchCriteriaState = atom({
     maxPersonalBest: 100,
     minRating: 0,
     orderBy: "rating",
-    direction: "ascending",
+    direction: "descending",
     title: "",
     author: "",
     artist: ""

@@ -2,17 +2,110 @@ import React, { ChangeEvent, useCallback } from "react";
 import "./SearchCriteria.scss";
 import { useRecoilState } from "recoil";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckSquare, faSquare } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheckSquare,
+  faClock,
+  faDumbbell,
+  faFont,
+  faLongArrowAltDown,
+  faLongArrowAltUp,
+  faSortAlphaDown,
+  faSortAlphaUp,
+  faSquare,
+  faStar,
+  faTrophy,
+} from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "react-oidc-context";
+import Select from "react-select";
 import MultiRangeSlider from "../../vendor/components/MultiRangeSlider/MultiRangeSlider";
 import { viewState } from "../../atoms/viewState";
 import { searchCriteriaState } from "../../atoms/searchCriteriaState";
 
 const SearchCriteria = () => {
-  const [view, setView] = useRecoilState(viewState);
   const [searchCriteria, setSearchCritera] =
     useRecoilState(searchCriteriaState);
   const auth = useAuth();
+
+  const orderByOptions = [
+    {
+      value: "rating",
+      label: (
+        <>
+          <FontAwesomeIcon icon={faStar} />
+          <span>Rating</span>
+        </>
+      ),
+    },
+    {
+      value: "difficulty",
+      label: (
+        <>
+          <FontAwesomeIcon icon={faDumbbell} />
+          <span>Difficulty</span>
+        </>
+      ),
+    },
+    {
+      value: "title",
+      label: (
+        <>
+          <FontAwesomeIcon icon={faFont} />
+          <span>Alphabetical</span>
+        </>
+      ),
+    },
+    {
+      value: "length",
+      label: (
+        <>
+          <FontAwesomeIcon icon={faClock} />
+          <span>Length</span>
+        </>
+      ),
+    },
+    ...(auth.isAuthenticated
+      ? [
+          {
+            value: "personalBest",
+            label: (
+              <>
+                <FontAwesomeIcon icon={faTrophy} />
+                <span>Personal Best</span>
+              </>
+            ),
+          },
+        ]
+      : []),
+  ];
+
+  const directionOptions = [
+    {
+      value: "ascending",
+      label: (
+        <>
+          {searchCriteria.orderBy === "title" ? (
+            <FontAwesomeIcon icon={faSortAlphaUp} />
+          ) : (
+            <FontAwesomeIcon icon={faLongArrowAltUp} />
+          )}
+          <span>Ascending</span>
+        </>
+      ),
+    },
+    {
+      value: "descending",
+      label: (
+        <>
+          {searchCriteria.orderBy === "title" ? (
+            <FontAwesomeIcon icon={faSortAlphaDown} />
+          ) : (
+            <FontAwesomeIcon icon={faLongArrowAltDown} />
+          )}
+          <span>Descending</span>
+        </>
+      ),
+    },
+  ];
 
   const wrapperFormatter = useCallback((val: number) => {
     return <div>{val}</div>;
@@ -42,51 +135,49 @@ const SearchCriteria = () => {
 
   return (
     <div className="SearchCriteria" data-testid="SearchCriteria">
+      <div className="row">Order By</div>
       <div className="row">
-        <label htmlFor="order-by">
-          Order By
-          <select
-            name="Order By"
-            id="oder-by"
-            onChange={(e) =>
-              setSearchCritera((old) => {
-                return {
-                  ...old,
-                  orderBy: e.target.value as
-                    | "rating"
-                    | "difficulty"
-                    | "length"
-                    | "title"
-                    | "personalBest",
-                };
-              })
-            }
-          >
-            <option value="rating">Rating</option>
-            <option value="difficulty">Difficulty</option>
-            <option value="title">Alphabetical</option>
-            <option value="length">Length</option>
-            {auth.isAuthenticated && (
-              <option value="personalBest">Personal Best</option>
-            )}
-          </select>
-        </label>
-        <label htmlFor="order-direction">
-          <select
-            name="order-direction"
-            onChange={(e) =>
-              setSearchCritera((old) => {
-                return {
-                  ...old,
-                  direction: e.target.value as "ascending" | "descending",
-                };
-              })
-            }
-          >
-            <option value="ascending">Ascending</option>
-            <option value="descending">Descending</option>
-          </select>
-        </label>
+        <Select
+          value={
+            orderByOptions.filter(
+              (option) => searchCriteria.orderBy === option.value
+            )[0]
+          }
+          onChange={(selectedOption) =>
+            setSearchCritera((old) => {
+              return {
+                ...old,
+                orderBy: (selectedOption as any).value,
+                direction:
+                  (selectedOption as any).value === "rating"
+                    ? "descending"
+                    : "ascending",
+              };
+            })
+          }
+          options={orderByOptions}
+          controlShouldRenderValue
+          className="first react-select"
+          classNamePrefix="rs"
+        />
+      </div>
+      <div className="row">
+        <Select
+          value={
+            directionOptions.filter(
+              (option) => searchCriteria.direction === option.value
+            )[0]
+          }
+          onChange={(selectedOption) =>
+            setSearchCritera((old) => {
+              return { ...old, direction: (selectedOption as any).value };
+            })
+          }
+          options={directionOptions}
+          controlShouldRenderValue
+          className="second react-select"
+          classNamePrefix="rs"
+        />
       </div>
       <div className="row">
         Difficulty
@@ -168,7 +259,9 @@ const SearchCriteria = () => {
       <div className="row">
         <label
           htmlFor="show-playlists"
-          className={searchCriteria.showPlaylists ? "checked" : ""}
+          className={`checkbox${
+            searchCriteria.showPlaylists ? " checked" : ""
+          }`}
         >
           <input
             type="checkbox"

@@ -2,6 +2,7 @@
 
 .LevelList {
   flex-grow: 1;
+  margin: 0 0.5rem;
 
   button {
     border: none;
@@ -10,7 +11,6 @@
     background-color: transparent;
     font-size: 1rem;
     cursor: grab;
-    margin: 0 0.5rem;
     padding: 0;
 
     & > div {
