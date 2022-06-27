@@ -3,9 +3,21 @@ import { MongoClient } from "mongodb";
 import { middleware } from "express-openapi-validator";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import cors from "cors";
+import yaml from "js-yaml";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import verifyJWT from "./middleware/jwtVerifier.mjs";
 import levels from "./routers/levels.mjs";
 import "dotenv/config";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const apiSpecPath = path.join(__dirname, "docs/openapi.yaml");
+const workaroundApiSpecPath = path.join(
+  __dirname,
+  "docs/workaroundOpenapi.yaml"
+);
 
 const app = express();
 
@@ -26,9 +38,68 @@ app.disable("etag");
 app.use(cors());
 app.use(json());
 app.use(verifyJWT);
+
+// rewrite api spec to workaround problem with discerning collectibles and obstacles
+const apiSpec = yaml.load(fs.readFileSync(apiSpecPath, "utf8"));
+const workAroundGameObject = {
+  type: "object",
+  properties: {
+    dimensions: {
+      type: "object",
+      properties: {
+        x: {
+          type: "number",
+        },
+        y: {
+          type: "number",
+        },
+        z: {
+          type: "number",
+        },
+      },
+    },
+    collectibleType: {
+      type: "integer",
+      minimum: 1,
+      maximum: 9,
+    },
+    type: {
+      type: "string",
+      enum: ["Obstacle", "Collectible"],
+    },
+    position: {
+      type: "object",
+      properties: {
+        x: {
+          type: "number",
+        },
+        y: {
+          type: "number",
+        },
+        z: {
+          type: "number",
+        },
+      },
+    },
+    measure: {
+      type: "number",
+    },
+    beat: {
+      type: "number",
+    },
+  },
+};
+apiSpec.paths["/levels"].post.requestBody.content[
+  "application/json"
+].schema.properties.versions.items.properties.objects.items = workAroundGameObject;
+apiSpec.paths["/levels/{levelId}"].put.requestBody.content[
+  "application/json"
+].schema.properties.versions.items.properties.objects.items = workAroundGameObject;
+fs.writeFileSync(workaroundApiSpecPath, JSON.stringify(apiSpec));
+
 app.use(
   middleware({
-    apiSpec: "./docs/openapi.yaml",
+    apiSpec: workaroundApiSpecPath,
     validateRequests: {
       removeAdditional: "all",
     },

@@ -257,7 +257,7 @@ paths:
                       objects:
                         type: array
                         items:
-                          anyOf:
+                          oneOf:
                             - $ref: "#/components/schemas/Collectible"
                             - $ref: "#/components/schemas/Obstacle"
                 audioLinks:
@@ -370,7 +370,7 @@ paths:
                         objects:
                           type: array
                           items:
-                            anyOf:
+                            oneOf:
                               - $ref: "#/components/schemas/Collectible"
                               - $ref: "#/components/schemas/Obstacle"
                   audioLinks:
@@ -435,7 +435,7 @@ paths:
                       objects:
                         type: array
                         items:
-                          anyOf:
+                          oneOf:
                             - $ref: "#/components/schemas/Collectible"
                             - $ref: "#/components/schemas/Obstacle"
                 audioLinks:
@@ -508,7 +508,7 @@ paths:
                   objects:
                     type: array
                     items:
-                      anyOf:
+                      oneOf:
                         - $ref: "#/components/schemas/Collectible"
                         - $ref: "#/components/schemas/Obstacle"
         403:

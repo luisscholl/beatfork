@@ -56,6 +56,24 @@ function checkNoDuplicateVersionIds() {
   };
 }
 
+function removeAdditionalFromGameObjects() {
+  return async (req, res, next) => {
+    // because express-openapi-validator can't properly handle oneOf
+    // we need to remove additional properties from collectibles and obstacles manually
+    for (const version of req.body.versions) {
+      for (const object of version.objects) {
+        if (object.type === "Obstacle") {
+          delete object.collectibleType;
+        } else if (object.type === "Collectible") {
+          delete object.dimensions;
+        }
+      }
+    }
+    next();
+    return null;
+  };
+}
+
 function setArtists() {
   return async (req, res, next) => {
     req.body.artists = [];
@@ -150,6 +168,7 @@ router.post(
   "/",
   checkAuthenticated("Levels can only be created by authorized users"),
   checkNoDuplicateVersionIds(),
+  removeAdditionalFromGameObjects(),
   setArtists(),
   setAuthor(),
   async (req, res, next) => {
@@ -396,6 +415,7 @@ router.put(
   "/:levelId",
   checkAuthenticated("Levels can only be updated by authenticated users"),
   checkNoDuplicateVersionIds(),
+  removeAdditionalFromGameObjects(),
   setArtists(),
   getAuthor(),
   checkAuthorized(
