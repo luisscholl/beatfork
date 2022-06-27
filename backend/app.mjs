@@ -82,7 +82,7 @@ const workAroundGameObject = {
       },
     },
     measure: {
-      type: "number",
+      type: "integer",
     },
     beat: {
       type: "number",

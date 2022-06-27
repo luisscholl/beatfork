@@ -537,7 +537,7 @@ components:
         position: 
           $ref: "#/components/schemas/Vector3D"
         measure:
-          type: number
+          type: integer
         beat:
           type: number
     Obstacle:
