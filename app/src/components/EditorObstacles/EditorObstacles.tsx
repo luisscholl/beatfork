@@ -27,6 +27,7 @@ export interface EditorObstaclesRefAttributes {
   addObstacle(obstacle: Obstacle): void;
   moveTo(targets: number[], position: Vector3D): void;
   moveBy(targets: number[], distance: Vector3D): void;
+  copy(targets: number[]): void;
   remove(targets: number[]): void;
   export(): Obstacle[];
   configureSnap(
@@ -172,6 +173,18 @@ const EditorObstacles: ForwardRefExoticComponent<
         obstacles.current[target].position.z += distance.z;
       }
       meshRef.current.instanceMatrix.needsUpdate = true;
+    },
+
+    copy(targets: number[]): void {
+      for (const target of targets) {
+        _addObstacle({
+          type: "Obstacle",
+          dimensions: obstacles.current[target].dimensions,
+          position: obstacles.current[target].position,
+          measure: 0, // todo
+          beat: 0, // todo
+        });
+      }
     },
     // todo: Is this efficient enough?
     remove(targets: number[]): void {

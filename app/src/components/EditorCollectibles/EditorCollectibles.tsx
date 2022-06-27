@@ -25,8 +25,10 @@ import "./EditorCollectibles.scss";
 
 export interface EditorCollectiblesRefAttributes {
   addCollectible(collectible: Collectible): void;
+  addCollectible(collectible: Collectible): void;
   moveTo(targets: number[], position: Vector3D): void;
   moveBy(targets: number[], distance: Vector3D): void;
+  copy(targets: number[]): void;
   remove(targets: number[]): void;
   export(): Collectible[];
   configureSnap(
@@ -38,6 +40,7 @@ export interface EditorCollectiblesRefAttributes {
   select(targets: number[]): void;
   deselect(targets: number[]): void;
   getLastIndex(): number;
+  setSnappingxy(snapTo: 0.1 | 0.3 | 0.5): void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -48,6 +51,7 @@ export interface EditorCollectiblesProps {
     type: "collectibles" | "obstacles"
   ) => void;
   selected: MutableRefObject<number[]>;
+  snappingModulusxy: number;
 }
 
 const tempObject = new THREE.Object3D();
@@ -74,7 +78,13 @@ const EditorCollectibles: ForwardRefExoticComponent<
     Float32Array.from({ length: 1024 }).fill(0)
   );
   const snappingModulus = useRef<number>(undefined);
-  const snapBuffer = useRef<number>(0);
+  const snappingModulusxy = useRef<number>(0.2);
+
+  const snapBufferx = useRef<number>(0);
+  const snapBuffery = useRef<number>(0);
+  const snapBufferz = useRef<number>(0);
+
+  const snapBufferxyz = useRef<Vector3D>({ x: 0, y: 0, z: 0 });
 
   const _addCollectible = (
     collectible: Collectible,
@@ -142,12 +152,18 @@ const EditorCollectibles: ForwardRefExoticComponent<
       meshRef.current.instanceMatrix.needsUpdate = true;
     },
     moveBy(targets: number[], distance: Vector3D): void {
-      if (typeof snappingModulus.current !== "undefined") {
-        distance.z += snapBuffer.current;
-        const distanceRemainder = distance.z % snappingModulus.current;
-        distance.z -= distanceRemainder;
-        snapBuffer.current = distanceRemainder;
-      }
+      distance.x += snapBufferx.current;
+      distance.y += snapBuffery.current;
+      distance.z += snapBufferz.current;
+      const distanceRemainderx = distance.x % snappingModulusxy.current;
+      const distanceRemaindery = distance.y % snappingModulusxy.current;
+      const distanceRemainderz = distance.z % snappingModulusxy.current;
+      distance.x -= distanceRemainderx;
+      distance.y -= distanceRemaindery;
+      distance.z -= distanceRemainderz;
+      snapBufferx.current = distanceRemainderx;
+      snapBuffery.current = distanceRemaindery;
+      snapBufferz.current = distanceRemainderz;
 
       if (!distance.z && !distance.x && !distance.y) return;
 
@@ -167,6 +183,19 @@ const EditorCollectibles: ForwardRefExoticComponent<
         collectibles.current[target].position.z += distance.z;
       }
       meshRef.current.instanceMatrix.needsUpdate = true;
+    },
+
+    copy(targets: number[]): void {
+      for (const target of targets) {
+        const pos = collectibles.current[target].position;
+        _addCollectible({
+          type: "Collectible",
+          collectibleType: collectibles.current[target].collectibleType,
+          position: { x: pos.x, y: pos.y, z: pos.z },
+          measure: 0, // todo
+          beat: 0, // todo
+        });
+      }
     },
     // todo: Is this efficient enough?
     remove(targets: number[]): void {
@@ -268,6 +297,9 @@ const EditorCollectibles: ForwardRefExoticComponent<
     },
     getLastIndex(): number {
       return collectibles.current.length - 1;
+    },
+    setSnappingxy(snapTo: 0.1 | 0.3 | 0.5): void {
+      snappingModulusxy.current = snapTo;
     },
   }));
 
