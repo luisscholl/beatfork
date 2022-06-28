@@ -6,12 +6,18 @@ import {
   faCogs,
   faStop,
   faFolderOpen,
+  faAngry,
   faSave,
   faPlay,
   faPause,
   faTrash,
   faCaretUp,
   faCaretDown,
+  faCoffee,
+  faTable,
+  faBorderAll,
+  faMagnet,
+  faCopy,
 } from "@fortawesome/free-solid-svg-icons";
 import { DoubleSide, Mesh, Raycaster, Vector2 } from "three";
 import { generateUUID } from "three/src/math/MathUtils";
@@ -86,6 +92,14 @@ const Editor = () => {
   };
   const sideBarRef = useRef<HTMLDivElement>(null);
   const ground = useRef<{ animate: (t: number) => void }>(null);
+
+  const [snappingModulusxy, setSnappingModulusxy] = useState<0.1 | 0.3 | 0.5>(
+    0.3
+  );
+  // const snappingModulusxy = useState<number>(0.2);
+  const snapBufferx = useRef<number>(0);
+  const snapBuffery = useRef<number>(0);
+
   // Using just useRef would result in ground.current being undefined on the first frame.
   // Note that we don't need to useCallback for the other things rendered in animate as they are either non-existent on the first frame or already at their correct position.
   const groundCallback = useCallback((node) => {
@@ -352,6 +366,14 @@ const Editor = () => {
     corner: "upper-left" | "upper-right" | "lower-left" | "lower-right",
     reverseZ = false
   ) => {
+    distance.x += snapBufferx.current;
+    distance.y += snapBuffery.current;
+    const distanceRemainderx = distance.x % snappingModulusxy;
+    const distanceRemaindery = distance.y % snappingModulusxy;
+    distance.x -= distanceRemainderx;
+    distance.y -= distanceRemaindery;
+    snapBufferx.current = distanceRemainderx;
+    snapBuffery.current = distanceRemaindery;
     const d: Vector3D = { x: 0, y: 0, z: 0, ...distance };
     levelObjectRefs.obstacles.current.resizeBy(
       selected.obstacles.current,
@@ -373,6 +395,16 @@ const Editor = () => {
       obstacles.current.configureSnap(bpm, snapTo, tripletSnappingDivider);
       obstacles.current.snap(selected.obstacles.current);
     }
+  };
+
+  const setSnappingxy = (snapTo: 0.1 | 0.3 | 0.5) => {
+    setSnappingModulusxy(snapTo);
+    collectibles.current.setSnappingxy(snapTo);
+  };
+
+  const copy = () => {
+    levelObjectRefs.collectibles.current.copy(selected.collectibles.current);
+    levelObjectRefs.obstacles.current.copy(selected.obstacles.current);
   };
 
   const toggleTripletSnapping = () => {
@@ -527,6 +559,7 @@ const Editor = () => {
             ref={collectibles}
             onClick={selectLevelObject}
             selected={selected.collectibles}
+            snappingModulusxy={snappingModulusxy}
           />
           <EditorObstacles
             ref={obstacles}
@@ -618,6 +651,38 @@ const Editor = () => {
               onClick={() => toggleTripletSnapping()}
             >
               <MusicIcon type="triplet" />
+            </button>
+            <button
+              className={snappingModulusxy === 0.1 ? "active" : ""}
+              type="button"
+              style={{ fontSize: "150%" }}
+              onClick={() => setSnappingxy(0.1)}
+            >
+              <FontAwesomeIcon style={{ width: "50%" }} icon={faBorderAll} />1
+            </button>
+            <button
+              className={snappingModulusxy === 0.3 ? "active" : ""}
+              type="button"
+              style={{ fontSize: "150%" }}
+              onClick={() => setSnappingxy(0.3)}
+            >
+              <FontAwesomeIcon style={{ width: "50%" }} icon={faBorderAll} />2
+            </button>
+            <button
+              className={snappingModulusxy === 0.5 ? "active" : ""}
+              type="button"
+              style={{ fontSize: "150%" }}
+              onClick={() => setSnappingxy(0.5)}
+            >
+              <FontAwesomeIcon style={{ width: "50%" }} icon={faBorderAll} />3
+            </button>
+            <button
+              className=""
+              type="button"
+              style={{ fontSize: "150%" }}
+              onClick={() => copy()}
+            >
+              <FontAwesomeIcon style={{ width: "50%" }} icon={faCopy} />
             </button>
           </div>
           <div className="others">

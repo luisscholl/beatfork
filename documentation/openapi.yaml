@@ -1,0 +1,561 @@
+openapi: 3.0.3
+info:
+  description: This is the REST API for BeatFork.
+  version: 1.0.0
+  title: BeatFork API
+  termsOfService: https://beatfork.com/terms/
+  contact:
+    email: contact@beatfork.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  /levels:
+    get:
+      description: Retrieve all levels
+      parameters:
+        - name: currentPage
+          description: The current page of the paginated result
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pagesize
+          description: Indicates how many levels shall be returned. The upper limit for one page is 2000 levels.
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 2000
+            default: 20
+        - name: title
+          description: Search for levels by title.
+          in: query
+          schema:
+            type: string
+            minLength: 1
+        - name: author
+          description: Search for levels by author.
+          in: query
+          schema:
+            type: string
+            minLength: 1
+        - name: artist
+          description: Search for levels by artist.
+          in: query
+          schema:
+            type: string
+            minLength: 1
+        - name: minDifficulty
+          description: Minimal difficulty
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+        - name: maxDifficulty
+          description: Maximum difficulty
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+        - name: minLength
+          description: Minimal length in seconds
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+        - name: maxLength
+          description: Maximum length in seconds
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: minPersonalBest
+          description: Minimal personal best in percent points. Only available, if authenticated.
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 99
+        - name: maxPersonalBest
+          description: Maximum personal best in percent points. Only available, if authenticated.
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: minRating
+          description: Minimum rating
+          in: query
+          schema:
+            type: number
+            minimum: 0
+            maximum: 1
+        - name: orderBy 
+          description: By what attribute the levels are ordered.
+          in: query
+          schema:
+            type: string
+            enum:
+            - rating
+            - difficulty
+            - length
+            - personalBest
+            - alphabetical
+            default: rating
+        - name: direction
+          description: In which direction the levels are ordered
+          in: query
+          schema:
+            type: string
+            enum:
+            - ascending
+            - descending
+            default:
+              ascending
+      responses:
+        200:
+          description: Levels
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statistics:
+                    type: object
+                    properties:
+                      totalPages:
+                        type: integer
+                        minimum: 0
+                        example: 37
+                      currentPage:
+                        type: integer
+                        minimum: 1
+                        example: 3
+                      pageSize:
+                        type: integer
+                        minimum: 1
+                        example: 20
+                  levels:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          minLength: 1
+                          example:  A80F7A98-C02F-4A85-B13F-DCDF70035BDE
+                        title:
+                          type: string
+                          minLength: 1
+                          example:  One and Only
+                        bpm:
+                          type: number
+                          example: 111
+                        length:
+                          type: number
+                          minimum: 1
+                          example: 221
+                        published:
+                          type: boolean
+                          example: true
+                        rating:
+                          $ref: "#/components/schemas/Rating"
+                        versions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              difficulty:
+                                type: integer
+                                minimum: 1
+                                maximum: 20
+                              id:
+                                type: integer
+                                minimum: 1
+                                example: 1
+                        artists:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                minLength: 1
+                                example: A80F7A98-C02F-4A85-B13F-DCDF70035BDE
+                              name:
+                                type: string
+                                minLength: 1
+                                example: Ryan Anderson
+                              website:
+                                type: string
+                                minLength: 1
+                                example: https://www.ryanandersenmusic.com
+                          minLength: 0
+                        author:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              minLength: 1
+                              example: 2005F616-F913-45E1-9540-E9646A67219C
+                            username:
+                              type: string
+                              minLength: 1
+                              example: Atlas
+                        audioLinks:
+                          type: array
+                          items:
+                            description: Link to a music shop for buying the audio file. Domain may not be on block list.
+                            type: string
+                            minLength: 1
+    post:
+      description: Upload a new level
+      requestBody:
+        description: New level
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  example:  One and Only
+                bpm:
+                  type: number
+                  example: 111
+                length:
+                  type: number
+                  minimum: 1
+                published:
+                  type: boolean
+                  example: true
+                artistIds:
+                  type: array
+                  items:
+                    type: string
+                    minLength: 1
+                    example: 5E7798E6-9A48-44AC-A672-F8B853AF70CA
+                  minLength: 0
+                versions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        minimum: 1
+                        example: 1
+                      difficulty:
+                        type: integer
+                        minimum: 1
+                        maximum: 20
+                      objects:
+                        type: array
+                        items:
+                          anyOf:
+                            - $ref: "#/components/schemas/Collectible"
+                            - $ref: "#/components/schemas/Obstacle"
+                audioLinks:
+                  type: array
+                  items:
+                    description: Link to a music shop for buying the audio file. Domain may not be on block list.
+                    type: string
+                    minLength: 1
+              required:
+              - title
+              - bpm
+              - length
+              - published
+              - versions
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    minLength: 1
+                    example: A80F7A98-C02F-4A85-B13F-DCDF70035BDE
+        401:
+          description: User needs to be logged in.
+        451:
+          description: Audio links to domains on block list not allowed.
+  /levels/{levelId}:
+    get:
+      description: Get a level by id
+      parameters:
+        - in: path
+          name: levelId
+          schema:
+            type: string
+          required: true
+          description: UUID of the level
+      responses:
+        200:
+          description: Level
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    minLength: 1
+                    example:  A80F7A98-C02F-4A85-B13F-DCDF70035BDE
+                  title:
+                    type: string
+                    minLength: 1
+                    example:  One and Only
+                  bpm:
+                    type: number
+                    example: 111
+                  length:
+                    type: number
+                    minimum: 1
+                  published:
+                    type: boolean
+                    example: true
+                  rating:
+                    $ref: "#/components/schemas/Rating"
+                  artists:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          minLength: 1
+                          example:  A80F7A98-C02F-4A85-B13F-DCDF70035BDE
+                        name:
+                          type: string
+                          minLength: 1
+                          example: Ryan Anderson
+                        website:
+                          type: string
+                          minLength: 1
+                          example: https://www.ryanandersenmusic.com
+                    minLength: 0
+                  author:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        minLength: 1
+                        example: 2005F616-F913-45E1-9540-E9646A67219C
+                      username:
+                        type: string
+                        minLength: 1
+                        example: Atlas
+                  versions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          minimum: 1
+                          example: 1
+                        difficulty:
+                          type: integer
+                          minimum: 1
+                          maximum: 20
+                        objects:
+                          type: array
+                          items:
+                            anyOf:
+                              - $ref: "#/components/schemas/Collectible"
+                              - $ref: "#/components/schemas/Obstacle"
+                  audioLinks:
+                    type: array
+                    items:
+                      description: Link to a music shop for buying the audio file. Domain may not be on block list.
+                      type: string
+                      minLength: 1
+        403:
+          description: User must be level author or admin.
+        404:
+          description: Level not found.
+    put:
+      description: Update a level by id
+      parameters:
+        - in: path
+          name: levelId
+          schema:
+            type: string
+          required: true
+          description: UUID of the level
+      requestBody:
+        description: Updated level
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  example:  One and Only
+                bpm:
+                  type: number
+                  example: 111
+                length:
+                  type: number
+                  minimum: 1
+                published:
+                  type: boolean
+                  example: true
+                artistIds:
+                  type: array
+                  items:
+                    type: string
+                    minLength: 1
+                    example: 5E7798E6-9A48-44AC-A672-F8B853AF70CA
+                  minLength: 0
+                versions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        minimum: 1
+                        example: 1
+                      difficulty:
+                        type: integer
+                        minimum: 1
+                        maximum: 20
+                      objects:
+                        type: array
+                        items:
+                          anyOf:
+                            - $ref: "#/components/schemas/Collectible"
+                            - $ref: "#/components/schemas/Obstacle"
+                audioLinks:
+                  type: array
+                  items:
+                    description: Link to a music shop for buying the audio file. Domain may not be on block list.
+                    type: string
+                    minLength: 1
+      responses:
+        200:
+          description: Ok
+        401:
+          description: User needs to be logged in.
+        403:
+          description: User must be level author or admin.
+        404:
+          description: Level not found.
+        451:
+          description: Audio links to domains on block list not allowed.
+    delete:
+      description: Delete a level by id
+      parameters:
+        - in: path
+          name: levelId
+          schema:
+            type: string
+          required: true
+          description: UUID of the level
+      responses:
+        200:
+          description: Ok
+        401:
+          description: User needs to be logged in.
+        403:
+          description: User must be level author or admin.
+        404:
+          description: Level not found.
+        451:
+          description: Audio links to domains on block list not allowed.
+  /levels/{levelId}/{versionId}:
+    get:
+      description: Get a level version by level and version id
+      parameters:
+        - in: path
+          name: levelId
+          schema:
+            type: string
+          required: true
+          description: UUID of the level
+        - in: path
+          name: versionId
+          schema:
+            type: integer
+          required: true
+          description: ID of the version
+      responses:
+        200:
+          description: Level Version
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    minimum: 1
+                    example: 1
+                  difficulty:
+                    type: integer
+                    minimum: 1
+                    maximum: 20
+                  objects:
+                    type: array
+                    items:
+                      anyOf:
+                        - $ref: "#/components/schemas/Collectible"
+                        - $ref: "#/components/schemas/Obstacle"
+components:
+  schemas:
+    Vector3D:
+      type: object
+      properties:
+        x:
+          type: number
+        y:
+          type: number
+        z:
+          type: number
+    Collectible:
+      type: object
+      properties:
+        collectibleType:
+          type: integer
+          minimum: 1
+          maximum: 9
+        type:
+          type: string
+          enum: [ Collectible ]
+        position: 
+          $ref: "#/components/schemas/Vector3D"
+        measure:
+          type: number
+        beat:
+          type: number
+    Obstacle:
+      type: object
+      properties:
+        dimensions:
+          $ref: "#/components/schemas/Vector3D"
+        type:
+          type: string
+          enum: [ Obstacle ]
+        position: 
+          $ref: "#/components/schemas/Vector3D"
+        measure:
+          type: integer
+        beat:
+          type: number
+    Rating:
+      type: number
+      minimum: 0
+      maximum: 1
+      example: 0.87
