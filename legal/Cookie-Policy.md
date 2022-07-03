@@ -1,4 +1,4 @@
-Our [Privacy Policy](https://automattic.com/privacy/) explains our principles when it comes to the collection, processing, and storage of your information. This policy specifically explains how we, our partners, and users of our services deploy cookies, as well as the options you have to control them.
+Our [Privacy Policy](https://beatfork.com/privacy/) explains our principles when it comes to the collection, processing, and storage of your information. This policy specifically explains how we, our partners, and users of our services deploy cookies, as well as the options you have to control them.
 
 ### What are cookies?
 
@@ -6,39 +6,31 @@ Cookies are small pieces of data, stored in text files, that are stored on your 
 
 ### **How we use cookies**
 
-We use cookies for a number of different purposes. Some cookies are necessary for technical reasons; some enable a personalized experience for both visitors and registered users; and some allow the display of advertising from selected third party networks. Some of these cookies may be set when a page is loaded, or when a visitor takes a particular action (clicking the "like" or "follow" button on a post, for example). Many of the cookies we use are only set if you are a registered WordPress.com user (so you don’t have to log in every time, for example), while others are set whenever you visit one of our websites, irrespective of whether you have an account. For more information on the choices you have about the cookies we use, please see the Controlling Cookies section below.
+We use cookies for a number of different purposes. Some cookies are necessary for technical reasons; some enable a personalized experience for both visitors and registered users. Some of these cookies may be set when a page is loaded, or when a visitor takes a particular action (clicking the "like" button on a level, for example). Many of the cookies we use are only set if you are a registered BeatFork.com user (so you don’t have to log in every time, for example), while others are set whenever you visit one of our websites, irrespective of whether you have an account. For more information on the choices you have about the cookies we use, please see the Controlling Cookies section below.
 
 ### **Where we place cookies**
 
 We set cookies in a number of different locations across our services. These include:
 
-*   On our websites (including automattic.com, wordpress.com, vip.wordpress.com, jetpack.com, woocommerce.com, crowdsignal.com, gravatar.com, intensedebate.com, vaultpress.com, akismet.com, simplenote.com, simperium.com, leandomainsearch.com, cloudup.com, longreads.com, and happy.tools).
-*   In the administrative dashboards of our websites, such as Calypso and wp-admin.
-*   On sites we host for our users.
-*   On sites that use our plugins (e.g. Jetpack).
+*   On our websites (including BeatFork.com, auth.BeatFork.com, backend.BeatFork.com).
 
 ### **Types of Cookie**
 
 The table below explains the types of cookies we use on our websites and why we use them.
 
+todo:
+
 |Category of cookies|Why we use these cookies|
 |---|---|
 |Required|These cookies are essential for our websites and services to perform basic functions and are necessary for us to operate certain features. These include those required to allow registered users to authenticate and perform account-related functions, store preferences set by users such as account name, language, and location, and ensure our services are operating properly.|
 |Analytics and Performance|These cookies allow us to optimize performance by collecting information on how users interact with our websites, including which pages are visited most, as well as other analytical data. We use these details to improve how our websites function and to understand how users interact with them.|
-|Advertising|These cookies are set by us and our advertising partners to provide you with relevant content and to understand that content’s effectiveness. They may be used to collect information about your online activities over time and across different websites to predict your preferences and to display more relevant advertisements to you. These cookies also allow a profile to be built about you and your interests and enable personalized ads to be shown to you based on your profile.|
-
-
-### User Sites
-
-In addition to the cookies set on our own sites, we utilize cookies for our [Site Stats](https://en.support.wordpress.com/stats/) feature. This tallies the unique numbers of visitors to a site, as well as the number from specific geographic locations. A visitor is counted when we see a user or browser for the first time in a given period.
+|Level Analytics|These cookies allow us to optimize level difficulty estimation. We use these details to improve how our level difficulty estimation functions and to understand how users interact with levels. Collected data will be used in an anonymized form in a Bachelor's thesis by Luis Scholl.|
 
 ### Examples
 
-Below are examples of the cookies set by Automattic, with explanations of their purpose. Some of these cookies are set across our whole network, whereas some are specific to individual services (e.g. WordPress.com, Longreads, etc). Please note that this is not an exhaustive list, but rather aims to be representative. Information about cookies that may be set by third parties, such as our ads partners, is below. Additionally, we occasionally set referrer cookies on Jetpack connected sites, using WooCommerce.
+Below are examples of the cookies set by Luis Scholl, with explanations of their purpose. Please note that this is not an exhaustive list, but rather aims to be representative. Information about cookies that may be set by third parties, such as our authentication provider, is below. 
 
-In addition, people and companies that use our services to publish or host their own sites may place additional cookies. We provide more information on these cookies below.
-
-#### **Required**
+todo: #### **Required**
 
 |Cookie|Purpose|
 |--- |--- |
@@ -77,93 +69,6 @@ optimizelySegments|Gathers information that helps us understand how visitors int
 |tk_ni / tk_ai / tk_qs|Gathers information for our own, first party analytics tool about how our services are used. A collection of internal metrics for user activity, used to improve user experience.|
 |wp-affiliate-tracker|Remembers the ID of the affiliate that referred the current user to WordPress.com|
 |utma / utmb / utmc / utmt / utmz / ga / gat / gid|Google Analytics. Gathers information that helps us understand how visitors interact with our websites, which allow us to create a better experience for our visitors. Our users may also implement Google Analytics on their own websites.|
-
-#### **Advertising**
-
-|Cookie|Purpose|
-|--- |--- |
-|ads|Tracks if a visitor has clicked an ad before.|
-|lr_nw|Counts and tracks pageviews on Longreads.com. Used to determine whether or not to show our Membership popup message.|
-|wordpress_eli|Reduces the display of ads for repeat visitors.|
-
-Reduces the display of ads for repeat visitors.
-
-Please also see the section below on third party advertisements that you may see on our sites or sites that use our services.
-
-#### **Advertisements from Third Parties Through Automattic’s Ads Program** 
-
-Our mission is to democratize publishing. So that we can offer free access to create a website using WordPress.com, we show ads on some of our users’ sites. Our users may also choose to place ads on their site through our ads program. Additionally, we also show ads from our ads program on some of our own websites (e.g. longreads.com). We operate our ads program in partnership with third party vendors. As part of the operation of our ads program, we use cookies to collect certain information. Advertising cookies enable us and our partners to serve ads and to personalize those ads based on information like visits to our sites and other sites on the Internet. Below is a representative list of our advertising program partners, along with information on the cookies that that each partner sets. The partners we work with change from time to time, and this is not an exhaustive list. Your choices to control cookies related to our ads program are described below.
-
-|Partner|Cookie Info|
-|--- |--- |
-|33across|https://33across.com/privacy-policy/ and https://optout.33across.com|
-|AdMixer|https://admixer.net/privacy|
-|ADYOULIKE|https://www.adyoulike.com/privacy_policy.php|
-|Amazon|https://www.amazon.co.uk/gp/help/customer/display.html/ref=footer_iba?ie=UTF8&nodeId=201909150|
-|AppNexus|https://www.appnexus.com/en/company/cookie-policy|
-|BidSwitch|http://www.bidswitch.com/cookie-statement/|
-|Criteo|https://www.criteo.com/privacy/|
-|EMX Digital|https://enginemediaexchange.com/privacy/|
-|Google (AdSense, DoubleClick Ad Exchange “AdX”)|https://policies.google.com/technologies/ads|
-|Index Exchange|https://www.indexexchange.com/privacy/|
-|LKQD|https://www.lotame.com/about-lotame/privacy/|
-|Media.net|https://www.media.net/privacy-policy|
-|OATH|https://policies.oath.com/us/en/oath/privacy/topics/cookies/index.html|
-|Ogury|https://ogury.com/privacy-policy/|
-|OpenX|https://www.openx.com/legal/privacy-policy/|
-|Polymorph|https://getpolymorph.com/privacy-policy/|
-|PowerInBox|https://powerinbox.com/privacy-policy/|
-|Pubmatic|https://pubmatic.com/legal/website-cookie-policy/|
-|Rubicon|https://rubiconproject.com/privacy/consumer-online-profile-and-opt-out/|
-|Skimlinks|https://skimlinks.com/user-cookies and https://skimlinks.com/privacy-policy|
-|Sonobi|https://sonobi.com/privacy-policy/|
-|Teads|https://www.teads.tv/privacy-policy/|
-|TripleLift|https://triplelift.com/privacy/|
-
-### Visitors to Sites with Parse.ly installed
-
-Below are examples of the cookies set for visitors to sites with the Parse.ly plugin installed.
-
-|Cookie|Purpose|
-|--- |--- |
-|test|Used to discover cookie support.|
-|_parsely_visitor|JSON document uniquely identifying a browser and counting its sessions.|
-|_parsely_tpa_blocked|JSON document storing a flag indicating whether pixel.parsely.com is not accessible by the tracker.|
-|_parsely_slot_click|JSON document storing positional information about a clicked internal link.|
-|_parsely_session|JSON document storing information identifying a browsing session according to Parse.ly’s proprietary definition.|
-
-### Visitors to Sites with Jetpack installed
-
-Below are examples of the cookies set for visitors to sites with the Jetpack plugin installed. For more details on the cookies set for administrators, please see [https://jetpack.com/support/cookies/](https://jetpack.com/support/cookies/).
-
-#### **Jetpack Comments**
-
-|Cookie Name|Purpose|
-|--- |--- |
-|comment_author_{HASH}|Remembers the value entered into the comment form's name field. Specific to the site from which it is set. This cookie mirrors one set by the core WordPress software for commenting purposes.|
-|comment_author_email_{HASH}|Remembers the value entered into the comment form's email field. Specific to the site from which it is set. This cookie mirrors one set by the core WordPress software for commenting purposes.|
-|comment_author_url_{HASH}|Remembers the value entered into the comment form's URL field. Specific to the site from which it is set. This cookie mirrors one set by the core WordPress software for commenting purposes|
-
-#### **Mobile Theme**
-
-|Cookie Name|Purpose|
-|--- |--- |
-|akm_mobile|Remembers whether or not a user wishes to view the mobile version of a site.|
-
-#### **Subscriptions**
-
-|Cookie Name|Purpose|
-|--- |--- |
-|jetpack_comments_subscribe_{HASH}|Remembers the state of the post and comment subscription checkboxes.|
-|jetpack_blog_subscribe_{HASH}|Remembers the state of the post and comment subscription checkboxes.|
-
-#### **EU Cookie Law Banner**
-
-|Cookie Name|Purpose|
-|--- |--- |
-|eucookielaw|Remembers the state of visitor acceptance to the EU Cookie Law banner.|
-
-Please note that this section is not intended to be exhaustive, but rather aims to be representative, and that our users may set additional cookies (such as Google Analytics), depending on the features they have chosen to enable or the plugins they have installed.
 
 ### Controlling Cookies
 
