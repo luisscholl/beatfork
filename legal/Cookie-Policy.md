@@ -18,8 +18,6 @@ We set cookies in a number of different locations across our services. These inc
 
 The table below explains the types of cookies we use on our websites and why we use them.
 
-todo:
-
 |Category of cookies|Why we use these cookies|
 |---|---|
 |Required|These cookies are essential for our websites and services to perform basic functions and are necessary for us to operate certain features. These include those required to allow registered users to authenticate and perform account-related functions, store preferences set by users such as account name, language, and location, and ensure our services are operating properly.|
@@ -30,78 +28,37 @@ todo:
 
 Below are examples of the cookies set by Luis Scholl, with explanations of their purpose. Please note that this is not an exhaustive list, but rather aims to be representative. Information about cookies that may be set by third parties, such as our authentication provider, is below. 
 
-todo: #### **Required**
+#### **Required**
 
 |Cookie|Purpose|
 |--- |--- |
-|__ssid|For processing payment and to aid in fraud detection.|
-|__stripe_sid / __stripe_mid|For processing payment and to aid in fraud detection.|
-|_longreads_prod_new|Authentication for Longreads.com Member accounts. Only active when logged in, on *.longreads.com domains.|
-|akm_mobile|Stores whether a user has chosen to view the mobile version of a website.|
-|botdlang|Used to track the language a user has selected to view popular blogs in.|
-|country_code|Used in order to determine whether or not the cookie banner should be shown. Set immediately on page load and retained for 6 hours to remember the visitor's country.|
-|csrftoken|Python/Ajax security cookie used on accounts.longreads.com.|
-|forterToken|For processing payment and to aid in fraud detection.|
-|landingpage_currency|Defines the currency displayed in WordPress.com landing pages.|
-|pd_dashboard|Records last used folder in Polldaddy dashboard so it can be reopened upon user’s next visit.|
-|PD_USER_AUTH|Login cookie used to identify Polldaddy user.|
-|sensitive_pixel_option|Remembers the state of visitor acceptance to the cookie banner. Only set when the visitor clicks Accept.|
-|twostep_auth|Set when the user is logged in using two factor authentication.|
-|wordpress_logged_in*|Checks whether or not the current visitor is a logged in WordPress.com user.|
-|wordpress_test_cookie|Checks if cookies are enabled to provide appropriate user experience.|
-|wp-settings-{user_id}|Persists a user’s wp-admin configuration.|
-|wp_sharing_{id}|Tracks whether or not a user has already performed an action.|
-
+|oidc.user:https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_GVIXEhvxt:77283vo4755a45ik7iag1qrsvu|Authentication.|
 #### **Analytics and Performance**
 
+We do not use analytics and performance cookies yet. However, we plan to use Matomo On-Premise. This section will be updated when we do.
+
 |Cookie|Purpose|
 |--- |--- |
-|__pdvt|Used in log of Polldaddy survey data to aid in debugging customer problems|
-|_hjIncludedInSample
-mp_6d7c50ad560e01715a871a117a2fbd90_mixpanel
-optimizelyBuckets
-optimizelyEndUserId
-__hstc
-hubspotutk
-optimizelySegments|Gathers information that helps us understand how visitors interact with our websites, which allows us to create a better visitor experience.|
-|ab|Used for "AB testing" of new features.|
-|nux_flow_name|Identifies which user signup flow was shown to the user.|
-|tk_ni / tk_ai / tk_qs|Gathers information for our own, first party analytics tool about how our services are used. A collection of internal metrics for user activity, used to improve user experience.|
-|wp-affiliate-tracker|Remembers the ID of the affiliate that referred the current user to WordPress.com|
-|utma / utmb / utmc / utmt / utmz / ga / gat / gid|Google Analytics. Gathers information that helps us understand how visitors interact with our websites, which allow us to create a better experience for our visitors. Our users may also implement Google Analytics on their own websites.|
 
-### Controlling Cookies
+
+#### **Level Analytics**
+
+We do not use level analytics cookies yet. However, we plan to add opt-in level performance tracking on a game object level in the future. The results will be used for Luis Scholl's bachelor's thesis and improving BeatFork.com. This section will be updated when we do.
+
+|Cookie|Purpose|
+|--- |--- |
+
+#### Controlling Cookies
 
 Visitors may wish to restrict the use of cookies or completely prevent them from being set. Most browsers provide for ways to control cookie behavior such as the length of time they are stored – either through built-in functionality or by utilizing third party plugins. If you disable cookies, please be aware that some of the features of our service may not function correctly. To find out more on how to manage and delete cookies, visit aboutcookies.org. For more details on your choices regarding use of your web browsing activity for interest-based advertising visit [youronlinechoices.eu](http://youronlinechoices.eu) (EU based) or [optout.aboutads.info](http://optout.aboutads.info) (US based). 
 
 On a mobile device, you may also be able to adjust your settings to limit tracking.
 
-Some analytics services we use, which place their own cookies or web tags on your browser, offer their own opt out choices. For example, you can opt out of Google Analytics by installing [Google’s opt-out browser add-on](https://tools.google.com/dlpage/gaoptout), from Hotjar by using the [Do Not Track header](https://www.hotjar.com/legal/compliance/opt-out), and from Nielsen by clicking the opt out link found within [Nielsen's Privacy Statement](https://www.nielsen.com/us/en/legal/privacy-statement/digital-measurement/).
+### Our Analytics Tool
 
-### Our Internal Analytics Tool
+We use Matomo On-Premise as our analytics tool.
 
-In order to better understand how our services are used, we monitor certain user activities that take place within our products, including page views and clicks on any links used when managing a site via our dashboards. We call each one of these actions an “event.” Analytics events are attached to your WordPress.com account and are handled via a first party system that Automattic owns and maintains. In general, we record the following data for each event: IP address, WordPress.com user ID and username, WordPress.com-connected site ID (for sites not hosted on WordPress.com), user agent, referring URL, timestamp of event, browser language, and country code. We use this information to improve our products, make our marketing to you more relevant, personalize your experience, and for the other purposes described in our [Privacy Policy](http://automattic.com/privacy/). You may opt out of our analytics program through your user settings. By doing so, you won’t share information with our analytics tool about events or actions that happen after the opt-out, while logged in to your WordPress.com account. Note that opting out does not disable the functionality of the actions we track - for example, if you publish a post, we will still have record of that (don’t worry!), but for an event or action after you opt out, we will not have other data associated with that action or event in the analytics tool.
-
-### Consent for Advertising Cookies on Our Sites
-
-You may see a “cookie banner” on our websites and dashboards. If you are visiting one of our sites from the EU, then we do not set, or allow our ad partners to set, cookies that are used to show you targeted ads before you click to accept. When you consent in this manner, we and our advertising partners may set advertising cookies on the site you are visiting and on our other websites, dashboards, and services, which we use to show you advertisements about our various Automattic products. We’ll display the banner to you periodically, just in case you change your mind.
-
-### **Consent and Choices for Advertisements on Our Users’ Sites Through Our Ads Program**
-
-You may see a “cookie banner” on our users’ websites, particularly if you are in the European Union. If so, then our ad program does not set, or allow our ad partners to set, cookies that are used to show you targeted ads before you accept.
-
-When you consent in this manner, we and our advertising partners may set third party advertising cookies in order to show you personalized ads on the website you are visiting and, if you are visiting a site in the WordPress.com network, on all websites within that network of sites. You’ll know that a site is in the WordPress.com network because it will have a WordPress.com subdomain (e.g., example.wordpress.com). For other sites that participate in our ads program, your consent is only for personalized ads on the specific site you are visiting.
-
-_For visitors to sites in the WordPress.com network:_
-
-You can manage your privacy choices for third party advertising cookies for sites in the WordPress.com network by clicking “Learn More” on the banner, which will bring up our consent management platform (CMP). You can also adjust your settings for sites in the WordPress.com network at any time by clicking on the “Privacy” link displayed beneath every ad.
-
-In March 2021 we began rolling out a new CMP to some of our users as part of our transition to the Interactive Advertising Bureau (IAB) Europe’s Transparency and Consent Framework, which we will participate in as both a CMP provider and as a vendor (framework identification number 496). Our new CMP complies with the the framework’s Specifications and Policies, and honors the choices you make using the IAB’s tools. Within the CMP we list as partners all the vendors that participate in the IAB’s Framework. We don’t work with all of these vendors, but our ad partners listed above might, so we want you to give you the choice to deactivate them. (This is also why the list in our CMP is longer than you’d expect!).
-
-_Other Choices:_
-
-We also set a cookie to help us understand how visitors engage with websites that participate in our ad program. Visitors may opt out of our use of this information by visiting [visiting this link](https://s.pubmine.com/opt-out) (the opt-out will be processed immediately with no confirmation step). When you opt out, we replace the unique value for that cookie with an opt-out value. The opt-out works across all websites in our ads program. If you have opted out by accident  or wish to opt back in, you may do so by [visiting this link](https://s.pubmine.com/opt-in). Please note that this option is browser-specific, so if you use a different device or browser or clear your cookies, then you will need to repeat the process.
-
+In order to better understand how our services are used, we monitor certain user activities that take place within our products, including page views and clicks on any links used when managing a site via our dashboards.  We use this information to improve our services, make our marketing to you more relevant, personalize your experience, and for the other purposes described in our [Privacy Policy](http://beatfork.com/privacy/). You may opt out of our analytics program through the settings. By doing so, you won’t share information with our analytics tool about events or actions that happen after the opt-out, while logged in to your BeatFork.com account. Note that opting out does not disable the functionality of the actions we track - for example, if you publish a level, we will still have record of that (don’t worry!), but for an event or action after you opt out, we will not have other data associated with that action or event in the analytics tool.
 ### Contact Us
 
-If you have any questions about our use of cookies, you can find the most relevant contact details in our [Privacy Policy](https://automattic.com/privacy/).
+If you have any questions about our use of cookies, you can find the most relevant contact details in our [Privacy Policy](https://beatfork.com/privacy/).
