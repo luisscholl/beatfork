@@ -5,6 +5,74 @@
 
   .row {
     padding: 0.5rem 1rem;
+    align-items: center;
+
+    .react-select {
+      width: 100%;
+
+      &.first {
+        z-index: 11;
+      }
+
+      &.second {
+        z-index: 10;
+      }
+
+      .rs__control {
+        background-color: var(--search-criteria-dropdown-bg-color);
+        border-color: transparent;
+
+        .rs__value-container {
+          span {
+            color: var(--search-criteria-dropdown-text-color);
+          }
+
+          svg {
+            margin-right: 0.5rem;
+            color: var(--search-criteria-dropdown-selected-icon-color);
+          }
+        }
+
+        .rs__indicators {
+          span {
+            background-color: var(--search-criteria-dropdown-indicator-color);
+          }
+
+          svg {
+            color: var(--search-criteria-dropdown-indicator-color);
+          }
+        }
+      }
+
+      .rs__menu {
+        background-color: var(--search-criteria-dropdown-bg-color);
+
+        .rs__menu-list {
+          .rs__option {
+            span {
+              color: var(--search-criteria-dropdown-text-color);
+            }
+
+            svg {
+              margin-right: 0.5rem;
+              color: var(--search-criteria-dropdown-icon-color);
+            }
+
+            &.rs__option--is-selected {
+              background-color: transparent;
+
+              svg {
+                color: var(--search-criteria-dropdown-selected-icon-color);
+              }
+            }
+
+            &.rs__option--is-focused {
+              background-color: var(--search-criteria-dropdown-focused-bg-color);
+            }
+          }
+        }
+      }
+    }
 
     .multi-range-slider {
       border: none;
@@ -109,7 +177,7 @@
       }
     }
 
-    label {
+    label.checkbox {
       user-select: none;
       display: block;
       font-size: 1rem;
