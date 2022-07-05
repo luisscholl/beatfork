@@ -1,4 +1,5 @@
-# User Guidelines
+User Guidelines
+===============
 
 There are a few categories of content and behavior that we don’t permit because we consider them harmful to the community.
 

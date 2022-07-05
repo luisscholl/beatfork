@@ -1,3 +1,6 @@
+Cookie Policy
+=============
+
 Our [Privacy Policy](https://beatfork.com/privacy/) explains our principles when it comes to the collection, processing, and storage of your information. This policy specifically explains how we, our partners, and users of our services deploy cookies, as well as the options you have to control them.
 
 ### What are cookies?

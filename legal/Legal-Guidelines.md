@@ -1,3 +1,6 @@
+Legal Guidelines
+================
+
 ### Requesting Private Information of BeatFork.com Users
 
 Our users place their trust in us to keep them safe, and, in some cases, anonymous. We view safeguarding that trust and protecting our users’ private information as vital to what we do. Luis Scholl receives requests for information about BeatFork.com users from government agencies, law enforcement, private parties, and individuals or corporations involved in civil lawsuits. Before revealing any non-public information about a user we require a valid subpoena, search warrant, or court order. The only exception is when we have a good faith belief that there is an emergency involving imminent danger of death or serious physical injury.

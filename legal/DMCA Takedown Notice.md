@@ -1,3 +1,6 @@
+DMCA Takedown Notice
+====================
+
 If you believe that material available on our sites, including those hosted at BeatFork.com, infringes on your copyright(s), please notify us by submitting a DMCA notice. After we receive a valid and complete notice, we will remove the material and make a good faith attempt to contact the user who uploaded the material by email.
 
 **You may be liable for damages (including costs and attorneys’ fees) if you materially misrepresent that material or activity infringes your copyright. ****We will [highlight such abuses](https://beatfork.com/hall-of-shame) and seek to collect those damages.**  **In addition, you are required to consider the possible fair use implications, as a result of [Lenz v. Universal](https://www.eff.org/press/releases/important-win-fair-use-dancing-baby-lawsuit). We reserve the right to challenge abuses of the DMCA process, and your use of this form does not waive that right.**
