@@ -77,7 +77,7 @@ A note here for those in the European Union about our legal grounds for processi
 
 #### _How We Share Information_
 
-We share information about you in limited circumstances, and with appropriate safeguards on your privacy. These are spelled out below, as well as in the section called (todo) [Ads and Analytics Services Provided by Others](https://beatfork.com/privacy/#ads-and-analytics-services-provided-by-others):
+We share information about you in limited circumstances, and with appropriate safeguards on your privacy. These are spelled out below:
 
 *   **BeatFork Developers** We may disclose information about you to individuals who need the information to help us provide our Services or process the information on our behalf. We require these individuals to follow this Privacy Policy for any personal information that we share with them.
 *   **Third-party vendors:** We may share information about you with third-party vendors who need the information in order to provide their services to us, or to provide their services to you. This includes vendors that help us provide our Services to you (like Amazon Web Services, which powers BeatFork.com authentication and authorization); those that make tools to help us run our operations (like programs that help us with task management, scheduling, word processing, email and other communications, and collaboration among our teams). Other vendors are listed in our more specific policies (e.g., our [Cookie Policy](https://beatfork.com/cookies/)).
@@ -95,7 +95,7 @@ Information that you choose to make public is — you guessed it — disclosed p
 
 ### How Long We Keep Information
 
-We generally discard information about you when it’s no longer needed for the purposes for which we collect and use it — described in the section above on How and Why We Use Information — and we’re not legally required to keep it. For example, we keep web server logs that record information about a visitor to one of Luis Scholl’s websites, like the visitor’s IP address, browser type, and operating system, for approximately (todo) 30 days. We retain the logs for this period of time in order to, among other things, analyze traffic to Luis Scholl’s websites and investigate issues if something goes wrong on one of our websites. As another example, when you delete a level, or comment from BeatFork.com site, it stays in your Trash folder for thirty days in case you change your mind and would like to restore that content, because starting from scratch is no fun. After the thirty days are up, the deleted content may remain on our backups and caches until purged.
+We generally discard information about you when it’s no longer needed for the purposes for which we collect and use it — described in the section above on How and Why We Use Information — and we’re not legally required to keep it. For example, we keep web server logs that record information about a visitor to one of Luis Scholl’s websites, like the visitor’s IP address, browser type, and operating system, for approximately 30 days. We retain the logs for this period of time in order to, among other things, analyze traffic to Luis Scholl’s websites and investigate issues if something goes wrong on one of our websites. As another example, when you delete a level, or comment from BeatFork.com site, it stays in your Trash folder for thirty days in case you change your mind and would like to restore that content, because starting from scratch is no fun. After the thirty days are up, the deleted content may remain on our backups and caches until purged.
 
 ### Security
 
@@ -145,8 +145,6 @@ You can find more information about what we collect and sources of that informat
 *   Request deletion of personal information we collect or maintain;
 *   Opt out of any sale of personal information; and
 *   Not receive discriminatory treatment for exercising your rights under the CCPA.
-
-You can find detailed metrics about Luis Scholl's compliance with these rights in (todo) [our Privacy Report](https://transparency.automattic.com/landing/).
 
 #### _Contacting Us About These Rights_
 
