@@ -113,5 +113,8 @@
   },
   "napa-config": {
     "cache": false
+  },
+  "overrides": {
+    "react-error-overlay": "6.0.9"
   }
 }
