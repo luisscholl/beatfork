@@ -55,7 +55,7 @@ const collectibleAudio = new Howl({ src: ["/sounds/collectibleHit.mp3"] });
 const hologramRadius = 0.125;
 const collectibleMeasure = 0.25;
 
-const Gameplay = (props: { level: Level; debug: boolean }) => {
+const Gameplay = (props: { debug: boolean }) => {
   const settings = useRecoilValue(settingsState);
   const RecoildBridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
   const music = useRef<Howl>();
@@ -245,7 +245,7 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
   }, [captureVideo, pose]);
 
   // Level Playback Logic
-  const { level } = props;
+  const { level }: { level: Level } = view as any;
   useEffect(() => {
     clippedObjectsThree.current = [];
     for (const obstacle of obstacles) {

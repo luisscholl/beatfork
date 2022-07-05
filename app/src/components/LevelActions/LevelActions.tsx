@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useRecoilState } from "recoil";
+import { useNavigate } from "react-router-dom";
 import { faEdit, faList, faPlay } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "react-oidc-context";
 import { viewState } from "../../atoms/viewState";
@@ -8,6 +9,7 @@ import "./LevelActions.scss";
 
 const LevelActions = () => {
   const auth = useAuth();
+  const navigate = useNavigate();
 
   const [view, setView] = useRecoilState(viewState);
 
@@ -42,6 +44,7 @@ const LevelActions = () => {
                   version: (old as any).version,
                 };
               });
+              navigate("/gameplay");
             })
         }
       >

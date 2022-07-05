@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRecoilState } from "recoil";
+import { Outlet } from "react-router-dom";
 import Level from "../../models/Level";
 import Gameplay from "../Gameplay/Gameplay";
 import Editor from "../Editor/Editor";
@@ -37,97 +38,7 @@ const App = () => {
   return (
     <div className="App" data-testid="App">
       <NavBar />
-      {/* view.view === "main-menu" && (
-        // Note: We need the user to interact before with the page, because autoplay is disabled otherwise
-        <div className="centered">
-          <div className="title">BeatFork</div>
-          <button
-            type="button"
-            className="start-button"
-            onClick={() => {
-              setView({ view: "level-select" });
-            }}
-          >
-            Start Game
-          </button>
-          <br />
-          <button
-            type="button"
-            className="menu-button"
-            onClick={() => {
-              setView({ view: "level-editor" });
-            }}
-          >
-            Level Editor
-          </button>
-          <br />
-          <button
-            type="button"
-            className="menu-button"
-            onClick={() => {
-              setView({ view: "options" });
-            }}
-          >
-            Options
-          </button>
-          <br />
-          <button
-            type="button"
-            className="menu-button"
-            onClick={() => {
-              setView({ view: "credits" });
-            }}
-          >
-            Credits
-          </button>
-        </div>
-          ) */}
-      {view.view === "about" && <About />}
-      {view.view === "home" && <Browse />}
-      {view.view === "browse" && <Browse />}
-      {view.view === "my-levels" && <Browse />}
-      {view.view === "profile" && <Profile />}
-      {view.view === "gameplay" && (
-        <Gameplay level={view.level} debug={!!process.env.REACT_APP_DEBUG} />
-      )}
-      {/* view.view === "level-select" && (
-        <div>
-          <button
-            type="button"
-            className="back-button"
-            onClick={() => {
-              setView({ view: "main-menu" });
-            }}
-          >
-            BACK
-          </button>
-          <div className="level-container">
-            {levels.map((level) => {
-              return (
-                <button
-                  type="button"
-                  className="square"
-                  key={level.id}
-                  onClick={() => {
-                    setView({ view: "gameplay", level });
-                  }}
-                >
-                  <div className="square-content">{level.title}</div>
-                </button>
-              );
-            })}
-            <button
-              type="button"
-              className="add-level"
-              onClick={() => {
-                setView({ view: "level-editor" });
-              }}
-            >
-              <div className="add-level-content">+</div>
-            </button>
-          </div>
-        </div>
-            ) */}
+      <Outlet />
       {view.view === "level-editor" && <Editor />}
       {view.view === "options" && (
         <div>

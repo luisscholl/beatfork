@@ -3,35 +3,30 @@ import React from "react";
 import { useAuth } from "react-oidc-context";
 import { useRecoilState } from "recoil";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 import { viewState } from "../../atoms/viewState";
 import "./NavBar.scss";
 
 const links = [
-  { name: "About", view: "about" },
-  { name: "Home", view: "home" },
-  { name: "Browse", view: "browse" },
-  { name: "My Levels", view: "my-levels" },
+  { name: "About", link: "/about" },
+  { name: "Home", link: "/home" },
+  { name: "Browse", link: "/browse" },
+  { name: "My Levels", link: "/my-levels" },
+  { name: "Legal", link: "/legal" },
 ];
 
 const NavBar = () => {
-  const [view, setView] = useRecoilState(viewState);
+  const navigate = useNavigate();
   const auth = useAuth();
-
-  if (!["about", "home", "browse", "my-levels", "profile"].includes(view.view))
-    return null;
 
   return (
     <div className="NavBar" data-testid="NavBar">
       {links.map((link) => (
         <button
           type="button"
-          className={view.view === link.view ? "active" : ""}
-          key={link.view}
-          onClick={() =>
-            setView({
-              view: link.view as "about" | "home" | "browse" | "my-levels",
-            })
-          }
+          className={window.location.pathname === link.link ? "active" : ""}
+          key={link.link}
+          onClick={() => navigate(link.link)}
         >
           {link.name}
         </button>
@@ -45,8 +40,8 @@ const NavBar = () => {
       {auth.isAuthenticated && (
         <button
           type="button"
-          className={view.view === "profile" ? "active" : ""}
-          onClick={() => setView({ view: "profile" })}
+          className={window.location.pathname === "profile" ? "active" : ""}
+          onClick={() => navigate("/profile")}
         >
           {auth.user?.profile["cognito:username"]}{" "}
           <FontAwesomeIcon icon={faUser} />

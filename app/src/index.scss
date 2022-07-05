@@ -3,6 +3,8 @@
 body {
   margin: 0;
   overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 * {

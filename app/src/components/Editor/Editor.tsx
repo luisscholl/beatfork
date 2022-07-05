@@ -303,7 +303,7 @@ const Editor = () => {
   ) => {
     // Ignore long clicks
     if (performance.now() - tLastMouseDown.current < 300) {
-      if (event.shiftKey) {
+      if (event.nativeEvent.shiftKey) {
         if (selected[type].current.includes(i)) {
           levelObjectRefs[type].current.deselect([i]);
         } else {
