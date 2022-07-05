@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { generateUUID } from "three/src/math/MathUtils";
-import { AutoSizer, InfiniteLoader, List } from "react-virtualized";
+import { FixedSizeList as List } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
+import InfiniteLoader from "react-window-infinite-loader";
 import { useAuth } from "react-oidc-context";
 import { viewState } from "../../atoms/viewState";
 import Level from "../../models/Level";
@@ -67,15 +69,7 @@ const LevelList = () => {
     !hasNextPage || index < levels.length;
 
   // Render a list item or a loading indicator.
-  const rowRenderer = ({
-    index,
-    key,
-    style,
-  }: {
-    index: number;
-    key: any;
-    style: any;
-  }) => {
+  const rowRenderer = ({ index, style }: { index: number; style: any }) => {
     let content;
 
     if (!isRowLoaded({ index })) {
@@ -87,7 +81,6 @@ const LevelList = () => {
     return (
       <button
         type="button"
-        key={key}
         style={style}
         className={
           ((view as any).level && (view as any).level.id) ===
@@ -126,25 +119,26 @@ const LevelList = () => {
       }}
     >
       <InfiniteLoader
-        isRowLoaded={isRowLoaded}
-        loadMoreRows={loadMoreRows as any}
-        rowCount={rowCount}
+        isItemLoaded={isRowLoaded as any}
+        loadMoreItems={loadMoreRows as any}
+        itemCount={rowCount}
         ref={infiniteLoader}
       >
-        {({ onRowsRendered, registerChild }) => {
+        {({ onItemsRendered, ref }) => {
           return (
             <AutoSizer>
               {({ width, height }) => {
                 return (
                   <List
-                    ref={registerChild}
-                    onRowsRendered={onRowsRendered}
-                    rowRenderer={rowRenderer}
+                    ref={ref}
+                    onItemsRendered={onItemsRendered}
                     width={width}
                     height={height}
-                    rowCount={rowCount}
-                    rowHeight={50}
-                  />
+                    itemCount={rowCount}
+                    itemSize={50}
+                  >
+                    {rowRenderer}
+                  </List>
                 );
               }}
             </AutoSizer>
