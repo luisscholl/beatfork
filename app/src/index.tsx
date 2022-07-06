@@ -2,7 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.scss";
 import { RecoilRoot } from "recoil";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider } from "react-oidc-context";
 import ReactMarkdown from "react-markdown";
 import App from "./components/App/App";
@@ -29,12 +34,14 @@ ReactDOM.render(
           <Routes>
             <Route path="/" element={<App />}>
               <Route path="/close-account" element={<CloseAccount />} />
+              <Route index element={<Navigate to="/about" />} />
               <Route path="/about" element={<About />} />
               <Route path="/home" element={<Browse />} />
               <Route path="/browse" element={<Browse />} />
               <Route path="/my-levels" element={<Browse />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/legal" element={<Legal />}>
+                <Route index element={<Navigate to="/legal/credits" />} />
                 <Route path="/legal/credits" element={<Credits />} />
                 <Route
                   path="/legal/tos"
