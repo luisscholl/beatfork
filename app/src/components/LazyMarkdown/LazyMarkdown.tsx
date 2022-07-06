@@ -8,7 +8,7 @@ interface LazyMarkdownProps {
 }
 
 const LazyMarkdown: FC<LazyMarkdownProps> = ({ url }) => {
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState("Loading...");
   fetch(url)
     .then((response) => response.text())
     .then((response) => setContent(response));

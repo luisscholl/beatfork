@@ -59,7 +59,7 @@ If you find a BeatFork.com account that you believe violates these Terms, please
 **Removing Content.** If you delete Content, we’ll use reasonable efforts to remove it from public view on BeatFork.com, but you acknowledge that cached versions of the Content or references to the Content may not be immediately unavailable. This does not extend to derivatives or reuploads of your Content through other BeatFork.com users as i) you granted them a license to do so ii) this is an operational overhead, which we cannot handle.
 **Prohibited Uses.** Your Content and conduct must not violate the [BeatFork.com User Guidelines](https://beatfork.com/user-guidelines/).
 ## 8. Copyright Infringement and DMCA Policy
-As we ask others to respect our intellectual property rights, we respect the intellectual property rights of others. If you believe any Content violates your copyright, please see our [Digital Millennium Copyright Act (“DMCA”) Policy](https://beatfork.com/dmca-notice/) and send us a notice.
+As we ask others to respect our intellectual property rights, we respect the intellectual property rights of others. If you believe any Content violates your copyright, please see our [Digital Millennium Copyright Act (“DMCA”) Policy](https://beatfork.com/dmca/) and send us a notice.
 ## 9. Intellectual Property
 The Agreement doesn’t transfer any Luis Scholl or third-party intellectual property to you, and all right, title, and interest in and to such property remains (as between Luis Scholl and you) solely with Luis Scholl. Trademarks, service marks, graphics, and logos used in connection with our Services may be the trademarks of third parties. Using our Services doesn’t grant you any right or license to reproduce or otherwise use any trademarks.
 ## 10. Changes

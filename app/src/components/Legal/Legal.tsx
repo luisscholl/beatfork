@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import "./Legal.scss";
 
 interface LegalProps {}
@@ -7,16 +7,18 @@ interface LegalProps {}
 const Legal: FC<LegalProps> = () => (
   <div className="Legal" data-testid="Legal">
     <div className="menu">
-      <a href="/legal/credits">Credits & Licenses</a>
-      <a href="/legal/tos">Terms of Service</a>
-      <a href="/legal/privacy">Privacy Policy</a>
-      <a href="/legal/user-guidelines">User Guidelines</a>
-      <a href="/legal/cookies">Cookie Policy</a>
-      <a href="/legal/legal-guidelines">Legal Guidelines</a>
-      <a href="/legal/dmca">DMCA Takedown Notice</a>
+      <Link to="/legal/credits">Credits & Licenses</Link>
+      <Link to="/legal/tos">Terms of Service</Link>
+      <Link to="/legal/privacy">Privacy Policy</Link>
+      <Link to="/legal/user-guidelines">User Guidelines</Link>
+      <Link to="/legal/cookies">Cookie Policy</Link>
+      <Link to="/legal/legal-guidelines">Legal Guidelines</Link>
+      <Link to="/legal/dmca">DMCA Takedown Notice</Link>
     </div>
-    <div className="content">
-      <Outlet />
+    <div className="content-wrapper">
+      <div className="content">
+        <Outlet />
+      </div>
     </div>
   </div>
 );
