@@ -13,7 +13,11 @@ const LazyMarkdown: FC<LazyMarkdownProps> = ({ url }) => {
     .then((response) => response.text())
     .then((response) => setContent(response));
 
-  return <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>;
+  return (
+    <div className="LazyMarkdown">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+    </div>
+  );
 };
 
 export default LazyMarkdown;

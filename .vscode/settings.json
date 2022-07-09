@@ -37,5 +37,8 @@
   "svg.preview.background": "transparent",
   "[dockercompose]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
   }
 }
