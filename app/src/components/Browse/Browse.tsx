@@ -1,4 +1,7 @@
 import React, { FC } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { NavLink } from "react-router-dom";
 import LevelActions from "../LevelActions/LevelActions";
 import LevelDifficulty from "../LevelDifficulty/LevelDifficulty";
 import LevelDifficultyMeta from "../LevelDifficultyMeta/LevelDifficultyMeta";
@@ -15,6 +18,10 @@ const Browse: FC<BrowseProps> = () => (
   <div className="Browse" data-testid="Browse">
     <SearchCriteria />
     <div>
+      <NavLink to="/editor" className="to-editor">
+        <FontAwesomeIcon icon={faPlus} />
+        New Level
+      </NavLink>
       <SearchBar />
       <LevelList />
       <Preview />

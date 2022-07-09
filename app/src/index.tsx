@@ -24,6 +24,7 @@ import Profile from "./components/Profile/Profile";
 import Gameplay from "./components/Gameplay/Gameplay";
 import Legal from "./components/Legal/Legal";
 import LazyMarkdown from "./components/LazyMarkdown/LazyMarkdown";
+import Editor from "./components/Editor/Editor";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -34,7 +35,10 @@ ReactDOM.render(
           <Routes>
             <Route path="/" element={<App />}>
               <Route path="/close-account" element={<CloseAccount />} />
-              <Route index element={<Navigate to="/about" />} />
+              <Route
+                index
+                element={<Navigate to={`/about${window.location.search}`} />}
+              />
               <Route path="/about" element={<About />} />
               <Route path="/home" element={<Browse />} />
               <Route path="/browse" element={<Browse />} />
@@ -79,6 +83,7 @@ ReactDOM.render(
               path="/gameplay"
               element={<Gameplay debug={!!process.env.REACT_APP_DEBUG} />}
             />
+            <Route path="/editor" element={<Editor />} />
             <Route path="/calibration" element={<CalibrationScene />} />
           </Routes>
         </Router>

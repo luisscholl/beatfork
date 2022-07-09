@@ -28,7 +28,7 @@ const LevelList = () => {
 
   const loadNextPage = async () => {
     setIsNextPageLoading(true);
-    const token = auth.user?.id_token;
+    const token = auth.user?.access_token;
     lastPage.current += 1;
     let url = `${process.env.REACT_APP_API_URL}/levels?currentPage=${lastPage.current}`;
     for (const [key, value] of Object.entries(searchCriteria)) {
@@ -39,6 +39,10 @@ const LevelList = () => {
       )
         continue;
       if (["title", "author", "artist"].includes(key) && !value) continue;
+      if (key === "maxLength" && value === 300) {
+        url += `&${encodeURIComponent(key)}=${encodeURIComponent(Infinity)}`;
+        continue;
+      }
       url += `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
     }
     return fetch(url, {
