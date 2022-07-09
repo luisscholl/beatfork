@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useRecoilState } from "recoil";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { faEdit, faList, faPlay } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "react-oidc-context";
 import { viewState } from "../../atoms/viewState";
@@ -27,30 +27,10 @@ const LevelActions = () => {
           Edit
         </button>
       </div>
-      <button
-        type="button"
-        className="play"
-        onClick={() =>
-          fetch(
-            `${process.env.REACT_APP_API_URL}/levels/${(view as any).level.id}`
-          )
-            .then((result) => result.json())
-            .then((result) => {
-              setView((old) => {
-                console.log(result);
-                return {
-                  view: "gameplay",
-                  level: result,
-                  version: (old as any).version,
-                };
-              });
-              navigate("/gameplay");
-            })
-        }
-      >
+      <Link to={`/gameplay/${view.level.id}/${view.version}`} className="play">
         <FontAwesomeIcon icon={faPlay} />
         Play
-      </button>
+      </Link>
     </div>
   );
 };

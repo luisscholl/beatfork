@@ -94,7 +94,7 @@ const LevelList = () => {
         }
         onClick={(event) => {
           setView((old) => ({
-            view: view.view as "home" | "browse" | "my-levels",
+            ...old,
             level: levels[index],
           }));
         }}

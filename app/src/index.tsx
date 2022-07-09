@@ -25,6 +25,8 @@ import Gameplay from "./components/Gameplay/Gameplay";
 import Legal from "./components/Legal/Legal";
 import LazyMarkdown from "./components/LazyMarkdown/LazyMarkdown";
 import Editor from "./components/Editor/Editor";
+import GameOver from "./components/GameOver/GameOver";
+import LevelCompleted from "./components/LevelCompleted/LevelCompleted";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -78,9 +80,11 @@ ReactDOM.render(
                   element={<LazyMarkdown url="/legal/treat.md" />}
                 />
               </Route>
+              <Route path="/game-over" element={<GameOver />} />
+              <Route path="/level-completed" element={<LevelCompleted />} />
             </Route>
             <Route
-              path="/gameplay"
+              path="/gameplay/:levelId/:versionId"
               element={<Gameplay debug={!!process.env.REACT_APP_DEBUG} />}
             />
             <Route path="/editor" element={<Editor />} />

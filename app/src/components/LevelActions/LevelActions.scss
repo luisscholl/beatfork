@@ -5,7 +5,9 @@
   flex-direction: column;
   justify-content: end;
 
-  button {
+  button,
+  a {
+    display: block;
     width: calc(100% - 0.5rem);
     border: none;
     margin: 0.25rem;
@@ -14,6 +16,8 @@
     background-color: var(--level-actions-bg-color);
     color: var(--level-actions-text-color);
     cursor: grab;
+    text-decoration: none;
+    text-align: center;
 
     svg {
       margin-right: 0.5rem;

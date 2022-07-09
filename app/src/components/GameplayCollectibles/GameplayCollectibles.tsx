@@ -64,7 +64,7 @@ const GameplayCollectibles: ForwardRefExoticComponent<
       fragmentShader: gameplayCollectibleFragmentShader,
       uniforms: {
         collectibleTexture: {
-          value: new THREE.TextureLoader().load("./assets/collectibles.png"),
+          value: new THREE.TextureLoader().load("/assets/collectibles.png"),
         },
       },
     }),

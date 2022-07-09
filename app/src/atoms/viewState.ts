@@ -6,32 +6,12 @@ import LevelPartial from "../models/LevelPartial";
 export const viewState = atom({
   key: "view",
   default: {
-    view: "browse",
+    returnView: "/browse"
   } as
     | {
-      view:
-      | "about"
-      | "profile"
-      | "level-editor"
-      | "options"
-      | "credits"
-    } | {
-      view: "gameplay" | "game-over";
-      level: Level;
-      version: string;
-    }
-    | {
-      view: "level-completed";
-      score: number;
-      level: Level;
-      version: string;
-    }
-    | {
-      view:
-      | "home"
-      | "browse"
-      | "my-levels";
       level?: LevelPartial | Level;
       version?: string;
+      score?: number;
+      returnView: string;
     },
 });
