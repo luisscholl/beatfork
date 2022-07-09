@@ -24,22 +24,28 @@
       padding: 0.5rem 2rem 0.5rem 1rem;
       font-size: 1.5rem;
       color: var(--legal-menu-text-color);
+      transition: color 0.3s ease;
       text-decoration: none;
 
-      span::after {
-        content: "";
-        background-color: var(--legal-menu-active-text-color);
-        height: 0.1rem;
-        display: block;
-        width: 0;
-        margin-left: 50%;
-        transition: width 0.3s ease, margin-left 0.3s ease;
+      span {
+        display: inline-block;
+
+        &::after {
+          content: "";
+          background-color: var(--legal-menu-text-color);
+          height: 0.1rem;
+          display: block;
+          width: 0;
+          margin-left: 50%;
+          transition: width 0.3s ease, margin-left 0.3s ease, background-color 0.3s ease;
+        }
       }
 
       &.active {
         color: var(--legal-menu-active-text-color);
 
         span::after {
+          background-color: var(--legal-menu-active-text-color);
           width: 100%;
           margin-left: 0;
         }
