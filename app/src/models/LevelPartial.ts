@@ -13,8 +13,10 @@ export default interface LevelPartial {
   rating?: number;
   artists: Artist[];
   author: User;
-  versions: LevelVersionPartial[];
-  audio: string; // URL
+  versions: {
+    [key: string]: LevelVersionPartial;
+  };
+  audioLinks: string[]; // URL
   length: number;
   // todo: styling?
   // todo: difficulty

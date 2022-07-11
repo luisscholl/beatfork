@@ -165,8 +165,8 @@ paths:
                         rating:
                           $ref: "#/components/schemas/Rating"
                         versions:
-                          type: array
-                          items:
+                          type: object
+                          additionalProperties:
                             type: object
                             properties:
                               difficulty:
@@ -242,8 +242,8 @@ paths:
                     example: 5E7798E6-9A48-44AC-A672-F8B853AF70CA
                   minLength: 0
                 versions:
-                  type: array
-                  items:
+                  type: object
+                  additionalProperties:
                     type: object
                     properties:
                       id:
@@ -355,8 +355,8 @@ paths:
                         minLength: 1
                         example: Atlas
                   versions:
-                    type: array
-                    items:
+                    type: object
+                    additionalProperties:
                       type: object
                       properties:
                         id:
@@ -420,8 +420,8 @@ paths:
                     example: 5E7798E6-9A48-44AC-A672-F8B853AF70CA
                   minLength: 0
                 versions:
-                  type: array
-                  items:
+                  type: object
+                  additionalProperties:
                     type: object
                     properties:
                       id:

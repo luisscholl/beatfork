@@ -13,7 +13,9 @@ export default interface Level {
   rating: number | undefined;
   artists: Artist[];
   author: User;
-  versions: LevelVersion[];
+  versions: {
+    [key: string]: LevelVersion;
+  };
   audioLinks: string[]; // URL
   length: number;
   // todo: styling?

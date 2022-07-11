@@ -20,9 +20,11 @@ const LevelDifficulty = () => {
       };
     });
 
-  let _versions = JSON.parse(
-    JSON.stringify((view as any).level.versions)
-  ) as LevelVersionPartial[];
+  let _versions = Object.values(
+    JSON.parse(JSON.stringify((view as any).level.versions)) as {
+      [key: string]: LevelVersionPartial;
+    }
+  );
   _versions = _versions.sort((a, b) => a.difficulty - b.difficulty);
 
   return (

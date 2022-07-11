@@ -47,6 +47,7 @@ import GameplayCollectibles, {
   GameplayCollectiblesRefAttributes,
 } from "../GameplayCollectibles/GameplayCollectibles";
 import { viewState } from "../../atoms/viewState";
+import { getLevel } from "../../services/LevelService";
 
 const leftHandThreeURL = "/assets/hand_left.png";
 const rightHandThreeURL = "/assets/hand_right.png";
@@ -228,17 +229,15 @@ const Gameplay = (props: { debug: boolean }) => {
         version: versionId,
       };
     });
-    fetch(`${process.env.REACT_APP_API_URL}/levels/${levelId}`)
-      .then((result) => result.json())
-      .then((result) => {
-        setView((old) => {
-          return {
-            ...old,
-            level: result,
-          };
-        });
-        setLevel(result);
+    getLevel(levelId, versionId).then((result) => {
+      setView((old) => {
+        return {
+          ...old,
+          level: result,
+        };
       });
+      setLevel(result);
+    });
   }, [levelId, versionId]);
 
   useEffect(() => {
@@ -305,7 +304,7 @@ const Gameplay = (props: { debug: boolean }) => {
   const collectibles: Array<Collectible & { pristine: boolean }> =
     useMemo(() => {
       if (!level) return null;
-      return level.versions[0].objects
+      return level.versions[versionId].objects
         .filter((e: Collectible | Obstacle) => e.type === "Collectible")
         .map((e) => {
           return {
@@ -317,7 +316,7 @@ const Gameplay = (props: { debug: boolean }) => {
 
   const obstacles: Array<Obstacle & { pristine: boolean }> = useMemo(() => {
     if (!level) return null;
-    return level.versions[0].objects
+    return level.versions[versionId].objects
       .filter((e: Collectible | Obstacle) => e.type === "Obstacle")
       .map((e) => {
         return {
@@ -340,22 +339,22 @@ const Gameplay = (props: { debug: boolean }) => {
 
   useEffect(() => {
     if (!level) return;
-    if (level.versions[0].objects[0].type === "Obstacle") {
+    if (level.versions[versionId].objects[0].type === "Obstacle") {
       clippedObjectsThree.current.push(
         <GameplayObstacle
           key={0}
           position={{
-            x: level.versions[0].objects[0].position.x,
-            y: level.versions[0].objects[0].position.y,
+            x: level.versions[versionId].objects[0].position.x,
+            y: level.versions[versionId].objects[0].position.y,
             z:
-              -level.versions[0].objects[0].position.z *
+              -level.versions[versionId].objects[0].position.z *
               settings.gamePlaytimeScaleFactor,
           }}
           dimensions={{
-            x: level.versions[0].objects[0].dimensions.x,
-            y: level.versions[0].objects[0].dimensions.y,
+            x: (level.versions[versionId].objects[0] as Obstacle).dimensions.x,
+            y: (level.versions[versionId].objects[0] as Obstacle).dimensions.y,
             z:
-              -level.versions[0].objects[0].dimensions.z *
+              -(level.versions[versionId].objects[0] as Obstacle).dimensions.z *
               settings.gamePlaytimeScaleFactor,
           }}
         />

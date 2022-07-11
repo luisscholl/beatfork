@@ -11,6 +11,7 @@ import "./LevelList.scss";
 import LevelListStories from "./LevelList.stories";
 import LevelPartial from "../../models/LevelPartial";
 import { searchCriteriaState } from "../../atoms/searchCriteriaState";
+import { searchLevel } from "../../services/LevelService";
 
 const LevelList = () => {
   const auth = useAuth();
@@ -28,36 +29,18 @@ const LevelList = () => {
 
   const loadNextPage = async () => {
     setIsNextPageLoading(true);
-    const token = auth.user?.access_token;
     lastPage.current += 1;
-    let url = `${process.env.REACT_APP_API_URL}/levels?currentPage=${lastPage.current}`;
-    for (const [key, value] of Object.entries(searchCriteria)) {
-      if (key === "showPlaylists") continue;
-      if (
-        ["minPersonalBest", "maxPersonalBest"].includes(key) &&
-        !auth.isAuthenticated
-      )
-        continue;
-      if (["title", "author", "artist"].includes(key) && !value) continue;
-      if (key === "maxLength" && value === 300) {
-        url += `&${encodeURIComponent(key)}=${encodeURIComponent(Infinity)}`;
-        continue;
+    const options = JSON.parse(JSON.stringify(searchCriteria));
+    if (options.maxLength === 300) options.maxLength = Infinity;
+    delete options.showPlaylists;
+    searchLevel(options, lastPage.current).then((results) => {
+      setIsNextPageLoading(false);
+      if (results.length > 0) {
+        setLevels((old) => [...old, ...results]);
+      } else {
+        setHasNextPage(false);
       }
-      url += `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-    }
-    return fetch(url, {
-      headers: {
-        ...(token ? { Authorization: `${token}` } : {}),
-      },
-    })
-      .then((response) => response.json())
-      .then((results) => {
-        setLevels((old) => [...old, ...results.levels]);
-        setIsNextPageLoading(false);
-        if (results.statistics.currentPage === results.statistics.totalPages) {
-          setHasNextPage(false);
-        }
-      });
+    });
   };
 
   // If there are more items to be loaded then add an extra row to hold a loading indicator.

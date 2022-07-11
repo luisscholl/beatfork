@@ -37,25 +37,6 @@ function checkAuthenticated(error) {
   };
 }
 
-function checkNoDuplicateVersionIds() {
-  return async (req, res, next) => {
-    const versionIds = {};
-    for (const version of req.body.versions) {
-      if (versionIds.hasOwnProperty(version.id)) {
-        const duplicateVersionId = new Error();
-        duplicateVersionId.status = 400;
-        duplicateVersionId.errors =
-          "Versions of a level can't share the same versionId";
-        duplicateVersionId.message = `Duplicate versionId ${version.id}`;
-        return next(duplicateVersionId);
-      }
-      versionIds[version.id] = 1;
-    }
-    next();
-    return null;
-  };
-}
-
 function removeAdditionalFromGameObjects() {
   return async (req, res, next) => {
     // because express-openapi-validator can't properly handle oneOf
@@ -201,13 +182,13 @@ router.get("/", async (req, res) => {
   // no rating or personalBest yet so use title as defailt in the meantime (also change in openapi.yaml)
   const orderBy =
     req.query.hasOwnProperty("orderBy") &&
-    req.query.orderBy !== "personalBest" &&
-    req.query.orderBy !== "rating"
+      req.query.orderBy !== "personalBest" &&
+      req.query.orderBy !== "rating"
       ? req.query.orderBy
       : "title";
   const direction =
     req.query.hasOwnProperty("direction") &&
-    req.query.direction === "descending"
+      req.query.direction === "descending"
       ? -1
       : 1;
   const minDifficulty = req.query.hasOwnProperty("minDifficulty")
@@ -244,8 +225,8 @@ router.get("/", async (req, res) => {
       ...(!res.locals.authenticated && { published: true }),
       ...(res.locals.authenticated &&
         !res.locals.admin && {
-          $or: [{ published: true }, { "author.id": res.locals.userId }],
-        }),
+        $or: [{ published: true }, { "author.id": res.locals.userId }],
+      }),
       "author.username": {
         $regex: author,
         $options: "i",
@@ -414,7 +395,6 @@ router.get("/:levelId", async (req, res, next) => {
 router.put(
   "/:levelId",
   checkAuthenticated("Levels can only be updated by authenticated users"),
-  checkNoDuplicateVersionIds(),
   removeAdditionalFromGameObjects(),
   setArtists(),
   getAuthor(),
