@@ -30,6 +30,9 @@ const jwtVerifier = CognitoJwtVerifier.create({
   tokenUse: "access",
   clientId: process.env.CLIENT_ID,
 });
+console.log("----");
+console.log(jwtVerifier);
+console.log("----");
 
 app.disable("etag");
 app.use(cors());
@@ -88,10 +91,10 @@ const workAroundGameObject = {
 };
 apiSpec.paths["/levels"].post.requestBody.content[
   "application/json"
-].schema.properties.versions.additionalProperties.properties.objects.items = workAroundGameObject;
+].schema.properties.versions.items.properties.objects.items = workAroundGameObject;
 apiSpec.paths["/levels/{levelId}"].put.requestBody.content[
   "application/json"
-].schema.properties.versions.additionalProperties.properties.objects.items = workAroundGameObject;
+].schema.properties.versions.items.properties.objects.items = workAroundGameObject;
 fs.writeFileSync(workaroundApiSpecPath, JSON.stringify(apiSpec));
 
 app.use(

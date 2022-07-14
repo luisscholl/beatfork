@@ -37,6 +37,25 @@ function checkAuthenticated(error) {
   };
 }
 
+function checkNoDuplicateVersionIds() {
+  return async (req, res, next) => {
+    const versionIds = {};
+    for (const version of req.body.versions) {
+      if (versionIds.hasOwnProperty(version.id)) {
+        const duplicateVersionId = new Error();
+        duplicateVersionId.status = 400;
+        duplicateVersionId.errors =
+          "Versions of a level can't share the same versionId";
+        duplicateVersionId.message = `Duplicate versionId ${version.id}`;
+        return next(duplicateVersionId);
+      }
+      versionIds[version.id] = 1;
+    }
+    next();
+    return null;
+  };
+}
+
 function removeAdditionalFromGameObjects() {
   return async (req, res, next) => {
     // because express-openapi-validator can't properly handle oneOf
@@ -395,6 +414,7 @@ router.get("/:levelId", async (req, res, next) => {
 router.put(
   "/:levelId",
   checkAuthenticated("Levels can only be updated by authenticated users"),
+  checkNoDuplicateVersionIds(),
   removeAdditionalFromGameObjects(),
   setArtists(),
   getAuthor(),
