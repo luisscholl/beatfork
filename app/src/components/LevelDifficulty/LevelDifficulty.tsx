@@ -16,7 +16,9 @@ const LevelDifficulty = () => {
     setView((old) => {
       return {
         ...old,
-        version: ((view as any).level as LevelPartial | Level).versions[0].id,
+        version: Object.values(
+          ((view as any).level as LevelPartial | Level).versions
+        )[0].id,
       };
     });
 

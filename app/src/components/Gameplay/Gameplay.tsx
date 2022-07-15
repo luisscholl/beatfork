@@ -47,7 +47,7 @@ import GameplayCollectibles, {
   GameplayCollectiblesRefAttributes,
 } from "../GameplayCollectibles/GameplayCollectibles";
 import { viewState } from "../../atoms/viewState";
-import { getLevel } from "../../services/LevelService";
+import { LevelService } from "../../services/LevelService";
 
 const leftHandThreeURL = "/assets/hand_left.png";
 const rightHandThreeURL = "/assets/hand_right.png";
@@ -229,7 +229,7 @@ const Gameplay = (props: { debug: boolean }) => {
         version: versionId,
       };
     });
-    getLevel(levelId, versionId).then((result) => {
+    LevelService.getLevel(levelId, versionId).then((result) => {
       setView((old) => {
         return {
           ...old,

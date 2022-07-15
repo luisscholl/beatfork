@@ -1,9 +1,12 @@
 import { User } from "oidc-client-ts";
 import Level from "../models/Level";
 import LevelPartial from "../models/LevelPartial";
+import LevelVersion from "../models/LevelVersion";
+import LevelVersionPartial from "../models/LevelVersionPartial";
 
 const levels: Map<string, Level> = new Map();
 const levelPartials: Map<string, LevelPartial> = new Map();
+let counter = 0;
 
 export type SearchOptions = {
   currentPage?: number;
@@ -35,26 +38,42 @@ function getAuthToken() {
 
 // If version is specified, the returned level is only guaranteed to contain the specified full version. Other values of the version dictionary can be LevelVersionPartials.
 function getLevel(id: string, version?: string): Promise<Level> {
+  console.log("counter :>> ", counter);
+  counter += 1;
+  console.log(`getLevel(${id},${version})`);
+  console.log("levels :>> ", levels);
+  console.log("levelPartials :>> ", JSON.parse(JSON.stringify(levelPartials)));
   // If level is cached -> Dandy!
   if (levels.get(id)) return new Promise((resolve) => resolve(levels.get(id)));
   const token = getAuthToken();
   const headers = token ? { Authorization: token } : {};
 
   // If no level partial cached, we need to get the whole level.
+  console.log(
+    `typeof version !== "undefined": ${typeof version !== "undefined"}}`
+  );
+  console.log("levelPartials.get(id) :>> ", levelPartials.get(id));
   if (typeof version !== "undefined" && levelPartials.get(id)) {
     // If version is cached -> Dandy!
-    if (levelPartials.get(id).versions[version]) {
+    console.log(levelPartials.get(id));
+    console.log(levelPartials.get(id).versions[version]);
+    console.log((levelPartials.get(id).versions[version] as any).objects);
+    if ((levelPartials.get(id).versions[version] as any).objects) {
+      console.log("meow");
       return new Promise((resolve) => resolve(<Level>levelPartials.get(id)));
     }
     // Get, cache and return version.
+    console.log("woof");
     return fetch(`${process.env.REACT_APP_API_URL}/levels/${id}/${version}`, {
       headers,
     })
       .then((result) => result.json())
       .then((result) => {
-        const levelPartial = levelPartials.get(version);
+        const levelPartial = JSON.parse(JSON.stringify(levelPartials.get(id)));
         levelPartial.versions[version] = result;
         levelPartials.set(id, levelPartial);
+        console.log("levelPartial :>> ", levelPartial);
+        console.log("levelPartials.get(id) :>> ", levelPartials.get(id));
         return levelPartial as Level;
       });
   }
@@ -64,6 +83,11 @@ function getLevel(id: string, version?: string): Promise<Level> {
   })
     .then((result) => result.json())
     .then((result) => {
+      const versions: { [key: string]: LevelVersion } = {};
+      for (const v of result.versions) {
+        versions[v.id] = v;
+      }
+      result.versions = versions;
       levels.set(id, result);
       return result;
     });
@@ -86,12 +110,23 @@ function searchLevel(
     headers,
   })
     .then((response) => response.json())
-    .then((results) => {
-      for (const [key, levelPartial] of Object.entries(results.levels)) {
-        levelPartials.set(key, levelPartial as LevelPartial);
-      }
-      return results.levels;
+    .then((result) => {
+      result.levels = result.levels.map((levelPartial: any) => {
+        const versions: { [key: string]: LevelVersionPartial } = {};
+        for (const v of (levelPartial as any).versions) {
+          versions[v.id] = v;
+        }
+        (levelPartial as any).versions = versions;
+        levelPartials.set(levelPartial.id, levelPartial as LevelPartial);
+        return levelPartial;
+      });
+      return result.levels;
     });
 }
 
-export { getLevel, searchLevel };
+const LevelService = {
+  getLevel,
+  searchLevel,
+};
+
+export { LevelService };

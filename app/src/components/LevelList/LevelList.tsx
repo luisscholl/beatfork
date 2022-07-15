@@ -11,7 +11,7 @@ import "./LevelList.scss";
 import LevelListStories from "./LevelList.stories";
 import LevelPartial from "../../models/LevelPartial";
 import { searchCriteriaState } from "../../atoms/searchCriteriaState";
-import { searchLevel } from "../../services/LevelService";
+import { LevelService } from "../../services/LevelService";
 
 const LevelList = () => {
   const auth = useAuth();
@@ -33,7 +33,7 @@ const LevelList = () => {
     const options = JSON.parse(JSON.stringify(searchCriteria));
     if (options.maxLength === 300) options.maxLength = Infinity;
     delete options.showPlaylists;
-    searchLevel(options, lastPage.current).then((results) => {
+    LevelService.searchLevel(options, lastPage.current).then((results) => {
       setIsNextPageLoading(false);
       if (results.length > 0) {
         setLevels((old) => [...old, ...results]);
