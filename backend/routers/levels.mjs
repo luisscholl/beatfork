@@ -114,7 +114,7 @@ function keepAuthor() {
   };
 }
 
-function getAuthor() {
+function getAuthorFromDB() {
   return async (req, res, next) => {
     let query;
     try {
@@ -139,6 +139,14 @@ function getAuthor() {
     }
     res.locals.authorId = oldLevel.author.id;
     res.locals.authorName = oldLevel.author.username;
+    next();
+    return null;
+  };
+}
+
+function getAuthorFromQuery() {
+  return async (req, res, next) => {
+    res.locals.authorId = req.query.authorId;
     next();
     return null;
   };
@@ -369,6 +377,31 @@ router.get("/", async (req, res) => {
   res.json(levels[0]);
 });
 
+router.delete(
+  "/",
+  checkAuthenticated("Levels can only be deleted by authenticated users"),
+  getAuthorFromQuery(),
+  checkAuthorized(
+    "Levels can only be deleted by authorized users",
+    "The given user isn't authorized to delete this level"
+  ),
+  async (req, res, next) => {
+    const query = { "author.id": res.locals.authorId };
+    const result = await res.app.locals.db
+      .collection("levels")
+      .deleteMany(query);
+    if (!result.acknowledged) {
+      const unknownServerError = new Error();
+      unknownServerError.status = 500;
+      unknownServerError.errors = "Something went wrong";
+      unknownServerError.message = "Something went wrong";
+      return next(unknownServerError);
+    }
+    res.sendStatus(200);
+    return null;
+  }
+);
+
 router.get("/:levelId", async (req, res, next) => {
   let query;
   try {
@@ -417,7 +450,7 @@ router.put(
   checkNoDuplicateVersionIds(),
   removeAdditionalFromGameObjects(),
   setArtists(),
-  getAuthor(),
+  getAuthorFromDB(),
   checkAuthorized(
     "Levels can only be updated by authorized users",
     "The given user isn't authorized to update this level"
@@ -452,7 +485,7 @@ router.put(
 
 router.delete(
   "/:levelId",
-  getAuthor(),
+  getAuthorFromDB(),
   checkAuthenticated("Levels can only be deleted by authenticated users"),
   checkAuthorized(
     "Levels can only be deleted by authorized users",

@@ -288,6 +288,23 @@ paths:
           description: User needs to be logged in.
         451:
           description: Audio links to domains on block list not allowed.
+    delete:
+      description: Delete all levels of an author
+      parameters:
+        - name: authorId
+          description: The id of the author
+          in: query
+          schema:
+            type: string
+            minLength: 1
+            example: 2005F616-F913-45E1-9540-E9646A67219C
+      responses:
+        200:
+          description: Ok
+        401:
+          description: User needs to be logged in.
+        403:
+          description: User must be level author or admin.
   /levels/{levelId}:
     get:
       description: Get a level by id
