@@ -173,6 +173,10 @@ paths:
                                 type: integer
                                 minimum: 1
                                 maximum: 20
+                              personalBest:
+                                type: integer
+                                minimum: 0
+                                maximum: 100
                               id:
                                 type: integer
                                 minimum: 1
@@ -298,6 +302,7 @@ paths:
             type: string
             minLength: 1
             example: 2005F616-F913-45E1-9540-E9646A67219C
+          required: true
       responses:
         200:
           description: Ok
@@ -380,6 +385,10 @@ paths:
                           type: integer
                           minimum: 1
                           example: 1
+                        personalBest:
+                                type: integer
+                                minimum: 0
+                                maximum: 100
                         difficulty:
                           type: integer
                           minimum: 1
@@ -461,6 +470,12 @@ paths:
                     description: Link to a music shop for buying the audio file. Domain may not be on block list.
                     type: string
                     minLength: 1
+              required:
+              - title
+              - bpm
+              - length
+              - published
+              - versions
       responses:
         200:
           description: Ok
@@ -518,6 +533,10 @@ paths:
                     type: integer
                     minimum: 1
                     example: 1
+                  personalBest:
+                    type: integer
+                    minimum: 0
+                    maximum: 100
                   difficulty:
                     type: integer
                     minimum: 1
@@ -530,6 +549,47 @@ paths:
                         - $ref: "#/components/schemas/Obstacle"
         403:
           description: User must be level author or admin.
+  /levels/{levelId}/{versionId}/personalBest:
+    put:
+      description: Set a users personal best on a version of a level. If no userId is given, the requesting user's best is updated
+      parameters:
+        - in: path
+          name: levelId
+          schema:
+            type: string
+          required: true
+          description: UUID of the level
+        - in: path
+          name: versionId
+          schema:
+            type: integer
+          required: true
+          description: ID of the version
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                personalBest:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                userId:
+                  type: string
+                  minLength: 1
+                  example: 2005F616-F913-45E1-9540-E9646A67219C
+              required:
+              - personalBest
+      responses:
+        200:
+          description: Ok
+        401:
+          description: User needs to be logged in.
+        403:
+          description: User must be admin to set the personal best of another user.
+        404:
+          description: Level not found.
 components:
   schemas:
     Vector3D:
