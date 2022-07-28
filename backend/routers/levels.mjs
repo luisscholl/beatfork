@@ -144,37 +144,6 @@ function getAuthorFromDB() {
   };
 }
 
-function checkVersionExists() {
-  return async (req, res, next) => {
-    let query;
-    try {
-      query = {
-        _id: new ObjectId(req.params.levelId),
-        "versions.id": {
-          $eq: Number(req.params.versionId),
-        },
-      };
-    } catch (err) {
-      // An ObjectId can't be constructed from the given levelId
-      const levelNotFound = new Error();
-      levelNotFound.status = 404;
-      levelNotFound.errors = "Level not found";
-      levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
-      return next(levelNotFound);
-    }
-    const level = await res.app.locals.db.collection("levels").findOne(query);
-    if (!level) {
-      const levelNotFound = new Error();
-      levelNotFound.status = 404;
-      levelNotFound.errors = "Level not found";
-      levelNotFound.message = `No level with levelId ${req.params.levelId} and versionId ${req.params.versionId} found`;
-      return next(levelNotFound);
-    }
-    next();
-    return null;
-  };
-}
-
 function getAuthorFromQuery() {
   return async (req, res, next) => {
     res.locals.authorId = req.query.authorId;
@@ -201,8 +170,6 @@ function checkAuthorized(error, message) {
   };
 }
 
-// TODO: only return unpublished levels to their autor
-
 router.post(
   "/",
   checkAuthenticated("Levels can only be created by authenticated users"),
@@ -211,18 +178,42 @@ router.post(
   setArtists(),
   setAuthor(),
   async (req, res, next) => {
-    const result = await res.app.locals.db
+    const { versions } = req.body;
+    delete req.body.versions;
+    const levelResult = await res.app.locals.db
       .collection("levels")
       .insertOne(req.body);
-    if (result.acknowledged) {
-      res.json({
-        id: result.insertedId,
-      });
-    } else {
+    if (!levelResult.acknowledged) {
       return next(
         new Error("Something went wrong inserting new level into the database")
       );
     }
+
+    const versionInserts = [];
+    for (const version of versions) {
+      version._id = {
+        levelId: new ObjectId(levelResult.insertedId),
+        versionId: version.id,
+      };
+      delete version.id;
+      versionInserts.push(
+        res.app.locals.db.collection("versions").insertOne(version)
+      );
+    }
+    const versionResults = await Promise.all(versionInserts);
+    for (const versionResult of versionResults) {
+      if (!versionResult.acknowledged) {
+        return next(
+          new Error(
+            "Something went wrong inserting version of new level into the database"
+          )
+        );
+      }
+    }
+
+    res.json({
+      id: levelResult.insertedId,
+    });
     return null;
   }
 );
@@ -299,6 +290,18 @@ router.get("/", async (req, res) => {
         $gte: minLength,
         ...(maxLength > 0 && { $lte: maxLength }),
       },
+    },
+  });
+  aggregationPipeline.push({
+    $lookup: {
+      from: "versions",
+      localField: "_id",
+      foreignField: "_id.levelId",
+      as: "versions",
+    },
+  });
+  aggregationPipeline.push({
+    $match: {
       "versions.difficulty": {
         $gte: minDifficulty,
         $lte: maxDifficulty,
@@ -371,11 +374,20 @@ router.get("/", async (req, res) => {
         {
           $addFields: {
             id: "$_id",
+            versions: {
+              $map: {
+                input: "$versions",
+                as: "version",
+                in: {
+                  id: "$$version._id.versionId",
+                  difficulty: "$$version.difficulty",
+                },
+              },
+            },
           },
         },
         {
           $project: {
-            "versions.objects": false,
             _id: false,
             ...(orderBy === "difficulty" && { difficulty: false }),
           },
@@ -417,26 +429,52 @@ router.delete(
     "The given user isn't authorized to delete this level"
   ),
   async (req, res, next) => {
-    const query = { "author.id": res.locals.authorId };
-    const result = await res.app.locals.db
+    const levelsQuery = { "author.id": res.locals.authorId };
+
+    const levels = await res.app.locals.db
       .collection("levels")
-      .deleteMany(query);
-    if (!result.acknowledged) {
+      .find(levelsQuery)
+      .toArray();
+
+    const deleteLevelsResult = await res.app.locals.db
+      .collection("levels")
+      .deleteMany(levelsQuery);
+    if (!deleteLevelsResult.acknowledged) {
       const unknownServerError = new Error();
       unknownServerError.status = 500;
       unknownServerError.errors = "Something went wrong";
       unknownServerError.message = "Something went wrong";
       return next(unknownServerError);
     }
+
+    const levelsIds = [];
+    for (const level of levels) {
+      levelsIds.push(new ObjectId(level._id));
+    }
+
+    const versionsQuery = { "_id.levelId": { $in: levelsIds } };
+
+    const deleteVersionsResult = await res.app.locals.db
+      .collection("versions")
+      .deleteMany(versionsQuery);
+
+    if (!deleteVersionsResult.acknowledged) {
+      const unknownServerError = new Error();
+      unknownServerError.status = 500;
+      unknownServerError.errors = "Something went wrong";
+      unknownServerError.message = "Something went wrong";
+      return next(unknownServerError);
+    }
+
     res.sendStatus(200);
     return null;
   }
 );
 
 router.get("/:levelId", async (req, res, next) => {
-  let query;
+  let levelId;
   try {
-    query = { _id: new ObjectId(req.params.levelId) };
+    levelId = new ObjectId(req.params.levelId);
   } catch (err) {
     // An ObjectId can't be constructed from the given levelId
     const levelNotFound = new Error();
@@ -445,14 +483,52 @@ router.get("/:levelId", async (req, res, next) => {
     levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
     return next(levelNotFound);
   }
-  const level = await res.app.locals.db.collection("levels").findOne(query);
-  if (!level) {
+  const aggregationPipeline = [
+    {
+      $match: { _id: levelId },
+    },
+    {
+      $lookup: {
+        from: "versions",
+        localField: "_id",
+        foreignField: "_id.levelId",
+        as: "versions",
+      },
+    },
+    {
+      $addFields: {
+        id: "$_id",
+        versions: {
+          $map: {
+            input: "$versions",
+            as: "version",
+            in: {
+              id: "$$version._id.versionId",
+              difficulty: "$$version.difficulty",
+              objects: "$$version.objects",
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: false,
+      },
+    },
+  ];
+  const levels = await res.app.locals.db
+    .collection("levels")
+    .aggregate(aggregationPipeline)
+    .toArray();
+  if (levels.length === 0) {
     const levelNotFound = new Error();
     levelNotFound.status = 404;
     levelNotFound.errors = "Level not found";
     levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
     return next(levelNotFound);
   }
+  const level = levels[0];
   if (
     !(
       level.published ||
@@ -469,8 +545,6 @@ router.get("/:levelId", async (req, res, next) => {
       "The given user isn't authorized to view this level";
     return next(userNotAuthorized);
   }
-  level.id = level._id;
-  delete level._id;
   res.json(level);
   return null;
 });
@@ -488,9 +562,12 @@ router.put(
   ),
   keepAuthor(),
   async (req, res, next) => {
-    let query;
+    const newVersions = req.body.versions;
+    delete req.body.versions;
+
+    let levelId;
     try {
-      query = { _id: new ObjectId(req.params.levelId) };
+      levelId = new ObjectId(req.params.levelId);
     } catch (err) {
       // An ObjectId can't be constructed from the given levelId
       const levelNotFound = new Error();
@@ -499,16 +576,70 @@ router.put(
       levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
       return next(levelNotFound);
     }
-    const result = await res.app.locals.db
+    const levelQuery = { _id: levelId };
+    const levelUpdateResult = await res.app.locals.db
       .collection("levels")
-      .replaceOne(query, req.body);
-    if (!result.acknowledged || !result.matchedCount === 1) {
+      .replaceOne(levelQuery, req.body);
+    if (
+      !levelUpdateResult.acknowledged ||
+      !levelUpdateResult.matchedCount === 1
+    ) {
       const unknownServerError = new Error();
       unknownServerError.status = 500;
       unknownServerError.errors = "Something went wrong";
       unknownServerError.message = "Something went wrong";
       return next(unknownServerError);
     }
+
+    const versionsQuery = { "_id.levelId": levelId };
+    let oldVersionIds = await res.app.locals.db
+      .collection("versions")
+      .find(versionsQuery)
+      .project({ _id: 1 })
+      .toArray();
+    const versionUpserts = [];
+    for (const newVersion of newVersions) {
+      oldVersionIds = oldVersionIds.filter(
+        (oldVersionId) => oldVersionId._id.versionId !== newVersion.id
+      );
+      const versionQuery = { _id: { levelId, versionId: newVersion.id } };
+      const update = {
+        $set: {
+          difficulty: newVersion.difficulty,
+          objects: newVersion.objects,
+          _id: versionQuery._id,
+        },
+      };
+      versionUpserts.push(
+        res.app.locals.db
+          .collection("versions")
+          .updateOne(versionQuery, update, { upsert: true })
+      );
+    }
+    const versionUpsertResults = await Promise.all(versionUpserts);
+    for (const versionUpsertResult of versionUpsertResults) {
+      if (!versionUpsertResult.acknowledged) {
+        return next(
+          new Error(
+            "Something went wrong updating or inserting version of new level into the database"
+          )
+        );
+      }
+    }
+    if (oldVersionIds.length > 0) {
+      oldVersionIds = oldVersionIds.map((id) => id._id);
+      const versionDeleteResult = await res.app.locals.db
+        .collection("versions")
+        .deleteMany({ _id: { $in: oldVersionIds } });
+      if (!versionDeleteResult.acknowledged) {
+        return next(
+          new Error(
+            "Something went wrong updating or inserting version of new level into the database"
+          )
+        );
+      }
+    }
+
     res.sendStatus(200);
     return null;
   }
@@ -523,9 +654,9 @@ router.delete(
     "The given user isn't authorized to delete this level"
   ),
   async (req, res, next) => {
-    let query;
+    let levelId;
     try {
-      query = { _id: new ObjectId(req.params.levelId) };
+      levelId = new ObjectId(req.params.levelId);
     } catch (err) {
       // An ObjectId can't be constructed from the given levelId
       const levelNotFound = new Error();
@@ -534,15 +665,27 @@ router.delete(
       levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
       return next(levelNotFound);
     }
-    const result = await res.app.locals.db
+    const levelQuery = { _id: levelId };
+    const levelResult = await res.app.locals.db
       .collection("levels")
-      .deleteOne(query);
-    if (!result.acknowledged || !result.matchedCount === 1) {
+      .deleteOne(levelQuery);
+    if (!levelResult.acknowledged || !levelResult.matchedCount === 1) {
       const unknownServerError = new Error();
       unknownServerError.status = 500;
       unknownServerError.errors = "Something went wrong";
       unknownServerError.message = "Something went wrong";
       return next(unknownServerError);
+    }
+    const versionsQuery = { "_id.levelId": levelId };
+    const versionsResult = await res.app.locals.db
+      .collection("versions")
+      .deleteMany(versionsQuery);
+    if (!versionsResult.acknowledged) {
+      return next(
+        new Error(
+          "Something went wrong deleting a version of the level from the database"
+        )
+      );
     }
     res.sendStatus(200);
     return null;
@@ -550,16 +693,11 @@ router.delete(
 );
 
 router.get("/:levelId/:versionId", async (req, res, next) => {
-  const aggregationPipeline = [];
+  let levelId;
+  let versionId;
   try {
-    aggregationPipeline.push({
-      $match: {
-        _id: ObjectId(req.params.levelId),
-        "versions.id": {
-          $eq: Number(req.params.versionId),
-        },
-      },
-    });
+    levelId = ObjectId(req.params.levelId);
+    versionId = Number(req.params.versionId);
   } catch (err) {
     // An ObjectId can't be constructed from the given levelId
     const levelNotFound = new Error();
@@ -568,35 +706,18 @@ router.get("/:levelId/:versionId", async (req, res, next) => {
     levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
     return next(levelNotFound);
   }
-  aggregationPipeline.push({
-    $project: {
-      version: {
-        $first: {
-          $filter: {
-            input: "$versions",
-            as: "version",
-            cond: {
-              $eq: ["$$version.id", Number(req.params.versionId)],
-            },
-          },
-        },
-      },
-      published: true,
-      "author.id": true,
-    },
-  });
-  const levels = await res.app.locals.db
+  const levelQuery = { _id: levelId };
+  const levelProjection = { published: true, author: true };
+  const level = await res.app.locals.db
     .collection("levels")
-    .aggregate(aggregationPipeline)
-    .toArray();
-  if (levels.length === 0) {
+    .findOne(levelQuery, levelProjection);
+  if (level === null) {
     const levelNotFound = new Error();
     levelNotFound.status = 404;
-    levelNotFound.errors = "Version of level not found";
-    levelNotFound.message = `Either no level with levelId ${req.params.levelId} found or no version with versionId ${req.params.versionId} of level found`;
+    levelNotFound.errors = "Level not found";
+    levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
     return next(levelNotFound);
   }
-  const level = levels[0];
   if (
     !(
       level.published ||
@@ -612,74 +733,21 @@ router.get("/:levelId/:versionId", async (req, res, next) => {
       "The given user isn't authorized to view this level";
     return next(userNotAuthorized);
   }
-  res.json(level.version);
+  const versionQuery = { _id: { levelId, versionId } };
+  const version = await res.app.locals.db
+    .collection("versions")
+    .findOne(versionQuery);
+  if (version === null) {
+    const versionNotFound = new Error();
+    versionNotFound.status = 404;
+    versionNotFound.errors = "Version not found";
+    versionNotFound.message = `No version with versionId ${req.params.versionId} found`;
+    return next(versionNotFound);
+  }
+  version.id = version._id.versionId;
+  delete version._id;
+  res.json(version);
   return null;
 });
-
-router.put(
-  "/:levelId/:versionId/personalBest",
-  checkAuthenticated(
-    "Personal best can only be updated by authenticated users"
-  ),
-  checkVersionExists(),
-  async (req, res, next) => {
-    let levelId;
-    try {
-      levelId = ObjectId(req.params.levelId);
-    } catch (err) {
-      // An ObjectId can't be constructed from the given levelId
-      const levelNotFound = new Error();
-      levelNotFound.status = 404;
-      levelNotFound.errors = "Level not found";
-      levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
-      return next(levelNotFound);
-    }
-
-    let userId;
-    if (
-      !req.body.hasOwnProperty("userId") ||
-      req.body.userId === res.locals.userId
-    ) {
-      userId = res.locals.userId;
-    } else if (res.locals.admin) {
-      userId = req.body.userId;
-    } else {
-      const userNotAuthorized = new Error();
-      userNotAuthorized.status = 403;
-      userNotAuthorized.errors =
-        "Personal best can only be updated by authorized users";
-      userNotAuthorized.message =
-        "The user must either equal the user of the personal best or an admin";
-      return next(userNotAuthorized);
-    }
-
-    const filter = {
-      _id: { levelId, versionId: req.params.versionId },
-    };
-
-    const update = {
-      $set: {
-        "_id.levelId": levelId,
-        "_id.versionId": req.params.versionId,
-      },
-    };
-    update.$set[userId] = req.body.personalBest;
-
-    const options = { upsert: true };
-
-    const result = await res.app.locals.db
-      .collection("personalBests")
-      .updateOne(filter, update, options);
-    if (!result.acknowledged) {
-      const unknownServerError = new Error();
-      unknownServerError.status = 500;
-      unknownServerError.errors = "Something went wrong";
-      unknownServerError.message = "Something went wrong";
-      return next(unknownServerError);
-    }
-    res.sendStatus(200);
-    return null;
-  }
-);
 
 export default router;
