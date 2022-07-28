@@ -702,8 +702,8 @@ router.get("/:levelId/:versionId", async (req, res, next) => {
     // An ObjectId can't be constructed from the given levelId
     const levelNotFound = new Error();
     levelNotFound.status = 404;
-    levelNotFound.errors = "Level not found";
-    levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
+    levelNotFound.errors = "Version not found";
+    levelNotFound.message = `No version with levelId ${req.params.levelId} and versionId ${req.params.versionId} found`;
     return next(levelNotFound);
   }
   const levelQuery = { _id: levelId };
@@ -734,20 +734,80 @@ router.get("/:levelId/:versionId", async (req, res, next) => {
     return next(userNotAuthorized);
   }
   const versionQuery = { _id: { levelId, versionId } };
-  const version = await res.app.locals.db
+  const project = { personalBests: false };
+  const versions = await res.app.locals.db
     .collection("versions")
-    .findOne(versionQuery);
-  if (version === null) {
+    .find(versionQuery)
+    .project(project)
+    .toArray();
+  if (versions.length !== 1) {
     const versionNotFound = new Error();
     versionNotFound.status = 404;
     versionNotFound.errors = "Version not found";
     versionNotFound.message = `No version with versionId ${req.params.versionId} found`;
     return next(versionNotFound);
   }
+  const version = versions[0];
   version.id = version._id.versionId;
   delete version._id;
   res.json(version);
   return null;
 });
+
+router.put(
+  "/:levelId/:versionId/personalBest",
+  checkAuthenticated("Only authenticated users can set personal bests"),
+  async (req, res, next) => {
+    let levelId;
+    let versionId;
+    try {
+      levelId = ObjectId(req.params.levelId);
+      versionId = Number(req.params.versionId);
+    } catch (err) {
+      // An ObjectId can't be constructed from the given levelId
+      const levelNotFound = new Error();
+      levelNotFound.status = 404;
+      levelNotFound.errors = "Version not found";
+      levelNotFound.message = `No version with levelId ${req.params.levelId} and versionId ${req.params.versionId} found`;
+      return next(levelNotFound);
+    }
+    if (
+      !res.locals.admin &&
+      req.body.hasOwnProperty("userId") &&
+      req.body.userId !== res.locals.userId
+    ) {
+      const userNotAuthorized = new Error();
+      userNotAuthorized.status = 403;
+      userNotAuthorized.errors =
+        "A non admin user can only set his own personal best";
+      userNotAuthorized.message =
+        "The given user isn't authorized to view this level";
+      return next(userNotAuthorized);
+    }
+    const query = { _id: { levelId, versionId } };
+    const field = `personalBests.${req.body.userId || res.locals.userId}`;
+    const update = { $set: {} };
+    update.$set[field] = req.body.personalBest;
+    const result = await res.app.locals.db
+      .collection("versions")
+      .updateOne(query, update);
+    if (!result.acknowledged) {
+      const unknownServerError = new Error();
+      unknownServerError.status = 500;
+      unknownServerError.errors = "Something went wrong";
+      unknownServerError.message = "Something went wrong";
+      return next(unknownServerError);
+    }
+    if (result.matchedCount === 0) {
+      const levelNotFound = new Error();
+      levelNotFound.status = 404;
+      levelNotFound.errors = "Version not found";
+      levelNotFound.message = `No version with levelId ${req.params.levelId} and versionId ${req.params.versionId} found`;
+      return next(levelNotFound);
+    }
+    res.sendStatus(200);
+    return null;
+  }
+);
 
 export default router;

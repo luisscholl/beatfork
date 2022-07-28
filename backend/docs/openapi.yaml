@@ -589,7 +589,7 @@ paths:
         403:
           description: User must be admin to set the personal best of another user.
         404:
-          description: Level not found.
+          description: Level or version not found.
 components:
   schemas:
     Vector3D:
