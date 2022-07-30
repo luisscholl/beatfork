@@ -94,13 +94,18 @@ paths:
             type: number
             minimum: 0
             maximum: 1
+        - name: onlyLiked
+          description: Show only levels liked by the user
+          in: query
+          schema:
+            type: boolean
         - name: orderBy 
           description: By what attribute the levels are ordered. If levels are sorted ascending by difficulty/personal best, they are sorted by their easiest version/lowest personal best. If levels are sorted descending by difficulty/personal best, they are sorted by their most difficult version/highest personal best.
           in: query
           schema:
             type: string
             enum:
-            - rating
+            - averageRating
             - difficulty
             - length
             - personalBest
@@ -162,8 +167,12 @@ paths:
                         published:
                           type: boolean
                           example: true
-                        rating:
+                        averageRating:
                           $ref: "#/components/schemas/Rating"
+                        ownRating:
+                          type: integer
+                          minimum: 0
+                          maximum: 1
                         versions:
                           type: array
                           items:
@@ -345,8 +354,12 @@ paths:
                   published:
                     type: boolean
                     example: true
-                  rating:
+                  averageRating:
                     $ref: "#/components/schemas/Rating"
+                  ownRating:
+                    type: integer
+                    minimum: 0
+                    maximum: 1
                   artists:
                     type: array
                     items:
@@ -503,6 +516,41 @@ paths:
           description: User needs to be logged in.
         403:
           description: User must be level author or admin.
+        404:
+          description: Level not found.
+  /levels/{levelId}/rating:
+    put:
+      description: Set a users rating for a level. If no userId is given, the requesting user's rating is updated
+      parameters:
+        - in: path
+          name: levelId
+          schema:
+            type: string
+          required: true
+          description: UUID of the level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  minimum: 0
+                  maximum: 1
+                userId:
+                  type: string
+                  minLength: 1
+                  example: 2005F616-F913-45E1-9540-E9646A67219C
+              required:
+              - rating
+      responses:
+        200:
+          description: Ok
+        401:
+          description: User needs to be logged in.
+        403:
+          description: User must be admin to set the rating for another user.
         404:
           description: Level not found.
   /levels/{levelId}/{versionId}:

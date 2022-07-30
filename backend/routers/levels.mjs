@@ -228,11 +228,13 @@ router.get("/", async (req, res) => {
   const pageSize = req.query.hasOwnProperty("pageSize")
     ? req.query.pageSize
     : 20;
-  // no rating yet so use title as default in the meantime (also change in openapi.yaml)
-  const orderBy =
-    req.query.hasOwnProperty("orderBy") && req.query.orderBy !== "rating"
-      ? req.query.orderBy
-      : "title";
+  const onlyLiked =
+    res.locals.authenticated && req.query.hasOwnProperty("onlyLiked")
+      ? req.query.onlyLiked
+      : false;
+  const orderBy = req.query.hasOwnProperty("orderBy")
+    ? req.query.orderBy
+    : "title";
   const direction =
     req.query.hasOwnProperty("direction") &&
     req.query.direction === "descending"
@@ -256,11 +258,9 @@ router.get("/", async (req, res) => {
   const maxPersonalBest = req.query.hasOwnProperty("maxPersonalBest")
     ? req.query.maxPersonalBest
     : 100;
-  /*
   const minRating = req.query.hasOwnProperty("minRating")
     ? req.query.minRating
-    : 0; // tracking of ratings not implemented
-  */
+    : 0;
   const title = req.query.hasOwnProperty("title") ? req.query.title : "";
   const author = req.query.hasOwnProperty("author") ? req.query.author : "";
   const artist = req.query.hasOwnProperty("artist") ? req.query.artist : "";
@@ -302,9 +302,22 @@ router.get("/", async (req, res) => {
   if (res.locals.authenticated) {
     personalBestField = `$$version.personalBests.${res.locals.userId}`;
   }
+  let ownRatingField;
+  if (res.locals.authenticated) {
+    ownRatingField = `$ratings.${res.locals.userId}`;
+  }
   aggregationPipeline.push({
     $addFields: {
       id: "$_id",
+      ...(res.locals.authenticated && {
+        ownRating: ownRatingField,
+      }),
+      ratingsArray: {
+        $ifNull: [
+          { $objectToArray: "$ratings" },
+          { $literal: [{ k: "internal", v: 0 }] },
+        ],
+      },
       versions: {
         $map: {
           input: "$versions",
@@ -323,19 +336,38 @@ router.get("/", async (req, res) => {
     },
   });
   aggregationPipeline.push({
+    $addFields: {
+      numFields: { $size: "$ratingsArray" },
+      numLikes: {
+        $reduce: {
+          input: "$ratingsArray",
+          initialValue: 0,
+          in: { $add: ["$$value", "$$this.v"] },
+        },
+      },
+    },
+  });
+  aggregationPipeline.push({
+    $addFields: {
+      averageRating: { $divide: ["$numLikes", "$numFields"] },
+    },
+  });
+  aggregationPipeline.push({
     $match: {
       "versions.difficulty": {
         $gte: minDifficulty,
         $lte: maxDifficulty,
       },
-    },
-  });
-  aggregationPipeline.push({
-    $match: {
-      "versions.personalBest": {
-        $gte: minPersonalBest,
-        $lte: maxPersonalBest,
+      averageRating: {
+        $gte: minRating,
       },
+      ...(res.locals.authenticated && {
+        "versions.personalBest": {
+          $gte: minPersonalBest,
+          $lte: maxPersonalBest,
+        },
+      }),
+      ...(onlyLiked && { ownRating: { $eq: 1 } }),
     },
   });
   if (orderBy === "difficulty") {
@@ -433,6 +465,10 @@ router.get("/", async (req, res) => {
             _id: false,
             ...(orderBy === "difficulty" && { difficulty: false }),
             ...(orderBy === "personalBest" && { personalBest: false }),
+            ratings: false,
+            ratingsArray: false,
+            numFields: false,
+            numLikes: false,
           },
         },
       ],
@@ -530,6 +566,10 @@ router.get("/:levelId", async (req, res, next) => {
   if (res.locals.authenticated) {
     personalBestField = `$$version.personalBests.${res.locals.userId}`;
   }
+  let ownRatingField;
+  if (res.locals.authenticated) {
+    ownRatingField = `$ratings.${res.locals.userId}`;
+  }
   const aggregationPipeline = [
     {
       $match: { _id: levelId },
@@ -545,6 +585,15 @@ router.get("/:levelId", async (req, res, next) => {
     {
       $addFields: {
         id: "$_id",
+        ...(res.locals.authenticated && {
+          ownRating: ownRatingField,
+        }),
+        ratingsArray: {
+          $ifNull: [
+            { $objectToArray: "$ratings" },
+            { $literal: [{ k: "internal", v: 0 }] },
+          ],
+        },
         versions: {
           $map: {
             input: "$versions",
@@ -562,8 +611,29 @@ router.get("/:levelId", async (req, res, next) => {
       },
     },
     {
+      $addFields: {
+        numFields: { $size: "$ratingsArray" },
+        numLikes: {
+          $reduce: {
+            input: "$ratingsArray",
+            initialValue: 0,
+            in: { $add: ["$$value", "$$this.v"] },
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        averageRating: { $divide: ["$numLikes", "$numFields"] },
+      },
+    },
+    {
       $project: {
+        ratings: false,
         _id: false,
+        ratingsArray: false,
+        numFields: false,
+        numLikes: false,
       },
     },
   ];
@@ -742,6 +812,59 @@ router.delete(
   }
 );
 
+router.put(
+  "/:levelId/rating",
+  checkAuthenticated("Only authenticated users can set ratings"),
+  async (req, res, next) => {
+    let levelId;
+    try {
+      levelId = ObjectId(req.params.levelId);
+    } catch (err) {
+      // An ObjectId can't be constructed from the given levelId
+      const levelNotFound = new Error();
+      levelNotFound.status = 404;
+      levelNotFound.errors = "Level not found";
+      levelNotFound.message = `No level with levelId found`;
+      return next(levelNotFound);
+    }
+    if (
+      !res.locals.admin &&
+      req.body.hasOwnProperty("userId") &&
+      req.body.userId !== res.locals.userId
+    ) {
+      const userNotAuthorized = new Error();
+      userNotAuthorized.status = 403;
+      userNotAuthorized.errors = "A non admin user can only set his own rating";
+      userNotAuthorized.message =
+        "The given user isn't authorized to set a rating for this user";
+      return next(userNotAuthorized);
+    }
+    const query = { _id: levelId };
+    const field = `ratings.${req.body.userId || res.locals.userId}`;
+    const update = { $set: {} };
+    update.$set[field] = req.body.rating;
+    const result = await res.app.locals.db
+      .collection("levels")
+      .updateOne(query, update);
+    if (!result.acknowledged) {
+      const unknownServerError = new Error();
+      unknownServerError.status = 500;
+      unknownServerError.errors = "Something went wrong";
+      unknownServerError.message = "Something went wrong";
+      return next(unknownServerError);
+    }
+    if (result.matchedCount === 0) {
+      const levelNotFound = new Error();
+      levelNotFound.status = 404;
+      levelNotFound.errors = "Version not found";
+      levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
+      return next(levelNotFound);
+    }
+    res.sendStatus(200);
+    return null;
+  }
+);
+
 router.get("/:levelId/:versionId", async (req, res, next) => {
   let levelId;
   let versionId;
@@ -852,7 +975,7 @@ router.put(
       userNotAuthorized.errors =
         "A non admin user can only set his own personal best";
       userNotAuthorized.message =
-        "The given user isn't authorized to view this level";
+        "The given user isn't authorized to set a personal best for this user";
       return next(userNotAuthorized);
     }
     const query = { _id: { levelId, versionId } };
