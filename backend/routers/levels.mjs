@@ -228,11 +228,9 @@ router.get("/", async (req, res) => {
   const pageSize = req.query.hasOwnProperty("pageSize")
     ? req.query.pageSize
     : 20;
-  // no rating or personalBest yet so use title as defailt in the meantime (also change in openapi.yaml)
+  // no rating yet so use title as default in the meantime (also change in openapi.yaml)
   const orderBy =
-    req.query.hasOwnProperty("orderBy") &&
-    req.query.orderBy !== "personalBest" &&
-    req.query.orderBy !== "rating"
+    req.query.hasOwnProperty("orderBy") && req.query.orderBy !== "rating"
       ? req.query.orderBy
       : "title";
   const direction =
@@ -252,13 +250,13 @@ router.get("/", async (req, res) => {
   const maxLength = req.query.hasOwnProperty("maxLength")
     ? req.query.maxLength
     : 0;
-  /*
   const minPersonalBest = req.query.hasOwnProperty("minPersonalBest")
     ? req.query.minPersonalBest
-    : 0; // tracking of personal bests not implemented
+    : 0;
   const maxPersonalBest = req.query.hasOwnProperty("maxPersonalBest")
     ? req.query.maxPersonalBest
-    : 100; // tracking of personal bests not implemented
+    : 100;
+  /*
   const minRating = req.query.hasOwnProperty("minRating")
     ? req.query.minRating
     : 0; // tracking of ratings not implemented
@@ -300,11 +298,43 @@ router.get("/", async (req, res) => {
       as: "versions",
     },
   });
+  let personalBestField;
+  if (res.locals.authenticated) {
+    personalBestField = `$$version.personalBests.${res.locals.userId}`;
+  }
+  aggregationPipeline.push({
+    $addFields: {
+      id: "$_id",
+      versions: {
+        $map: {
+          input: "$versions",
+          as: "version",
+          in: {
+            id: "$$version._id.versionId",
+            difficulty: "$$version.difficulty",
+            ...(res.locals.authenticated && {
+              personalBest: {
+                $ifNull: [personalBestField, { $literal: 0 }],
+              },
+            }),
+          },
+        },
+      },
+    },
+  });
   aggregationPipeline.push({
     $match: {
       "versions.difficulty": {
         $gte: minDifficulty,
         $lte: maxDifficulty,
+      },
+    },
+  });
+  aggregationPipeline.push({
+    $match: {
+      "versions.personalBest": {
+        $gte: minPersonalBest,
+        $lte: maxPersonalBest,
       },
     },
   });
@@ -335,9 +365,32 @@ router.get("/", async (req, res) => {
       });
     }
   }
-  let personalBestField;
-  if (res.locals.authenticated) {
-    personalBestField = `$$version.personalBests.${res.locals.userId}`;
+  if (orderBy === "personalBest") {
+    if (direction === 1) {
+      aggregationPipeline.push({
+        $addFields: {
+          personalBest: {
+            $reduce: {
+              input: "$versions",
+              initialValue: 100,
+              in: { $min: ["$$value", "$$this.personalBest"] },
+            },
+          },
+        },
+      });
+    } else {
+      aggregationPipeline.push({
+        $addFields: {
+          personalBest: {
+            $reduce: {
+              input: "$versions",
+              initialValue: 0,
+              in: { $max: ["$$value", "$$this.personalBest"] },
+            },
+          },
+        },
+      });
+    }
   }
   aggregationPipeline.push({
     $facet: {
@@ -376,27 +429,10 @@ router.get("/", async (req, res) => {
           $limit: pageSize,
         },
         {
-          $addFields: {
-            id: "$_id",
-            versions: {
-              $map: {
-                input: "$versions",
-                as: "version",
-                in: {
-                  id: "$$version._id.versionId",
-                  difficulty: "$$version.difficulty",
-                  ...(res.locals.authenticated && {
-                    personalBest: personalBestField,
-                  }),
-                },
-              },
-            },
-          },
-        },
-        {
           $project: {
             _id: false,
             ...(orderBy === "difficulty" && { difficulty: false }),
+            ...(orderBy === "personalBest" && { personalBest: false }),
           },
         },
       ],
