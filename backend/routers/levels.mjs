@@ -706,23 +706,60 @@ router.get("/:levelId/:versionId", async (req, res, next) => {
     levelNotFound.message = `No version with levelId ${req.params.levelId} and versionId ${req.params.versionId} found`;
     return next(levelNotFound);
   }
-  const levelQuery = { _id: levelId };
-  const levelProjection = { published: true, author: true };
-  const level = await res.app.locals.db
-    .collection("levels")
-    .findOne(levelQuery, levelProjection);
-  if (level === null) {
+  const aggregationPipeline = [];
+  aggregationPipeline.push({
+    $match: {
+      "_id.levelId": levelId,
+      "_id.versionId": versionId,
+    },
+  });
+  aggregationPipeline.push({
+    $lookup: {
+      from: "levels",
+      localField: "_id.levelId",
+      foreignField: "_id",
+      as: "level",
+    },
+  });
+  let personalBestField;
+  if (res.locals.authenticated) {
+    personalBestField = `$personalBests.${res.locals.userId}`;
+  }
+  aggregationPipeline.push({
+    $project: {
+      level: {
+        $first: "$level",
+      },
+      ...(res.locals.authenticated && { personalBest: personalBestField }),
+      id: "$_id.versionId",
+      objects: 1,
+      difficulty: 1,
+      _id: 0,
+    },
+  });
+  aggregationPipeline.push({
+    $project: {
+      personalBests: 0,
+    },
+  });
+  const versions = await req.app.locals.db
+    .collection("versions")
+    .aggregate(aggregationPipeline)
+    .toArray();
+  if (versions.length === 0 || versions[0].level === null) {
     const levelNotFound = new Error();
     levelNotFound.status = 404;
-    levelNotFound.errors = "Level not found";
-    levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
+    levelNotFound.errors = "Version not found";
+    levelNotFound.message = `No version with levelId ${req.params.levelId} and versionId ${req.params.versionId} found`;
     return next(levelNotFound);
   }
+  const version = versions[0];
   if (
     !(
-      level.published ||
+      version.level.published ||
       res.locals.admin ||
-      (res.locals.authenticated && res.locals.userId === level.author.id)
+      (res.locals.authenticated &&
+        res.locals.userId === version.level.author.id)
     )
   ) {
     const userNotAuthorized = new Error();
@@ -733,23 +770,7 @@ router.get("/:levelId/:versionId", async (req, res, next) => {
       "The given user isn't authorized to view this level";
     return next(userNotAuthorized);
   }
-  const versionQuery = { _id: { levelId, versionId } };
-  const project = { personalBests: false };
-  const versions = await res.app.locals.db
-    .collection("versions")
-    .find(versionQuery)
-    .project(project)
-    .toArray();
-  if (versions.length !== 1) {
-    const versionNotFound = new Error();
-    versionNotFound.status = 404;
-    versionNotFound.errors = "Version not found";
-    versionNotFound.message = `No version with versionId ${req.params.versionId} found`;
-    return next(versionNotFound);
-  }
-  const version = versions[0];
-  version.id = version._id.versionId;
-  delete version._id;
+  delete version.level;
   res.json(version);
   return null;
 });
