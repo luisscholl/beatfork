@@ -335,6 +335,10 @@ router.get("/", async (req, res) => {
       });
     }
   }
+  let personalBestField;
+  if (res.locals.authenticated) {
+    personalBestField = `$$version.personalBests.${res.locals.userId}`;
+  }
   aggregationPipeline.push({
     $facet: {
       statistics: [
@@ -381,6 +385,9 @@ router.get("/", async (req, res) => {
                 in: {
                   id: "$$version._id.versionId",
                   difficulty: "$$version.difficulty",
+                  ...(res.locals.authenticated && {
+                    personalBest: personalBestField,
+                  }),
                 },
               },
             },
