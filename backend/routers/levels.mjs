@@ -483,6 +483,10 @@ router.get("/:levelId", async (req, res, next) => {
     levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
     return next(levelNotFound);
   }
+  let personalBestField;
+  if (res.locals.authenticated) {
+    personalBestField = `$$version.personalBests.${res.locals.userId}`;
+  }
   const aggregationPipeline = [
     {
       $match: { _id: levelId },
@@ -505,6 +509,9 @@ router.get("/:levelId", async (req, res, next) => {
             in: {
               id: "$$version._id.versionId",
               difficulty: "$$version.difficulty",
+              ...(res.locals.authenticated && {
+                personalBest: personalBestField,
+              }),
               objects: "$$version.objects",
             },
           },
