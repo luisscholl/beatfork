@@ -3,6 +3,7 @@ import Level from "../models/Level";
 import LevelPartial from "../models/LevelPartial";
 import LevelVersion from "../models/LevelVersion";
 import LevelVersionPartial from "../models/LevelVersionPartial";
+import oidcConfig from "../config/config.json";
 
 const levels: Map<string, Level> = new Map();
 const levelPartials: Map<string, LevelPartial> = new Map();
@@ -25,20 +26,24 @@ export type SearchOptions = {
 };
 
 function getAuthToken() {
-  const oidcStorage = localStorage.getItem(
-    `oidc.user:<your authority>:<your client id>`
+  const oidcStorage = sessionStorage.getItem(
+    `oidc.user:${oidcConfig.authority}:${oidcConfig.client_id}`
   );
+  console.log(oidcStorage);
   if (!oidcStorage) {
     return null;
   }
 
-  return User.fromStorageString(oidcStorage)?.access_token;
+  return `Bearer ${User.fromStorageString(oidcStorage)?.access_token}`;
 }
 
 // If version is specified, the returned level is only guaranteed to contain the specified full version. Other values of the version dictionary can be LevelVersionPartials.
 function getLevel(id: string, version?: string): Promise<Level> {
   // If level is cached -> Dandy!
-  if (levels.get(id)) return new Promise((resolve) => resolve(levels.get(id)));
+  if (levels.get(id))
+    return new Promise((resolve) => {
+      resolve(levels.get(id));
+    });
   const token = getAuthToken();
   const headers = token ? { Authorization: token } : {};
 
@@ -46,7 +51,9 @@ function getLevel(id: string, version?: string): Promise<Level> {
   if (typeof version !== "undefined" && levelPartials.get(id)) {
     // If version is cached -> Dandy!
     if ((levelPartials.get(id).versions[version] as any).objects) {
-      return new Promise((resolve) => resolve(<Level>levelPartials.get(id)));
+      return new Promise((resolve) => {
+        resolve(<Level>levelPartials.get(id));
+      });
     }
     // Get, cache and return version.
     return fetch(`${process.env.REACT_APP_API_URL}/levels/${id}/${version}`, {

@@ -24,6 +24,13 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "react/function-component-definition": [
+      "error",
+      {
+        "namedComponents": "arrow-function",
+        "unnamedComponents": "arrow-function"
+      }
+    ],
     "no-continue": "off",
     "no-restricted-syntax": [
       "error",

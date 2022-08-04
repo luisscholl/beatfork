@@ -1,15 +1,19 @@
 import express, { json } from "express";
 import { MongoClient } from "mongodb";
 import { middleware } from "express-openapi-validator";
-import { CognitoJwtVerifier } from "aws-jwt-verify";
 import cors from "cors";
 import yaml from "js-yaml";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import passport from "passport";
+import passportAnonymous from "passport-anonymous";
+import KeycloakBearerStrategy from "passport-keycloak-bearer";
 import verifyJWT from "./middleware/jwtVerifier.mjs";
 import levels from "./routers/levels.mjs";
 import "dotenv/config";
+
+const { Strategy: AnonymousStrategy } = passportAnonymous;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,18 +29,28 @@ const appPort = process.env.PORT;
 
 const mongoClient = new MongoClient(process.env.MONGO_URI);
 
-const jwtVerifier = CognitoJwtVerifier.create({
-  userPoolId: process.env.USER_POOL_ID,
-  tokenUse: "access",
-  clientId: process.env.CLIENT_ID,
-});
-console.log("----");
-console.log(jwtVerifier);
-console.log("----");
+const opts = {
+  realm: process.env.REALM,
+  url: process.env.URL,
+};
+passport.use(
+  new KeycloakBearerStrategy(opts, (jwtPayload, done) => {
+    console.log("____");
+    console.log(jwtPayload);
+    console.log("____");
+    return done(null, jwtPayload);
+  })
+);
+passport.use(new AnonymousStrategy());
 
 app.disable("etag");
 app.use(cors());
 app.use(json());
+app.use(passport.initialize());
+app.use(
+  "/",
+  passport.authenticate(["keycloak", "anonymous"], { session: false })
+);
 app.use(verifyJWT);
 
 // rewrite api spec to workaround problem with discerning collectibles and obstacles
@@ -122,15 +136,7 @@ mongoClient.connect(function (mongoConnectionError, client) {
     throw mongoConnectionError;
   }
   app.locals.db = client.db("beatfork");
-  jwtVerifier
-    .hydrate()
-    .catch((err) => {
-      throw err;
-    })
-    .then(() => {
-      app.locals.jwtVerifier = jwtVerifier;
-      app.listen(appPort, () => {
-        console.log(`Example app listening on port ${appPort}`);
-      });
-    });
+  app.listen(appPort, () => {
+    console.log(`Example app listening on port ${appPort}`);
+  });
 });

@@ -61,7 +61,7 @@
   },
   "scripts": {
     "install": "rimraf node_modules/bravura && rimraf src/bravura && git clone https://github.com/steinbergmedia/bravura.git && rimraf bravura/.git && move-file bravura node_modules/bravura && cpy node_modules/bravura src/bravura --flat",
-    "start": "rimraf public/legal && cpy ../legal public && npm run start:prod-pool",
+    "start": "rimraf public/legal && cpy ../legal public && npm run start:dev-pool",
     "start:dev-pool": "shx cp src/config/config.local.dev.json src/config/config.json && rescripts start",
     "start:prod-pool": "shx cp src/config/config.local.prod.json src/config/config.json && rescripts start",
     "build": "shx cp src/config/config.prod.json src/config/config.json && rescripts build",

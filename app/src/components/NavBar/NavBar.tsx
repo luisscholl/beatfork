@@ -31,7 +31,7 @@ const NavBar = () => {
       {auth.error && <div>Oops... {auth.error.message}</div>}
       {auth.isAuthenticated && (
         <NavLink to="/profile">
-          {auth.user?.profile["cognito:username"]}{" "}
+          {auth.user?.profile.preferred_username}{" "}
           <FontAwesomeIcon icon={faUser} />
         </NavLink>
       )}

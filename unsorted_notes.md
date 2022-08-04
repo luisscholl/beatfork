@@ -19,3 +19,7 @@ Two audio sources make jarring sounds in Firefox. Use something like Howler.js h
 Exposing methods of child components is not well supported by TypeScript. See
 * https://github.com/typescript-cheatsheets/react/issues/106
 * https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/hooks/#useimperativehandle
+
+<hr />
+
+Why is there .env and config folder in app/ ?

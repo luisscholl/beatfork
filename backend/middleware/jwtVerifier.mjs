@@ -1,5 +1,7 @@
 async function verifyJWT(req, res, next) {
   try {
+    console.log(req.isAuthenticated());
+    console.log(req.user);
     // A valid JWT is expected in the HTTP header "authorization"
     const payload = await req.app.locals.jwtVerifier.verify(
       req.header("authorization")

@@ -31,6 +31,10 @@ init(
                       name: "Legalmattic",
                       repository: "https://github.com/Automattic/legalmattic",
                     },
+                    {
+                      name: "Keycloak",
+                      repository: "https://github.com/keycloak/keycloak",
+                    },
                   ];
                   for (const key of Object.keys(packagesRoot)) {
                     const packageRoot = packagesRoot[key];
