@@ -29,3 +29,4 @@ src/bravura/
 public/licensed_audio/
 
 .env
+src/config/config.json
