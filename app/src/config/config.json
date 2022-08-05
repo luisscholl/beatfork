@@ -1,8 +1,9 @@
 {
-  "authority": "http://localhost:9090/auth/realms/BeatFork/",
-  "client_id": "frontend",
-  "redirect_uri": "https://localhost:4200",
+  "authority": "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_GVIXEhvxt",
+  "client_id": "77283vo4755a45ik7iag1qrsvu",
+  "redirect_uri": "https://beatfork.com",
   "revokeTokenTypes": [
     "refresh_token"
-  ]
+  ],
+  "automaticSilentRenew": false
 }
