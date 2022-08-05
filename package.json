@@ -13,7 +13,7 @@
     "bd": "npm run build && npm run deploy",
     "api-doc-viewer": "redocly preview-docs backend/docs/openapi.yaml",
     "docker-prod": "cd docker && docker-compose -f docker-compose.yml -f production.yml up -d --remove-orphans && cd ..",
-    "backend-prod": "cd backend && pm2 stop 'all' & pm2 start app.mjs && cd .."
+    "backend-prod": "pm2 stop 'all' & pm2 start backend/app.mjs"
   },
   "repository": {
     "type": "git",
