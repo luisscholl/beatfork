@@ -3,15 +3,17 @@ services:
   postgres:
     image: postgres
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ~/postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: keycloak
+      POSTGRES_DB: ${KC_DB_USERNAME}
       POSTGRES_USER: ${KC_DB_USERNAME}
       POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
     ports:
       - 5432:5432
   keycloak:
     image: quay.io/keycloak/keycloak:19.0.1
+    volumes:
+      - ~/beatfork/docker/themes:/opt/keycloak/themes
     environment:
       KC_DB: postgres
       KC_DB_URL: postgres:5432
@@ -20,11 +22,9 @@ services:
       KC_HOSTNAME: ${KC_HOSTNAME}
       KEYCLOAK_ADMIN: ${KC_USER}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_PASSWORD}
-    ports:
-      - 8080:8080
     depends_on:
       - postgres
-    entrypoint: "/opt/keycloak/bin/kc.sh start --proxy=edge --http-relative-path=auth"
+    entrypoint: "/opt/keycloak/bin/kc.sh start --proxy=edge --http-relative-path=auth --hostname-strict=false --hostname-strict-https=false"
     network_mode: "host"
 volumes:
   postgres_data:

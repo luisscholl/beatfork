@@ -8,12 +8,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "cd app && npm i && cd .. && cd backend && npm i && cd .. && npm i -g generate-react-cli",
     "start": "cd docker &&  docker-compose up -d --build && node start-keycloak-dev.mjs && cd .. && concurrently -n frontend,backend,db-viewer,api-doc-viewer \"cd app && npm start\" \"cd backend && npm start\" \"mongoku start\" \"npm run api-doc-viewer\"",
-    "build": "node scripts/generate-credits && cd app && npm run build",
+    "build": "node scripts/generate-credits.mjs && cd app && npm run build",
     "deploy": "ssh finsternis \"cd beatfork && git pull && npm i && npm run build && rsync -r --del app/build/ /var/www/html && npm run docker-prod && npm run backend-prod\"",
     "bd": "npm run build && npm run deploy",
     "api-doc-viewer": "redocly preview-docs backend/docs/openapi.yaml",
     "docker-prod": "cd docker && docker-compose -f docker-compose.yml -f production.yml up -d --remove-orphans && cd ..",
-    "backend-prod": "cd backend && pm2 stop 'all' && pm2 start app.mjs && cd .."
+    "backend-prod": "cd backend && pm2 stop 'all' & pm2 start app.mjs && cd .."
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "dotenv": "^16.0.1",
     "fs-extra": "^10.0.1",
     "license-checker": "^25.0.1",
+    "pm2": "^5.2.0",
     "sync-fetch": "^0.3.1"
   },
   "devDependencies": {
