@@ -1,6 +1,13 @@
 import { PerspectiveCamera } from "@react-three/drei";
+import * as THREE from "three";
 import { Canvas, ThreeEvent } from "@react-three/fiber";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCogs,
@@ -22,7 +29,7 @@ import {
   faToggleOff,
   faThLarge,
 } from "@fortawesome/free-solid-svg-icons";
-import { DoubleSide, Mesh, Raycaster, Vector2 } from "three";
+import { Camera, DoubleSide, Mesh, Raycaster, Vector2 } from "three";
 import { generateUUID } from "three/src/math/MathUtils";
 import { saveAs } from "file-saver";
 import {
@@ -47,8 +54,24 @@ import EditorObstacles, {
   EditorObstaclesRefAttributes,
 } from "../EditorObstacles/EditorObstacles";
 import SettingsRow from "../SettingsRow/SettingsRow";
+import editorObstacleFragmentShader from "../../shaders/editorObstacleFragmentShader.glsl";
+import editorObstacleVertexShader from "../../shaders/editorObstacleVertexShader.glsl";
 
 const Editor = () => {
+  // todo: move outside into separate component
+  const shaderData = useMemo(
+    () => ({
+      fragmentShader: editorObstacleFragmentShader,
+      vertexShader: editorObstacleVertexShader,
+      uniforms: {
+        obstacleTexture: {
+          value: new THREE.TextureLoader().load("./assets/obstacles.png"),
+        },
+      },
+    }),
+    []
+  );
+
   const settings = useRecoilValue(settingsState);
   const RecoilBridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
 
@@ -128,9 +151,10 @@ const Editor = () => {
   const fileInput = useRef<HTMLInputElement>();
   const animationFrameRequest = useRef<number>(null);
 
-  const renderer = new THREE.WebGLRenderer({
-    preserveDrawingBuffer: true,
-  });
+  // todo: remove entirely, when other solution works
+  //  const renderer = new THREE.WebGLRenderer({
+  //    preserveDrawingBuffer: true,
+  //  });
   const itemTypes = Array.from({ length: 10 }, (e, i) => i);
 
   const [templateTypes, setTemplateType] = useState<
@@ -146,6 +170,25 @@ const Editor = () => {
   const [isOpen, setOpen] = useState(
     JSON.parse(localStorage.getItem("templates")) || false
   );
+
+  const sideBarCanvasRef = useRef();
+
+  const [i, setI] = useState<number>(0);
+
+  // todo: idea, put into different component
+  // if (i < itemTypes) {
+  //  //setSideBarCanvasChildren()
+  //  setI(old => old + 1);
+  // }
+
+  // SideBarRenderComponent abstracts away rendering different templates via state changes
+  // Returns rendered images via callBack
+  // <SideBarRenderComponent templates={templates} templateIds={templateIds}></SideBarRenderComponent done={callBackWhenDone)}>
+
+  useEffect(() => {
+    console.log("canvasRef");
+    console.log(sideBarCanvasRef.current);
+  }, [sideBarCanvasRef.current]);
 
   // load level from file
   useEffect(() => {
@@ -576,6 +619,7 @@ const Editor = () => {
   };
 
   const mapSidebarItem = (type: number | Array<Collectible | Obstacle>) => {
+    // Case: primitive
     if (typeof type === "number") {
       console.log(type);
       if (type === 0) {
@@ -600,12 +644,14 @@ const Editor = () => {
         </button>
       );
     }
+    // Case: template
     return mapSidebarTemplate(type);
   };
 
   const mapSidebarTemplate = (type: Array<Collectible | Obstacle>) => {
     console.log(type);
     templateIndex.current += 1;
+    const img = renderSidebarTemplate(type);
 
     return (
       <button
@@ -619,6 +665,11 @@ const Editor = () => {
     );
   };
 
+  const renderSidebarTemplate = (template: Array<Collectible | Obstacle>) => {
+    return 1;
+  };
+
+  // todo: probably good point to generate template images
   const saveTemplate = () => {
     const collTemplate = levelObjectRefs.collectibles.current.copy(
       selected.collectibles.current,
@@ -632,19 +683,9 @@ const Editor = () => {
     const template = [...collTemplate, ...obstTemplate];
 
     templateTypes.push(template);
-    const templates = JSON.parse(localStorage.getItem("templates"));
-    if (templates === null) {
-      localStorage.setItem("templates", JSON.stringify([template]));
-      setTemplateType([template]);
-    } else {
-      localStorage.setItem(
-        "templates",
-        JSON.stringify([...templates, template])
-      );
-      setTemplateType([...templates, template]);
-    }
-
-    // localStorage.setItem("templates", JSON.stringify());
+    const templates = JSON.parse(localStorage.getItem("templates")) || [];
+    localStorage.setItem("templates", JSON.stringify([...templates, template]));
+    setTemplateType([...templates, template]);
   };
 
   const renderAtTime = (t: number) => {
@@ -906,6 +947,19 @@ const Editor = () => {
           </div>
         )}
       </div>
+      <Canvas ref={sideBarCanvasRef}>
+        <mesh position={[0, 0, 0]}>
+          <boxBufferGeometry args={[0.25, 0.25, 0.25]} attach="geometry" />
+          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+          <shaderMaterial attach="material" {...shaderData} />
+        </mesh>
+        <PerspectiveCamera
+          makeDefault
+          position={[0, 0, 0.55]}
+          rotation={[0, 0, 0]}
+        />
+        <directionalLight position={[-5, 20, -35]} />
+      </Canvas>
     </div>
   );
 };
