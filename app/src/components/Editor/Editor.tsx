@@ -18,6 +18,9 @@ import {
   faBorderAll,
   faMagnet,
   faCopy,
+  faToggleOn,
+  faToggleOff,
+  faThLarge,
 } from "@fortawesome/free-solid-svg-icons";
 import { DoubleSide, Mesh, Raycaster, Vector2 } from "three";
 import { generateUUID } from "three/src/math/MathUtils";
@@ -124,6 +127,25 @@ const Editor = () => {
   const tLastMouseDown = useRef<number>(0);
   const fileInput = useRef<HTMLInputElement>();
   const animationFrameRequest = useRef<number>(null);
+
+  const renderer = new THREE.WebGLRenderer({
+    preserveDrawingBuffer: true,
+  });
+  const itemTypes = Array.from({ length: 10 }, (e, i) => i);
+
+  const [templateTypes, setTemplateType] = useState<
+    Array<Array<Collectible | Obstacle>>
+  >(JSON.parse(localStorage.getItem("templates")) || []);
+  const [templateToggle, setTemplateToggle] = useState<false | true>(false);
+  const [sideBarItems, setSideBarItems] = useState<
+    Array<number> | Array<Array<Collectible | Obstacle>>
+  >(templateToggle ? templateTypes : itemTypes);
+
+  const templateIndex = useRef<number>(0);
+
+  const [isOpen, setOpen] = useState(
+    JSON.parse(localStorage.getItem("templates")) || false
+  );
 
   // load level from file
   useEffect(() => {
@@ -310,6 +332,57 @@ const Editor = () => {
     }
   };
 
+  const onSidebarTemplateMouseDown = (
+    event: React.MouseEvent,
+    template: Array<Collectible | Obstacle>
+  ) => {
+    collectibles.current.deselect(selected.collectibles.current);
+    obstacles.current.deselect(selected.obstacles.current);
+    // localStorage.clear();
+
+    for (const elem of template) {
+      // console.log(elem.position);
+      const pos = {
+        x: elem.position.x,
+        y: elem.position.y,
+        z: elem.position.z,
+      };
+      console.log(pos);
+      pos.z /= -settings.editorTimeScaleFactor;
+      if (elem.type === "Collectible") {
+        collectibles.current.addCollectible({
+          type: "Collectible",
+          collectibleType: elem.collectibleType,
+          position: pos,
+          measure: 0, // todo
+          beat: 0, // todo
+        });
+        collectibles.current.select([-1]);
+      }
+      if (elem.type === "Obstacle") {
+        obstacles.current.addObstacle({
+          type: "Obstacle",
+          position: pos,
+          dimensions: {
+            x: 0.5,
+            y: 0.75,
+            z: 0.25,
+          },
+          measure: 0, // todo
+          beat: 0, // todo
+        });
+        obstacles.current.select([-1]);
+      }
+
+      // collectibles.current.deselect(selected.collectibles.current);
+      // obstacles.current.deselect(selected.obstacles.current);
+      // collectibles.current.select([-1]);
+      if (snappingDivider) {
+        collectibles.current.snap([-1]);
+      }
+    }
+  };
+
   const selectLevelObject = (
     event: ThreeEvent<MouseEvent>,
     i: number,
@@ -403,8 +476,11 @@ const Editor = () => {
   };
 
   const copy = () => {
-    levelObjectRefs.collectibles.current.copy(selected.collectibles.current);
-    levelObjectRefs.obstacles.current.copy(selected.obstacles.current);
+    levelObjectRefs.collectibles.current.copy(
+      selected.collectibles.current,
+      true
+    );
+    levelObjectRefs.obstacles.current.copy(selected.obstacles.current, true);
   };
 
   const toggleTripletSnapping = () => {
@@ -493,6 +569,84 @@ const Editor = () => {
     }
   };
 
+  const templateToggleSwitch = () => {
+    setTemplateToggle(!templateToggle);
+
+    setSideBarItems(!templateToggle ? templateTypes : itemTypes);
+  };
+
+  const mapSidebarItem = (type: number | Array<Collectible | Obstacle>) => {
+    if (typeof type === "number") {
+      console.log(type);
+      if (type === 0) {
+        return (
+          <button
+            type="button"
+            onMouseDown={(event) => onSidebarObstacleMouseDown(event)}
+          >
+            <EditorSideBarObstacle />
+          </button>
+        );
+      }
+      return (
+        <button
+          key={type}
+          type="button"
+          onMouseDown={(event) =>
+            onSidebarCollectibleMouseDown(event, type as CollectibleType)
+          }
+        >
+          <EditorSideBarCollectible type={type as CollectibleType} />
+        </button>
+      );
+    }
+    return mapSidebarTemplate(type);
+  };
+
+  const mapSidebarTemplate = (type: Array<Collectible | Obstacle>) => {
+    console.log(type);
+    templateIndex.current += 1;
+
+    return (
+      <button
+        key={1}
+        type="button"
+        style={{ fontSize: "150%" }}
+        onMouseDown={(event) => onSidebarTemplateMouseDown(event, type)}
+      >
+        {templateIndex.current}
+      </button>
+    );
+  };
+
+  const saveTemplate = () => {
+    const collTemplate = levelObjectRefs.collectibles.current.copy(
+      selected.collectibles.current,
+      false
+    );
+    const obstTemplate = levelObjectRefs.obstacles.current.copy(
+      selected.obstacles.current,
+      false
+    );
+
+    const template = [...collTemplate, ...obstTemplate];
+
+    templateTypes.push(template);
+    const templates = JSON.parse(localStorage.getItem("templates"));
+    if (templates === null) {
+      localStorage.setItem("templates", JSON.stringify([template]));
+      setTemplateType([template]);
+    } else {
+      localStorage.setItem(
+        "templates",
+        JSON.stringify([...templates, template])
+      );
+      setTemplateType([...templates, template]);
+    }
+
+    // localStorage.setItem("templates", JSON.stringify());
+  };
+
   const renderAtTime = (t: number) => {
     tSince0.current = t;
     ground.current?.animate(t);
@@ -571,6 +725,12 @@ const Editor = () => {
       </Canvas>
       <div className="UI">
         <div className="side-bar">
+          <button type="button">
+            <FontAwesomeIcon
+              icon={templateToggle ? faToggleOn : faToggleOff}
+              onClick={templateToggleSwitch}
+            />
+          </button>
           <button
             type="button"
             onMouseEnter={() => {
@@ -583,25 +743,14 @@ const Editor = () => {
             <FontAwesomeIcon icon={faCaretUp} />
           </button>
           <div className="content" onWheel={onSideBarWheel} ref={sideBarRef}>
-            <button
+            {/*            <button
               type="button"
               onMouseDown={(event) => onSidebarObstacleMouseDown(event)}
             >
               <EditorSideBarObstacle />
             </button>
             {/* todo: Depends on implementation of CollectibleType. Is there a better solution? */}
-
-            {Array.from({ length: 9 }, (e, i) => i + 1).map((type) => (
-              <button
-                key={type}
-                type="button"
-                onMouseDown={(event) =>
-                  onSidebarCollectibleMouseDown(event, type as CollectibleType)
-                }
-              >
-                <EditorSideBarCollectible type={type as CollectibleType} />
-              </button>
-            ))}
+            {sideBarItems.map(mapSidebarItem)}
           </div>
           <button
             type="button"
@@ -683,6 +832,15 @@ const Editor = () => {
               onClick={() => copy()}
             >
               <FontAwesomeIcon style={{ width: "50%" }} icon={faCopy} />
+            </button>
+            <button
+              className=""
+              type="button"
+              onClick={saveTemplate}
+              style={{ fontSize: "150%" }}
+            >
+              <FontAwesomeIcon style={{ width: "50%" }} icon={faSave} />
+              <FontAwesomeIcon style={{ width: "20%" }} icon={faThLarge} />
             </button>
           </div>
           <div className="others">

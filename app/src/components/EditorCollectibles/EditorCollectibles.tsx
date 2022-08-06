@@ -28,7 +28,7 @@ export interface EditorCollectiblesRefAttributes {
   addCollectible(collectible: Collectible): void;
   moveTo(targets: number[], position: Vector3D): void;
   moveBy(targets: number[], distance: Vector3D): void;
-  copy(targets: number[]): void;
+  copy(targets: number[], save: boolean): Collectible[];
   remove(targets: number[]): void;
   export(): Collectible[];
   configureSnap(
@@ -185,17 +185,25 @@ const EditorCollectibles: ForwardRefExoticComponent<
       meshRef.current.instanceMatrix.needsUpdate = true;
     },
 
-    copy(targets: number[]): void {
+    copy(targets: number[], save: boolean): Collectible[] {
+      const selected = [];
       for (const target of targets) {
         const pos = collectibles.current[target].position;
-        _addCollectible({
+        const newCol = {
           type: "Collectible",
           collectibleType: collectibles.current[target].collectibleType,
           position: { x: pos.x, y: pos.y, z: pos.z },
           measure: 0, // todo
           beat: 0, // todo
-        });
+        } as Collectible;
+
+        if (save) {
+          _addCollectible(newCol);
+        }
+        selected.push(newCol);
       }
+
+      return selected;
     },
     // todo: Is this efficient enough?
     remove(targets: number[]): void {
