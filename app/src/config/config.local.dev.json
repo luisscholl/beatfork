@@ -1,0 +1,8 @@
+{
+  "authority": "http://localhost:9090/auth/realms/BeatFork/",
+  "client_id": "frontend",
+  "redirect_uri": "https://localhost:4200",
+  "revokeTokenTypes": [
+    "refresh_token"
+  ]
+}

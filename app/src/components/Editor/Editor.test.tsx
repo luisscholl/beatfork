@@ -7,8 +7,8 @@ describe("<Editor />", () => {
   test("it should mount", () => {
     render(<Editor />);
 
-    const Editor = screen.getByTestId("Editor");
+    const editor = screen.getByTestId("Editor");
 
-    expect(Editor).toBeInTheDocument();
+    expect(editor).toBeInTheDocument();
   });
 });

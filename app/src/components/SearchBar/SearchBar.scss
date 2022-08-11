@@ -1,0 +1,15 @@
+.SearchBar {
+  input {
+    width: calc(100% - 1rem);
+    margin: 0.5rem;
+    background-color: var(--search-bar-bg-color);
+    color: var(--search-bar-text-color);
+    border: none;
+    padding: 0.5rem;
+    font-size: 1rem;
+
+    &::placeholder {
+      color: var(--search-bar-placeholder-color);
+    }
+  }
+}

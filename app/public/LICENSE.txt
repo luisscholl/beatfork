@@ -1,3 +1,8 @@
+Note: This license only applies to all source files excluding files in the /app/legal folder, the /app/audio folder and the /app/src/vendors folder. See the COPYING section in the README.md file for how the parts not covered by this license are licensed.
+
+======
+
+License
 
                                  Apache License
                            Version 2.0, January 2004

@@ -1,0 +1,215 @@
+.SearchCriteria {
+  margin: 0.5rem;
+  background-color: var(--search-criteria-bg-color);
+  color: var(--search-criteria-text-color);
+
+  .row {
+    padding: 0.5rem 1rem;
+    align-items: center;
+
+    .react-select {
+      width: 100%;
+
+      &.first {
+        z-index: 11;
+      }
+
+      &.second {
+        z-index: 10;
+      }
+
+      .rs__control {
+        background-color: var(--search-criteria-dropdown-bg-color);
+        border-color: transparent;
+
+        .rs__value-container {
+          span {
+            color: var(--search-criteria-dropdown-text-color);
+          }
+
+          svg {
+            margin-right: 0.5rem;
+            color: var(--search-criteria-dropdown-selected-icon-color);
+          }
+        }
+
+        .rs__indicators {
+          span {
+            background-color: var(--search-criteria-dropdown-indicator-color);
+          }
+
+          svg {
+            color: var(--search-criteria-dropdown-indicator-color);
+          }
+        }
+      }
+
+      .rs__menu {
+        background-color: var(--search-criteria-dropdown-bg-color);
+
+        .rs__menu-list {
+          .rs__option {
+            span {
+              color: var(--search-criteria-dropdown-text-color);
+            }
+
+            svg {
+              margin-right: 0.5rem;
+              color: var(--search-criteria-dropdown-icon-color);
+            }
+
+            &.rs__option--is-selected {
+              background-color: transparent;
+
+              svg {
+                color: var(--search-criteria-dropdown-selected-icon-color);
+              }
+            }
+
+            &.rs__option--is-focused {
+              background-color: var(--search-criteria-dropdown-focused-bg-color);
+            }
+          }
+        }
+      }
+    }
+
+    .multi-range-slider {
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      height: 5rem;
+      padding: 0;
+      padding-top: 2rem;
+
+      .bar {
+        margin: 0 0.5rem;
+
+        .bar-left,
+        .bar-right {
+          box-shadow: none;
+          background-color: var(--search-criteria-multi-range-selector-bar-outer-color);
+        }
+
+        .bar-inner {
+          background-color: var(--search-criteria-multi-range-selector-bar-inner-color);
+          box-shadow: none;
+          border: none;
+        }
+
+        .thumb {
+          z-index: 1;
+
+          &:hover {
+            z-index: 2;
+          }
+
+          &::before {
+            border: none;
+            box-shadow: none;
+          }
+
+          * {
+            pointer-events: none;
+          }
+
+          & > * {
+            display: flex;
+            justify-content: center;
+            box-shadow: none;
+            border-radius: 0;
+            top: 1.25rem;
+            width: 1000px;
+            left: -498px;
+            background-color: transparent;
+
+            & > * {
+              position: relative;
+              display: flex;
+              box-shadow: none;
+              width: max-content;
+              background-color: var(--search-criteria-multi-range-selector-thumb-label-bg-color);
+              color: var(--search-criteria-multi-range-selector-thumb-label-text-color);
+              left: 0;
+              top: 0;
+              font-size: 1rem;
+              border-radius: 0.2rem;
+              padding: 0.2rem 0.4rem;
+              align-items: center;
+              z-index: 1;
+
+              // todo: Add ability to set limits by double clicking and entering value
+              // pointer-events: all;
+
+              &::before {
+                content: "";
+                box-sizing: border-box;
+                position: absolute;
+                border: 5px solid transparent;
+                border-bottom: 5px solid var(--search-criteria-multi-range-selector-thumb-label-bg-color);
+                width: 10px;
+                height: 10px;
+                top: -10px;
+                left: calc(50% - 5px);
+              }
+            }
+          }
+        }
+
+        .thumb-left::before {
+          background-color: var(--search-criteria-multi-range-selector-left-thumb-color);
+        }
+
+        .thumb-right::before {
+          background-color: var(--search-criteria-multi-range-selector-right-thumb-color);
+        }
+      }
+
+      .label {
+        margin: 0;
+        margin-top: -2.3rem;
+        color: var(--search-criteria-multi-range-selector-label-color);
+      }
+
+      .label-max,
+      .label-min {
+        font-size: 0.85rem;
+      }
+    }
+
+    label.checkbox {
+      user-select: none;
+      display: block;
+      font-size: 1rem;
+      color: var(--search-criteria-text-color);
+
+      input[type="checkbox"] {
+        margin: 0;
+        width: 1rem;
+        margin-right: -1rem;
+        z-index: 0;
+        position: relative;
+        transform: translateY(-0.05rem);
+      }
+
+      svg {
+        z-index: 1;
+        position: relative;
+        margin-right: 0.5rem;
+        width: 1rem;
+
+        path {
+          fill: var(--search-criteria-checkbox-color);
+        }
+      }
+
+      &.checked span.check svg {
+        margin-left: -1.5rem;
+
+        path {
+          fill: var(--search-criteria-checkbox-checked-color);
+        }
+      }
+    }
+  }
+}

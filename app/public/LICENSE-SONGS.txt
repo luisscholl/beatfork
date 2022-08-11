@@ -17,3 +17,11 @@ Link: https://freemusicarchive.org/music/Ryan_Andersen/Pop_Music/One_and_Only
 Backup-Link: https://web.archive.org/web/20210615104208/https://freemusicarchive.org/music/Ryan_Andersen/Pop_Music/One_and_Only
 
 Usage: Attribution-NonCommercial 4.0 International (https://creativecommons.org/licenses/by-nc/4.0/)
+
+------------------------
+Andy G. Cohen - Sprocket
+------------------------
+
+Link: https://archive.org/details/AndyG.CohenMusic/Andy+G.+Cohen+-+Sprocket.flac
+
+Usage: Attribution 3.0 (https://creativecommons.org/licenses/by/3.0/)

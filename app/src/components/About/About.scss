@@ -1,0 +1,15 @@
+.About {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  overflow: scroll;
+
+  .content {
+    max-width: 20cm;
+    background-color: var(--article-bg-color);
+    color: var(--article-text-color);
+    padding: 1rem;
+    margin: 1rem;
+    height: max-content;
+  }
+}

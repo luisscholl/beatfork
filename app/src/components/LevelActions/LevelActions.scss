@@ -1,0 +1,64 @@
+.LevelActions {
+  margin: 0.25rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+
+  button,
+  a {
+    display: block;
+    width: calc(100% - 0.5rem);
+    border: none;
+    margin: 0.25rem;
+    font-size: 1rem;
+    padding: 0.5rem;
+    background-color: var(--level-actions-bg-color);
+    color: var(--level-actions-text-color);
+    cursor: grab;
+    text-decoration: none;
+    text-align: center;
+
+    svg {
+      margin-right: 0.5rem;
+
+      path {
+        fill: var(--level-actions-text-color);
+      }
+    }
+
+    &.play {
+      background-color: var(--level-actions-play-bg-color, --level-actions-bg-color);
+      color: var(--level-actions-play-text-color, --level-actions-text-color);
+
+      svg {
+        path {
+          fill: var(--level-actions-play-text-color);
+        }
+      }
+    }
+
+    &:hover {
+      background-color: var(--level-actions-hover-bg-color);
+      color: var(--level-actions-hover-text-color);
+
+      svg path {
+        fill: var(--level-actions-hover-text-color);
+      }
+
+      &.play {
+        background-color: var(--level-actions-hover-play-bg-color, --level-actions-hover-bg-color);
+        color: var(--level-actions-hover-play-text-color, --level-actions-hover-text-color);
+
+        svg path {
+          fill: var(--level-actions-hover-play-text-color);
+        }
+      }
+    }
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

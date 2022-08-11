@@ -1,0 +1,13 @@
+.LazyMarkdown {
+  img {
+    width: 100%;
+  }
+
+  a {
+    color: var(--article-link-color);
+
+    &:visited {
+      color: var(--article-link-visited-color);
+    }
+  }
+}

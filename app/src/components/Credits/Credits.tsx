@@ -16,7 +16,7 @@ const Credits = () => {
   const setView = useSetRecoilState(viewState);
 
   useEffect(() => {
-    fetch("./LICENSE.txt")
+    fetch("/LICENSE.txt")
       .then((license) => license.text())
       .then((license) => {
         setCreditsText((creditsTextLocal) => {
@@ -25,7 +25,7 @@ const Credits = () => {
           return creditsTextCopy;
         });
       });
-    fetch("./LICENSE-SONGS.txt")
+    fetch("/LICENSE-SONGS.txt")
       .then((licenseSongs) => licenseSongs.text())
       .then((licenseSongs) => {
         setCreditsText((creditsTextLocal) => {
@@ -34,7 +34,7 @@ const Credits = () => {
           return creditsTextCopy;
         });
       });
-    fetch("./LICENSE-3RD-PARTY.txt")
+    fetch("/LICENSE-3RD-PARTY.txt")
       .then((license3rdParty) => license3rdParty.text())
       .then((license3rdParty) => {
         setCreditsText((creditsTextLocal) => {
@@ -47,27 +47,12 @@ const Credits = () => {
 
   return (
     <div className="Credits" data-testid="Credits">
-      {window.location.pathname === "/play" && (
-        <button
-          type="button"
-          className="back-button"
-          onClick={() => {
-            setView({ view: "main-menu" });
-          }}
-        >
-          BACK
-        </button>
-      )}
-      <div className="wrapper">
-        <div className="content">
-          <h2>License</h2>
-          <pre>{creditsText.license}</pre>
-          <h2>Song Notices</h2>
-          <pre>{creditsText.licenseSongs}</pre>
-          <h2>3rd Party Notices</h2>
-          <pre>{creditsText.license3rdParty}</pre>
-        </div>
-      </div>
+      <h2>License</h2>
+      <pre>{creditsText.license}</pre>
+      <h2>Song Notices</h2>
+      <pre>{creditsText.licenseSongs}</pre>
+      <h2>3rd Party Notices</h2>
+      <pre>{creditsText.license3rdParty}</pre>
     </div>
   );
 };

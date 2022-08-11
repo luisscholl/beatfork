@@ -1,0 +1,40 @@
+@use "../../styles/colors.scss";
+
+.LevelList {
+  flex-grow: 1;
+  margin: 0 0.5rem;
+
+  button {
+    border: none;
+    border-radius: 0;
+    text-align: left;
+    background-color: transparent;
+    font-size: 1rem;
+    cursor: grab;
+    padding: 0;
+
+    & > div {
+      background-color: var(--level-list-row-bg-color);
+      color: var(--level-list-row-text-color);
+      transition: color 0.3s ease, background-color 0.3s ease;
+      padding: 0 3rem;
+      height: calc(100% - 0.25rem);
+      display: flex;
+      align-items: center;
+    }
+
+    &.active {
+      div {
+        background-color: var(--level-list-row-active-bg-color);
+        color: var(--level-list-row-active-text-color);
+      }
+    }
+
+    &:hover {
+      div {
+        background-color: var(--level-list-row-hover-bg-color);
+        color: var(--level-list-row-hover-text-color);
+      }
+    }
+  }
+}

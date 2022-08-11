@@ -31,6 +31,7 @@ import {
   useRecoilState,
 } from "recoil";
 import { Howl } from "howler";
+import { useNavigate, useParams } from "react-router-dom";
 import Level from "../../models/Level";
 import Obstacle from "../../models/Obstacle";
 import Collectible, { CollectibleType } from "../../models/Collectible";
@@ -46,18 +47,23 @@ import GameplayCollectibles, {
   GameplayCollectiblesRefAttributes,
 } from "../GameplayCollectibles/GameplayCollectibles";
 import { viewState } from "../../atoms/viewState";
+import { LevelService } from "../../services/LevelService";
 
-const leftHandThreeURL = "assets/hand_left.png";
-const rightHandThreeURL = "assets/hand_right.png";
-const leftFootThreeURL = "assets/foot_left.png";
-const rightFootThreeURL = "assets/foot_right.png";
+const leftHandThreeURL = "/assets/hand_left.png";
+const rightHandThreeURL = "/assets/hand_right.png";
+const leftFootThreeURL = "/assets/foot_left.png";
+const rightFootThreeURL = "/assets/foot_right.png";
 const collectibleAudio = new Howl({ src: ["/sounds/collectibleHit.mp3"] });
 const hologramRadius = 0.125;
 const collectibleMeasure = 0.25;
 
-const Gameplay = (props: { level: Level; debug: boolean }) => {
+const Gameplay = (props: { debug: boolean }) => {
+  const { levelId, versionId } = useParams();
+  const navigate = useNavigate();
+
   const settings = useRecoilValue(settingsState);
   const RecoildBridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
+
   const music = useRef<Howl>();
   const captureVideo = useRef<HTMLVideoElement>();
   const gameplayWrapper = useRef<HTMLDivElement>();
@@ -104,7 +110,10 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
   const rightHandHologramRef = useRef<Mesh>();
   const leftFootHologramRef = useRef<Mesh>();
   const rightFootHologramRef = useRef<Mesh>();
+
   const [view, setView] = useRecoilState(viewState);
+
+  const [level, setLevel] = useState<Level>();
 
   function detectedPose(results: any) {
     if (!results.poseLandmarks) return;
@@ -208,7 +217,31 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
   });
   pose.onResults(detectedPose);
 
+  // todo: only fetch version
   useEffect(() => {
+    setView((old) => {
+      return {
+        ...old,
+        level: {
+          ...old.level,
+          id: levelId,
+        },
+        version: versionId,
+      };
+    });
+    LevelService.getLevel(levelId, versionId).then((result) => {
+      setView((old) => {
+        return {
+          ...old,
+          level: result,
+        };
+      });
+      setLevel(result);
+    });
+  }, [levelId, versionId]);
+
+  useEffect(() => {
+    if (!level) return null;
     if (!process.env.REACT_APP_VIDEO_SOURCE) {
       mediaPipeCamera.current =
         captureVideo.current &&
@@ -242,11 +275,11 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
       };
     }
     return undefined;
-  }, [captureVideo, pose]);
+  }, [level, captureVideo, pose]);
 
   // Level Playback Logic
-  const { level } = props;
   useEffect(() => {
+    if (!level) return;
     clippedObjectsThree.current = [];
     for (const obstacle of obstacles) {
       clippedObjectsThree.current.push(
@@ -270,7 +303,8 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
 
   const collectibles: Array<Collectible & { pristine: boolean }> =
     useMemo(() => {
-      return level.objects
+      if (!level) return null;
+      return level.versions[versionId].objects
         .filter((e: Collectible | Obstacle) => e.type === "Collectible")
         .map((e) => {
           return {
@@ -279,8 +313,10 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
           };
         }) as Array<Collectible & { pristine: boolean }>;
     }, [level]);
+
   const obstacles: Array<Obstacle & { pristine: boolean }> = useMemo(() => {
-    return level.objects
+    if (!level) return null;
+    return level.versions[versionId].objects
       .filter((e: Collectible | Obstacle) => e.type === "Obstacle")
       .map((e) => {
         return {
@@ -289,35 +325,42 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
         };
       }) as Array<Obstacle & { pristine: boolean }>;
   }, [level]);
+
   const t0 = useRef<number>();
   const tLast = useRef<number>();
   const animationFrameRequest = useRef<number>();
   const physicsIntervalId = useRef<number>();
   const clippingIndex = useRef<number>(1);
   const clippedObjectsThree = useRef<Array<ReactElement<any>>>([]);
+
   const [clippedObjectsThreeAsState, setClippedObjectsThreeAsState] = useState<
     Array<ReactElement<any>>
   >([]);
+
   useEffect(() => {
-    if (level.objects[0].type === "Obstacle") {
+    if (!level) return;
+    if (level.versions[versionId].objects[0].type === "Obstacle") {
       clippedObjectsThree.current.push(
         <GameplayObstacle
           key={0}
           position={{
-            x: level.objects[0].position.x,
-            y: level.objects[0].position.y,
-            z: -level.objects[0].position.z * settings.gamePlaytimeScaleFactor,
+            x: level.versions[versionId].objects[0].position.x,
+            y: level.versions[versionId].objects[0].position.y,
+            z:
+              -level.versions[versionId].objects[0].position.z *
+              settings.gamePlaytimeScaleFactor,
           }}
           dimensions={{
-            x: level.objects[0].dimensions.x,
-            y: level.objects[0].dimensions.y,
+            x: (level.versions[versionId].objects[0] as Obstacle).dimensions.x,
+            y: (level.versions[versionId].objects[0] as Obstacle).dimensions.y,
             z:
-              -level.objects[0].dimensions.z * settings.gamePlaytimeScaleFactor,
+              -(level.versions[versionId].objects[0] as Obstacle).dimensions.z *
+              settings.gamePlaytimeScaleFactor,
           }}
         />
       );
     }
-  }, [level.id]);
+  }, [level]);
   const camera = useRef<THREE.PerspectiveCamera>();
   // todo: If we have a lot of time, figure out how to do the types correctly.
   const ground = useRef<typeof Ground & { animate: (t: number) => void }>(null);
@@ -327,7 +370,6 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
   const landmarkDebugCanvas = useRef<
     typeof LandmarkDebugCanvas & { draw: (results: any) => void }
   >(null);
-  const [duration, setDuration] = useState<number>(1);
   const pointsByCollectible = 100;
   // Scoring Variables
   // todo: Determine whether it should be replaced with useRef -> Probably yes, because physics function is recreated on change
@@ -340,24 +382,22 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
   let currHealth = 100;
 
   useEffect(() => {
+    if (!level) return null;
     if (!music.current) return null;
     const musicEndedHandler = () => {
       setView((old: any) => {
         return {
-          view: "level-completed",
+          ...old,
           score,
-          level: old.level,
         };
       });
+      navigate("/level-completed");
     };
     music.current.once("end", musicEndedHandler);
-    music.current.once("load", () => {
-      setDuration(music.current.duration());
-    });
     return () => {
       music.current.off();
     };
-  }, [level.id, level.audio, mediaPipeReady, score]);
+  }, [level, mediaPipeReady, score]);
 
   useEffect(() => {
     if (health > 0) return;
@@ -366,27 +406,28 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
     if (typeof physicsIntervalId.current === "number")
       clearInterval(physicsIntervalId.current);
     music.current.pause();
-    setView((old: any) => {
-      return {
-        view: "game-over",
-        level: old.level,
-      };
-    });
+    navigate("/game-over");
   }, [health]);
 
   useEffect(() => {
+    if (!level) return null;
     if (!mediaPipeReady) return null;
-    music.current = new Howl({ src: [level.audio] });
+    for (const audio of level.audioLinks) {
+      if (audio.startsWith("/")) {
+        music.current = new Howl({ src: audio });
+        break;
+      }
+    }
+    if (!music.current) alert("Audio could not be loaded."); // todo
     music.current.play();
     t0.current = 0;
     tLast.current = t0.current;
     animationFrameRequest.current = requestAnimationFrame(animate);
-    setDuration(music.current.duration());
     return () => {
       if (animationFrameRequest.current)
         cancelAnimationFrame(animationFrameRequest.current);
     };
-  }, [level.id, level.audio, mediaPipeReady]);
+  }, [level, mediaPipeReady]);
 
   useEffect(() => {
     physicsIntervalId.current = window.setInterval(physics, 1000 / 60);
@@ -394,7 +435,7 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
       if (physicsIntervalId.current)
         clearInterval(physicsIntervalId.current as any);
     };
-  }, [score, currentMultiplier, health]);
+  }, [level, score, currentMultiplier, health]);
 
   const animate = () => {
     // Player holograms are rendered when MediaPipe has detected a new position, because rendering here would be wasted CPU time.
@@ -452,6 +493,7 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
 
   // todo: Use line from last frame to current frame for intersection instead of position on current frame for increased hit detection reliability.
   const physics = () => {
+    if (!level) return;
     if (!music.current) return;
     const tCurrent = music.current.seek();
     const tDelta = (tLast.current as number) - tCurrent;
@@ -575,11 +617,12 @@ const Gameplay = (props: { level: Level; debug: boolean }) => {
     }
   };
 
+  if (!level) return <div>Loading...</div>;
   return (
     <div className="Gameplay" data-testid="Gameplay" ref={gameplayWrapper}>
       <div className="UI">
         <div className="ProgressIndicator-wrapper">
-          <ProgressIndicator ref={progressIndicator} max={duration} />
+          <ProgressIndicator ref={progressIndicator} max={level.length} />
         </div>
         <div className="HealthBar-wrapper">
           <HealthBar current={health} max={100} />

@@ -3,6 +3,8 @@
   "editor.formatOnSave": true,
   "eslint.alwaysShowStatus": true,
   "eslint.validate": [
+    "javascript",
+    "javascriptreact",
     "typescript",
     "typescriptreact"
   ],
@@ -32,5 +34,11 @@
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
-  "svg.preview.background": "transparent"
+  "svg.preview.background": "transparent",
+  "[dockercompose]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+  }
 }

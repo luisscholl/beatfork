@@ -1,0 +1,800 @@
+{
+  "id": "724EA0A8-EF05-4203-9259-F02DA28D8186",
+  "title": "La La Triororiro",
+  "bpm": "128",
+  "objects": [
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.3709612705332004,
+        "y": -0.6139994075350508,
+        "z": 3.75
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.13527223064186095,
+        "y": -0.6289345282588764,
+        "z": 4.21875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.41577538375197615,
+        "y": -0.6173183232514574,
+        "z": 4.6875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.12365375684439311,
+        "y": -0.6305939861170835,
+        "z": 5.15625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.31784824745909557,
+        "y": -0.6272750704006747,
+        "z": 5.625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.055602696030703856,
+        "y": -0.6173183232514575,
+        "z": 6.09375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.34606454096721384,
+        "y": -0.6272750704006748,
+        "z": 6.5625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.10207659122054512,
+        "y": -0.5974048289530239,
+        "z": 7.03125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.0838189895388219,
+        "y": 0.27049163088706313,
+        "z": 7.5
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.10871571910480833,
+        "y": -0.13441608651443032,
+        "z": 7.96875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.1485504864103864,
+        "y": 0.2854267516108886,
+        "z": 8.4375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.19668416357129404,
+        "y": -0.14437283366364728,
+        "z": 8.90625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.09377768136521611,
+        "y": 0.30202133019291744,
+        "z": 9.375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.12365375684439989,
+        "y": -0.11616205007419944,
+        "z": 9.84375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.14191135852612313,
+        "y": 0.3036807880511201,
+        "z": 10.3125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.19834394554236,
+        "y": -0.1377350022308359,
+        "z": 10.78125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.15187005035251777,
+        "y": -0.6322534439752809,
+        "z": 11.25
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.439012331346895,
+        "y": -0.6106804918186441,
+        "z": 11.71875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.1601689602078467,
+        "y": -0.630593986117078,
+        "z": 12.1875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.40913625586771135,
+        "y": -0.6372318175498891,
+        "z": 12.65625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.37262105250426486,
+        "y": -0.6305939861170778,
+        "z": 13.125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.12863310275759626,
+        "y": -0.6222966968260635,
+        "z": 13.59375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.3726210525042645,
+        "y": -0.628934528258875,
+        "z": 14.0625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.10871571910480772,
+        "y": -0.6256156125424692,
+        "z": 14.53125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.1468907044393207,
+        "y": -0.6090210339604407,
+        "z": 15
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.1112199714113446,
+        "y": 0.24457415643322045,
+        "z": 15
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.3991775640413167,
+        "y": -0.6272750704006721,
+        "z": 15.46875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.1302637260287856,
+        "y": -0.06986449635383352,
+        "z": 15.46875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.15850917823678023,
+        "y": -0.6123399496768464,
+        "z": 15.9375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.14182388242649477,
+        "y": 0.27048282739709884,
+        "z": 15.9375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.4190949476941057,
+        "y": -0.6189777811096578,
+        "z": 16.40625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.14435729343290646,
+        "y": -0.05119669588529746,
+        "z": 16.40625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.37594061644639637,
+        "y": -0.6106804918186445,
+        "z": 16.875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.10213490862029725,
+        "y": 0.34699836041868976,
+        "z": 16.875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.12033419290226799,
+        "y": -0.6239561546842671,
+        "z": 17.34375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.1228384452088048,
+        "y": 0.012831086622443488,
+        "z": 17.34375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.3792601803885278,
+        "y": -0.6057021182440349,
+        "z": 17.8125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.1477351747747913,
+        "y": 0.5421233137244548,
+        "z": 17.8125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.11535484698907063,
+        "y": -0.6173183232514549,
+        "z": 18.28125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.10970598293965991,
+        "y": 0.019284044766011643,
+        "z": 18.28125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.14355542918631015,
+        "y": -0.6036024858876409,
+        "z": 18.75
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.14355542918631098,
+        "y": 0.43043783829692395,
+        "z": 18.75
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.37621422821239947,
+        "y": -0.6134976086071101,
+        "z": 19.21875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.5717466231385807,
+        "y": -0.032159148838275614,
+        "z": 19.21875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.14850561639963128,
+        "y": -0.6283402926863142,
+        "z": 19.6875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.15840599082627352,
+        "y": 0.4576494257754654,
+        "z": 19.6875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.4083904450989859,
+        "y": -0.6085500472473755,
+        "z": 20.15625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.6757005546183222,
+        "y": -0.0568969556369498,
+        "z": 20.15625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.35146329214579375,
+        "y": -0.6233927313265795,
+        "z": 20.625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.13860524197298965,
+        "y": 0.46012320645533433,
+        "z": 20.625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.12622977393968784,
+        "y": -0.6110238279272456,
+        "z": 21.09375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.6658001801916804,
+        "y": -0.1360579373927058,
+        "z": 21.09375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.42571610034561036,
+        "y": -0.6233927313265827,
+        "z": 21.5625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.14355542918631092,
+        "y": 0.4947561359734778,
+        "z": 21.5625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.14850561639963256,
+        "y": -0.6110238279272453,
+        "z": 22.03125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.7747042988847432,
+        "y": -0.1583219635115127,
+        "z": 22.03125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.13860524197298935,
+        "y": -0.6134976086071101,
+        "z": 22.5
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.13117996115300776,
+        "y": 0.4922823552936084,
+        "z": 22.5
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.44304175559223496,
+        "y": -0.613497608607112,
+        "z": 22.96875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": -0.13117996115300773,
+        "y": -0.05689695563694965,
+        "z": 22.96875
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.14108033557964977,
+        "y": -0.6159713892869783,
+        "z": 23.4375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": 0.14603052279297055,
+        "y": 0.47991345189427154,
+        "z": 23.4375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 9,
+      "position": {
+        "x": 0.44799194280555665,
+        "y": -0.6159713892869798,
+        "z": 23.90625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 7,
+      "position": {
+        "x": -0.12622977393968687,
+        "y": -0.12121525331349989,
+        "z": 23.90625
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.40096516427900586,
+        "y": -0.6060762665675099,
+        "z": 24.375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.13860524197298918,
+        "y": 0.47001832917480224,
+        "z": 24.375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.13613014836632936,
+        "y": -0.6036024858876428,
+        "z": 24.84375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": 0.15593089721961328,
+        "y": -0.07421342039602111,
+        "z": 24.84375
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.465317598052178,
+        "y": -0.6258665120064469,
+        "z": 25.3125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": -0.1608810844329343,
+        "y": 0.45270186441573046,
+        "z": 25.3125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 8,
+      "position": {
+        "x": -0.1633561780395944,
+        "y": -0.6283402926863144,
+        "z": 25.78125
+      },
+      "measure": 0,
+      "beat": 0
+    },
+    {
+      "type": "Collectible",
+      "collectibleType": 6,
+      "position": {
+        "x": 0.17078145885957668,
+        "y": -0.05194939427721504,
+        "z": 25.78125
+      },
+      "measure": 0,
+      "beat": 0
+    }
+  ],
+  "audio": "/levels/Rolemusic - La la triororiro/rolemusic_-_la_la_triroriro.mp3"
+}

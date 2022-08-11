@@ -27,3 +27,5 @@ public/debug_videos/
 public/licensed_audio/
 src/bravura/
 public/licensed_audio/
+
+src/config/config.json
