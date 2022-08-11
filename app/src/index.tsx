@@ -87,7 +87,7 @@ ReactDOM.render(
               path="/gameplay/:levelId/:versionId"
               element={<Gameplay debug={!!process.env.REACT_APP_DEBUG} />}
             />
-            <Route path="/editor" element={<Editor />} />
+            <Route path="/edit" element={<Editor />} />
             <Route path="/calibration" element={<CalibrationScene />} />
           </Routes>
         </Router>

@@ -22,10 +22,10 @@ const LevelActions = () => {
           <FontAwesomeIcon icon={faList} />
           Add to playlist
         </button>
-        <button type="button">
+        <Link to="/edit">
           <FontAwesomeIcon icon={faEdit} />
           Edit
-        </button>
+        </Link>
       </div>
       <Link to={`/gameplay/${view.level.id}/${view.version}`} className="play">
         <FontAwesomeIcon icon={faPlay} />

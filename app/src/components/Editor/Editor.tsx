@@ -22,6 +22,7 @@ import {
   faToggleOff,
   faThLarge,
 } from "@fortawesome/free-solid-svg-icons";
+import * as THREE from "three";
 import { DoubleSide, Mesh, Raycaster, Vector2 } from "three";
 import { generateUUID } from "three/src/math/MathUtils";
 import { saveAs } from "file-saver";
