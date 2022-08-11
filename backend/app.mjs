@@ -9,9 +9,11 @@ import { fileURLToPath } from "url";
 import passport from "passport";
 import passportAnonymous from "passport-anonymous";
 import KeycloakBearerStrategy from "passport-keycloak-bearer";
+import dotenv from "dotenv-flow";
 import verifyJWT from "./middleware/jwtVerifier.mjs";
 import levels from "./routers/levels.mjs";
-import "dotenv/config";
+
+dotenv.config();
 
 const { Strategy: AnonymousStrategy } = passportAnonymous;
 
