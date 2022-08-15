@@ -1,5 +1,5 @@
-import React from "react";
-import "./HealthBar.scss";
+import React from 'react';
+import './HealthBar.scss';
 
 const HealthBar = (props: any) => {
   const { current, max } = props;

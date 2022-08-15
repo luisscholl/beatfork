@@ -1,7 +1,7 @@
-import { PerspectiveCamera } from "@react-three/drei";
-import { Canvas, ThreeEvent } from "@react-three/fiber";
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { PerspectiveCamera } from '@react-three/drei';
+import { Canvas, ThreeEvent } from '@react-three/fiber';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCogs,
   faStop,
@@ -20,34 +20,32 @@ import {
   faCopy,
   faToggleOn,
   faToggleOff,
-  faThLarge,
-} from "@fortawesome/free-solid-svg-icons";
-import * as THREE from "three";
-import { DoubleSide, Mesh, Raycaster, Vector2 } from "three";
-import { generateUUID } from "three/src/math/MathUtils";
-import { saveAs } from "file-saver";
+  faThLarge
+} from '@fortawesome/free-solid-svg-icons';
+import * as THREE from 'three';
+import { DoubleSide, Mesh, Raycaster, Vector2 } from 'three';
+import { generateUUID } from 'three/src/math/MathUtils';
+import { saveAs } from 'file-saver';
 import {
   // eslint-disable-next-line camelcase
   useRecoilBridgeAcrossReactRoots_UNSTABLE,
-  useRecoilValue,
-} from "recoil";
-import { Howl } from "howler";
-import Collectible, { CollectibleType } from "../../models/Collectible";
-import EditorSideBarCollectible from "../EditorSideBarCollectible/EditorSideBarCollectible";
-import MusicIcon from "../MusicIcon/MusicIcon";
-import "./Editor.scss";
-import Vector3D from "../../models/Vector3D";
-import Ground from "../Ground/Ground";
-import Obstacle from "../../models/Obstacle";
-import { settingsState } from "../../atoms/settingsState";
+  useRecoilValue
+} from 'recoil';
+import { Howl } from 'howler';
+import Collectible, { CollectibleType } from '../../models/Collectible';
+import EditorSideBarCollectible from '../EditorSideBarCollectible/EditorSideBarCollectible';
+import MusicIcon from '../MusicIcon/MusicIcon';
+import './Editor.scss';
+import Vector3D from '../../models/Vector3D';
+import Ground from '../Ground/Ground';
+import Obstacle from '../../models/Obstacle';
+import { settingsState } from '../../atoms/settingsState';
 import EditorCollectibles, {
-  EditorCollectiblesRefAttributes,
-} from "../EditorCollectibles/EditorCollectibles";
-import EditorSideBarObstacle from "../EditorSideBarObstacle/EditorSideBarObstacle";
-import EditorObstacles, {
-  EditorObstaclesRefAttributes,
-} from "../EditorObstacles/EditorObstacles";
-import SettingsRow from "../SettingsRow/SettingsRow";
+  EditorCollectiblesRefAttributes
+} from '../EditorCollectibles/EditorCollectibles';
+import EditorSideBarObstacle from '../EditorSideBarObstacle/EditorSideBarObstacle';
+import EditorObstacles, { EditorObstaclesRefAttributes } from '../EditorObstacles/EditorObstacles';
+import SettingsRow from '../SettingsRow/SettingsRow';
 
 const Editor = () => {
   const settings = useRecoilValue(settingsState);
@@ -57,26 +55,19 @@ const Editor = () => {
   const [playing, setPlaying] = useState<boolean>(false);
   const tSince0 = useRef<number>(0);
   const [id, setId] = useState<string>(generateUUID());
-  const [title, setTitle] = useState<string>("My Level");
+  const [title, setTitle] = useState<string>('My Level');
   const [bpm, setBpm] = useState<number>(120);
   const audio = useRef<Howl>(null);
-  const [audioPath, setAudioPath] = useState<string>(
-    "/levels/Für Elise/silence.mp3"
-  );
+  const [audioPath, setAudioPath] = useState<string>('/levels/Für Elise/silence.mp3');
   // Holds indexes of selected collectibles and obstacles
   const selectedCollectibles = useRef<number[]>([]);
   const selectedObstacles = useRef<number[]>([]);
   const selected = {
     collectibles: selectedCollectibles,
-    obstacles: selectedObstacles,
+    obstacles: selectedObstacles
   };
   const obstaclesResizeFlag = useRef<
-    | null
-    | "do-not-resize"
-    | "upper-left"
-    | "upper-right"
-    | "lower-left"
-    | "lower-right"
+    null | 'do-not-resize' | 'upper-left' | 'upper-right' | 'lower-left' | 'lower-right'
   >(undefined);
   const scrollSideBarTop = useRef<number>(0);
   // When snapping is activated, level objects will only be moved once a certain threshold of movement was crossed. Especially when this threshold is not crossed in a single event, the distance needs to be buffered for subsequent events regarding the same set of events. Otherwise the level objects would never move.
@@ -84,22 +75,18 @@ const Editor = () => {
   // todo: Reset snapBuffers, when user changes the selection?
   const [importedFile, setFile] = useState<File>();
   const [snappingDivider, setSnappingDivider] = useState<4 | 8 | 16 | 32>();
-  const [tripletSnappingDivider, setTripletSnappingDivider] = useState<1 | 1.5>(
-    1
-  );
+  const [tripletSnappingDivider, setTripletSnappingDivider] = useState<1 | 1.5>(1);
 
   const collectibles = useRef<EditorCollectiblesRefAttributes>(null);
   const obstacles = useRef<EditorObstaclesRefAttributes>(null);
   const levelObjectRefs = {
     collectibles,
-    obstacles,
+    obstacles
   };
   const sideBarRef = useRef<HTMLDivElement>(null);
   const ground = useRef<{ animate: (t: number) => void }>(null);
 
-  const [snappingModulusxy, setSnappingModulusxy] = useState<0.1 | 0.3 | 0.5>(
-    0.3
-  );
+  const [snappingModulusxy, setSnappingModulusxy] = useState<0.1 | 0.3 | 0.5>(0.3);
   // const snappingModulusxy = useState<number>(0.2);
   const snapBufferx = useRef<number>(0);
   const snapBuffery = useRef<number>(0);
@@ -118,25 +105,25 @@ const Editor = () => {
   const last3DMousePosition = useRef<{ x: number; y: number; z: number }>({
     x: 0,
     y: 0,
-    z: 0,
+    z: 0
   });
   const current3DMousePosition = useRef<{ x: number; y: number; z: number }>({
     x: 0,
     y: 0,
-    z: 0,
+    z: 0
   });
   const tLastMouseDown = useRef<number>(0);
   const fileInput = useRef<HTMLInputElement>();
   const animationFrameRequest = useRef<number>(null);
 
   const renderer = new THREE.WebGLRenderer({
-    preserveDrawingBuffer: true,
+    preserveDrawingBuffer: true
   });
   const itemTypes = Array.from({ length: 10 }, (e, i) => i);
 
-  const [templateTypes, setTemplateType] = useState<
-    Array<Array<Collectible | Obstacle>>
-  >(JSON.parse(localStorage.getItem("templates")) || []);
+  const [templateTypes, setTemplateType] = useState<Array<Array<Collectible | Obstacle>>>(
+    JSON.parse(localStorage.getItem('templates')) || []
+  );
   const [templateToggle, setTemplateToggle] = useState<false | true>(false);
   const [sideBarItems, setSideBarItems] = useState<
     Array<number> | Array<Array<Collectible | Obstacle>>
@@ -144,9 +131,7 @@ const Editor = () => {
 
   const templateIndex = useRef<number>(0);
 
-  const [isOpen, setOpen] = useState(
-    JSON.parse(localStorage.getItem("templates")) || false
-  );
+  const [isOpen, setOpen] = useState(JSON.parse(localStorage.getItem('templates')) || false);
 
   // load level from file
   useEffect(() => {
@@ -160,9 +145,9 @@ const Editor = () => {
         if (levelData.bpm) setBpm(levelData.bpm);
         if (levelData.objects && Array.isArray(levelData.objects)) {
           levelData.objects.forEach((f: Collectible | Obstacle) => {
-            if (f.type === "Collectible") {
+            if (f.type === 'Collectible') {
               collectibles.current.addCollectible(f);
-            } else if (f.type === "Obstacle") {
+            } else if (f.type === 'Obstacle') {
               obstacles.current.addObstacle(f);
             }
           });
@@ -180,7 +165,7 @@ const Editor = () => {
       audio.current = null;
     } else {
       audio.current = new Howl({
-        src: audioPath,
+        src: audioPath
       });
     }
   }, [audioPath]);
@@ -201,39 +186,26 @@ const Editor = () => {
       (-event.clientY / window.innerHeight) * 2 + 1
     );
     raycaster.current.setFromCamera(mouse, camera.current as any); // todo
-    const intersection = raycaster.current.intersectObject(
-      placementPlane.current
-    );
+    const intersection = raycaster.current.intersectObject(placementPlane.current);
     if (intersection.length === 0) {
-      console.warn("No intersection found.");
+      console.warn('No intersection found.');
       return;
     }
     current3DMousePosition.current = {
       x: intersection[0].point.x,
       y: intersection[0].point.y,
-      z: intersection[0].point.z,
+      z: intersection[0].point.z
     };
 
     switch (event.buttons) {
       // Only left button
       case 1:
-        if (
-          selected.collectibles.current.length > 0 ||
-          selected.obstacles.current.length > 0
-        ) {
+        if (selected.collectibles.current.length > 0 || selected.obstacles.current.length > 0) {
           if (!event.shiftKey) {
-            const movementX =
-              current3DMousePosition.current.x - last3DMousePosition.current.x;
-            const movementY =
-              current3DMousePosition.current.y - last3DMousePosition.current.y;
-            if (
-              obstaclesResizeFlag.current &&
-              obstaclesResizeFlag.current !== "do-not-resize"
-            ) {
-              resizeSelectedObstacles(
-                { x: movementX, y: movementY },
-                obstaclesResizeFlag.current
-              );
+            const movementX = current3DMousePosition.current.x - last3DMousePosition.current.x;
+            const movementY = current3DMousePosition.current.y - last3DMousePosition.current.y;
+            if (obstaclesResizeFlag.current && obstaclesResizeFlag.current !== 'do-not-resize') {
+              resizeSelectedObstacles({ x: movementX, y: movementY }, obstaclesResizeFlag.current);
             } else {
               moveSelectedLevelObjects({ x: movementX, y: movementY });
             }
@@ -242,34 +214,19 @@ const Editor = () => {
         break;
       // Only right button
       case 2:
-        if (
-          selected.collectibles.current.length > 0 ||
-          selected.obstacles.current.length > 0
-        ) {
+        if (selected.collectibles.current.length > 0 || selected.obstacles.current.length > 0) {
           const distance = -(event.movementY / window.innerHeight) * 20;
-          if (
-            obstaclesResizeFlag.current &&
-            obstaclesResizeFlag.current !== "do-not-resize"
-          ) {
+          if (obstaclesResizeFlag.current && obstaclesResizeFlag.current !== 'do-not-resize') {
             if (event.shiftKey) {
-              resizeSelectedObstacles(
-                { z: distance },
-                obstaclesResizeFlag.current,
-                true
-              );
+              resizeSelectedObstacles({ z: distance }, obstaclesResizeFlag.current, true);
             } else {
-              resizeSelectedObstacles(
-                { z: distance },
-                obstaclesResizeFlag.current
-              );
+              resizeSelectedObstacles({ z: distance }, obstaclesResizeFlag.current);
             }
-          } else if (typeof obstaclesResizeFlag.current !== "undefined") {
+          } else if (typeof obstaclesResizeFlag.current !== 'undefined') {
             moveSelectedLevelObjects({ z: distance });
           }
         } else {
-          renderAtTime(
-            tSince0.current - (event.movementY / window.innerHeight) * 20
-          );
+          renderAtTime(tSince0.current - (event.movementY / window.innerHeight) * 20);
         }
         break;
       default:
@@ -286,12 +243,12 @@ const Editor = () => {
   }, []);
 
   useEffect(() => {
-    sideBarRef.current?.addEventListener("wheel", onSideBarWheel, {
-      passive: false,
+    sideBarRef.current?.addEventListener('wheel', onSideBarWheel, {
+      passive: false
     });
     const ref = sideBarRef.current;
     return () => {
-      ref?.removeEventListener("wheel", onSideBarWheel);
+      ref?.removeEventListener('wheel', onSideBarWheel);
     };
   }, [onSideBarWheel]);
 
@@ -312,18 +269,15 @@ const Editor = () => {
     obstaclesResizeFlag.current = null;
   };
 
-  const onSidebarCollectibleMouseDown = (
-    event: React.MouseEvent,
-    type: CollectibleType
-  ) => {
+  const onSidebarCollectibleMouseDown = (event: React.MouseEvent, type: CollectibleType) => {
     const position = current3DMousePosition.current;
     position.z /= -settings.editorTimeScaleFactor;
     collectibles.current.addCollectible({
-      type: "Collectible",
+      type: 'Collectible',
       collectibleType: type,
       position,
       measure: 0, // todo
-      beat: 0, // todo
+      beat: 0 // todo
     });
     collectibles.current.deselect(selected.collectibles.current);
     obstacles.current.deselect(selected.obstacles.current);
@@ -346,31 +300,31 @@ const Editor = () => {
       const pos = {
         x: elem.position.x,
         y: elem.position.y,
-        z: elem.position.z,
+        z: elem.position.z
       };
       console.log(pos);
       pos.z /= -settings.editorTimeScaleFactor;
-      if (elem.type === "Collectible") {
+      if (elem.type === 'Collectible') {
         collectibles.current.addCollectible({
-          type: "Collectible",
+          type: 'Collectible',
           collectibleType: elem.collectibleType,
           position: pos,
           measure: 0, // todo
-          beat: 0, // todo
+          beat: 0 // todo
         });
         collectibles.current.select([-1]);
       }
-      if (elem.type === "Obstacle") {
+      if (elem.type === 'Obstacle') {
         obstacles.current.addObstacle({
-          type: "Obstacle",
+          type: 'Obstacle',
           position: pos,
           dimensions: {
             x: 0.5,
             y: 0.75,
-            z: 0.25,
+            z: 0.25
           },
           measure: 0, // todo
-          beat: 0, // todo
+          beat: 0 // todo
         });
         obstacles.current.select([-1]);
       }
@@ -387,7 +341,7 @@ const Editor = () => {
   const selectLevelObject = (
     event: ThreeEvent<MouseEvent>,
     i: number,
-    type: "collectibles" | "obstacles"
+    type: 'collectibles' | 'obstacles'
   ) => {
     // Ignore long clicks
     if (performance.now() - tLastMouseDown.current < 300) {
@@ -401,14 +355,9 @@ const Editor = () => {
           }
         }
       } else {
-        levelObjectRefs.collectibles.current.deselect(
-          selected.collectibles.current
-        );
+        levelObjectRefs.collectibles.current.deselect(selected.collectibles.current);
         levelObjectRefs.obstacles.current.deselect(selected.obstacles.current);
-        if (
-          !selected.collectibles.current.includes(i) &&
-          !selected.obstacles.current.includes(i)
-        ) {
+        if (!selected.collectibles.current.includes(i) && !selected.obstacles.current.includes(i)) {
           levelObjectRefs[type].current.select([i]);
         }
         if (snappingDivider) {
@@ -418,16 +367,9 @@ const Editor = () => {
     }
   };
 
-  const moveSelectedLevelObjects = (distance: {
-    x?: number;
-    y?: number;
-    z?: number;
-  }) => {
+  const moveSelectedLevelObjects = (distance: { x?: number; y?: number; z?: number }) => {
     const d: Vector3D = { x: 0, y: 0, z: 0, ...distance };
-    levelObjectRefs.collectibles.current.moveBy(
-      selected.collectibles.current,
-      d
-    );
+    levelObjectRefs.collectibles.current.moveBy(selected.collectibles.current, d);
     levelObjectRefs.obstacles.current.moveBy(selected.obstacles.current, d);
   };
 
@@ -437,7 +379,7 @@ const Editor = () => {
       y?: number;
       z?: number;
     },
-    corner: "upper-left" | "upper-right" | "lower-left" | "lower-right",
+    corner: 'upper-left' | 'upper-right' | 'lower-left' | 'lower-right',
     reverseZ = false
   ) => {
     distance.x += snapBufferx.current;
@@ -449,12 +391,7 @@ const Editor = () => {
     snapBufferx.current = distanceRemainderx;
     snapBuffery.current = distanceRemaindery;
     const d: Vector3D = { x: 0, y: 0, z: 0, ...distance };
-    levelObjectRefs.obstacles.current.resizeBy(
-      selected.obstacles.current,
-      d,
-      corner,
-      reverseZ
-    );
+    levelObjectRefs.obstacles.current.resizeBy(selected.obstacles.current, d, corner, reverseZ);
   };
 
   const setSnapping = (snapTo: 4 | 8 | 16 | 32) => {
@@ -477,10 +414,7 @@ const Editor = () => {
   };
 
   const copy = () => {
-    levelObjectRefs.collectibles.current.copy(
-      selected.collectibles.current,
-      true
-    );
+    levelObjectRefs.collectibles.current.copy(selected.collectibles.current, true);
     levelObjectRefs.obstacles.current.copy(selected.obstacles.current, true);
   };
 
@@ -508,7 +442,7 @@ const Editor = () => {
   };
 
   const stop = () => {
-    if (typeof animationFrameRequest.current === "number") {
+    if (typeof animationFrameRequest.current === 'number') {
       cancelAnimationFrame(animationFrameRequest.current);
       animationFrameRequest.current = null;
     }
@@ -531,10 +465,10 @@ const Editor = () => {
       title,
       bpm,
       objects,
-      audio: audioPath,
+      audio: audioPath
     };
     const fileForExport = new Blob([JSON.stringify(level, null, 2)], {
-      type: "application/json",
+      type: 'application/json'
     });
     const fileTitle = `${title}.json`;
     saveAs(fileForExport, fileTitle);
@@ -553,7 +487,7 @@ const Editor = () => {
   };
 
   const pause = () => {
-    if (typeof animationFrameRequest.current === "number") {
+    if (typeof animationFrameRequest.current === 'number') {
       cancelAnimationFrame(animationFrameRequest.current);
       animationFrameRequest.current = null;
     }
@@ -562,9 +496,7 @@ const Editor = () => {
   };
 
   const deleteSelected = () => {
-    for (const t of ["collectibles", "obstacles"] as Array<
-      "collectibles" | "obstacles"
-    >) {
+    for (const t of ['collectibles', 'obstacles'] as Array<'collectibles' | 'obstacles'>) {
       levelObjectRefs[t].current.remove(selected[t].current);
       selected[t].current = [];
     }
@@ -577,14 +509,11 @@ const Editor = () => {
   };
 
   const mapSidebarItem = (type: number | Array<Collectible | Obstacle>) => {
-    if (typeof type === "number") {
+    if (typeof type === 'number') {
       console.log(type);
       if (type === 0) {
         return (
-          <button
-            type="button"
-            onMouseDown={(event) => onSidebarObstacleMouseDown(event)}
-          >
+          <button type="button" onMouseDown={(event) => onSidebarObstacleMouseDown(event)}>
             <EditorSideBarObstacle />
           </button>
         );
@@ -593,10 +522,7 @@ const Editor = () => {
         <button
           key={type}
           type="button"
-          onMouseDown={(event) =>
-            onSidebarCollectibleMouseDown(event, type as CollectibleType)
-          }
-        >
+          onMouseDown={(event) => onSidebarCollectibleMouseDown(event, type as CollectibleType)}>
           <EditorSideBarCollectible type={type as CollectibleType} />
         </button>
       );
@@ -612,9 +538,8 @@ const Editor = () => {
       <button
         key={1}
         type="button"
-        style={{ fontSize: "150%" }}
-        onMouseDown={(event) => onSidebarTemplateMouseDown(event, type)}
-      >
+        style={{ fontSize: '150%' }}
+        onMouseDown={(event) => onSidebarTemplateMouseDown(event, type)}>
         {templateIndex.current}
       </button>
     );
@@ -625,23 +550,17 @@ const Editor = () => {
       selected.collectibles.current,
       false
     );
-    const obstTemplate = levelObjectRefs.obstacles.current.copy(
-      selected.obstacles.current,
-      false
-    );
+    const obstTemplate = levelObjectRefs.obstacles.current.copy(selected.obstacles.current, false);
 
     const template = [...collTemplate, ...obstTemplate];
 
     templateTypes.push(template);
-    const templates = JSON.parse(localStorage.getItem("templates"));
+    const templates = JSON.parse(localStorage.getItem('templates'));
     if (templates === null) {
-      localStorage.setItem("templates", JSON.stringify([template]));
+      localStorage.setItem('templates', JSON.stringify([template]));
       setTemplateType([template]);
     } else {
-      localStorage.setItem(
-        "templates",
-        JSON.stringify([...templates, template])
-      );
+      localStorage.setItem('templates', JSON.stringify([...templates, template]));
       setTemplateType([...templates, template]);
     }
 
@@ -659,15 +578,15 @@ const Editor = () => {
     const position = current3DMousePosition.current;
     position.z /= -settings.editorTimeScaleFactor;
     obstacles.current.addObstacle({
-      type: "Obstacle",
+      type: 'Obstacle',
       position,
       dimensions: {
         x: 0.5,
         y: 0.75,
-        z: 0.25,
+        z: 0.25
       },
       measure: 0, // todo
-      beat: 0, // todo
+      beat: 0 // todo
     });
     collectibles.current.deselect(selected.collectibles.current);
     obstacles.current.deselect(selected.obstacles.current);
@@ -684,32 +603,17 @@ const Editor = () => {
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       onWheel={onWheel}
-      onMouseUp={onMouseUp}
-    >
+      onMouseUp={onMouseUp}>
       <Canvas>
         <RecoilBridge>
-          <color attach="background" args={["#158ed4"]} />
-          <PerspectiveCamera
-            makeDefault
-            position={[0, 0, 2]}
-            rotation={[0, 0, 0]}
-            ref={camera}
-          />
+          <color attach="background" args={['#158ed4']} />
+          <PerspectiveCamera makeDefault position={[0, 0, 2]} rotation={[0, 0, 0]} ref={camera} />
           <directionalLight position={[5, 20, 35]} />
-          <mesh
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={[10, 10, 1]}
-            ref={placementPlane}
-          >
+          <mesh position={[0, 0, 0]} rotation={[0, 0, 0]} scale={[10, 10, 1]} ref={placementPlane}>
             <planeBufferGeometry />
             <meshBasicMaterial visible={false} side={DoubleSide} />
           </mesh>
-          <Ground
-            ref={groundCallback}
-            bpm={bpm}
-            timeScaleFactor={settings.editorTimeScaleFactor}
-          />
+          <Ground ref={groundCallback} bpm={bpm} timeScaleFactor={settings.editorTimeScaleFactor} />
           <EditorCollectibles
             ref={collectibles}
             onClick={selectLevelObject}
@@ -739,8 +643,7 @@ const Editor = () => {
             }}
             onMouseLeave={() => {
               scrollSideBarTop.current = 0;
-            }}
-          >
+            }}>
             <FontAwesomeIcon icon={faCaretUp} />
           </button>
           <div className="content" onWheel={onSideBarWheel} ref={sideBarRef}>
@@ -760,88 +663,69 @@ const Editor = () => {
             }}
             onMouseLeave={() => {
               scrollSideBarTop.current = 0;
-            }}
-          >
+            }}>
             <FontAwesomeIcon icon={faCaretDown} />
           </button>
         </div>
         <div className="top-bar">
           <div className="snapping">
             <button
-              className={snappingDivider === 4 ? "active" : ""}
+              className={snappingDivider === 4 ? 'active' : ''}
               type="button"
-              onClick={() => setSnapping(4)}
-            >
+              onClick={() => setSnapping(4)}>
               <MusicIcon type="quarter-note" />
             </button>
             <button
-              className={snappingDivider === 8 ? "active" : ""}
+              className={snappingDivider === 8 ? 'active' : ''}
               type="button"
-              onClick={() => setSnapping(8)}
-            >
+              onClick={() => setSnapping(8)}>
               <MusicIcon type="eight-note" />
             </button>
             <button
-              className={snappingDivider === 16 ? "active" : ""}
+              className={snappingDivider === 16 ? 'active' : ''}
               type="button"
-              onClick={() => setSnapping(16)}
-            >
+              onClick={() => setSnapping(16)}>
               <MusicIcon type="sixteenth-note" />
             </button>
             <button
-              className={snappingDivider === 32 ? "active" : ""}
+              className={snappingDivider === 32 ? 'active' : ''}
               type="button"
-              onClick={() => setSnapping(32)}
-            >
+              onClick={() => setSnapping(32)}>
               <MusicIcon type="thirty-second-note" />
             </button>
             <button
-              className={tripletSnappingDivider === 3 / 2 ? "active" : ""}
+              className={tripletSnappingDivider === 3 / 2 ? 'active' : ''}
               type="button"
-              onClick={() => toggleTripletSnapping()}
-            >
+              onClick={() => toggleTripletSnapping()}>
               <MusicIcon type="triplet" />
             </button>
             <button
-              className={snappingModulusxy === 0.1 ? "active" : ""}
+              className={snappingModulusxy === 0.1 ? 'active' : ''}
               type="button"
-              style={{ fontSize: "150%" }}
-              onClick={() => setSnappingxy(0.1)}
-            >
-              <FontAwesomeIcon style={{ width: "50%" }} icon={faBorderAll} />1
+              style={{ fontSize: '150%' }}
+              onClick={() => setSnappingxy(0.1)}>
+              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />1
             </button>
             <button
-              className={snappingModulusxy === 0.3 ? "active" : ""}
+              className={snappingModulusxy === 0.3 ? 'active' : ''}
               type="button"
-              style={{ fontSize: "150%" }}
-              onClick={() => setSnappingxy(0.3)}
-            >
-              <FontAwesomeIcon style={{ width: "50%" }} icon={faBorderAll} />2
+              style={{ fontSize: '150%' }}
+              onClick={() => setSnappingxy(0.3)}>
+              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />2
             </button>
             <button
-              className={snappingModulusxy === 0.5 ? "active" : ""}
+              className={snappingModulusxy === 0.5 ? 'active' : ''}
               type="button"
-              style={{ fontSize: "150%" }}
-              onClick={() => setSnappingxy(0.5)}
-            >
-              <FontAwesomeIcon style={{ width: "50%" }} icon={faBorderAll} />3
+              style={{ fontSize: '150%' }}
+              onClick={() => setSnappingxy(0.5)}>
+              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />3
             </button>
-            <button
-              className=""
-              type="button"
-              style={{ fontSize: "150%" }}
-              onClick={() => copy()}
-            >
-              <FontAwesomeIcon style={{ width: "50%" }} icon={faCopy} />
+            <button className="" type="button" style={{ fontSize: '150%' }} onClick={() => copy()}>
+              <FontAwesomeIcon style={{ width: '50%' }} icon={faCopy} />
             </button>
-            <button
-              className=""
-              type="button"
-              onClick={saveTemplate}
-              style={{ fontSize: "150%" }}
-            >
-              <FontAwesomeIcon style={{ width: "50%" }} icon={faSave} />
-              <FontAwesomeIcon style={{ width: "20%" }} icon={faThLarge} />
+            <button className="" type="button" onClick={saveTemplate} style={{ fontSize: '150%' }}>
+              <FontAwesomeIcon style={{ width: '50%' }} icon={faSave} />
+              <FontAwesomeIcon style={{ width: '20%' }} icon={faThLarge} />
             </button>
           </div>
           <div className="others">
@@ -885,24 +769,9 @@ const Editor = () => {
         {settingsOpen && (
           <div className="settings-wrapper" onClick={toggleSettings}>
             <div className="settings" onClick={(e) => e.stopPropagation()}>
-              <SettingsRow
-                title="Title"
-                value={title}
-                setter={setTitle}
-                type="text"
-              />
-              <SettingsRow
-                title="BPM"
-                value={bpm}
-                setter={setBpm}
-                type="number"
-              />
-              <SettingsRow
-                title="Audio Path"
-                value={audioPath}
-                setter={setAudioPath}
-                type="text"
-              />
+              <SettingsRow title="Title" value={title} setter={setTitle} type="text" />
+              <SettingsRow title="BPM" value={bpm} setter={setBpm} type="number" />
+              <SettingsRow title="Audio Path" value={audioPath} setter={setAudioPath} type="text" />
             </div>
           </div>
         )}

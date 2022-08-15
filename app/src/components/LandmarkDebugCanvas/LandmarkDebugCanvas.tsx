@@ -1,14 +1,9 @@
 /* eslint-disable react/display-name */
-import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
-import React, {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-} from "react";
-import { useRecoilValue } from "recoil";
-import { settingsState } from "../../atoms/settingsState";
-import "./LandmarkDebugCanvas.scss";
+import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { useRecoilValue } from 'recoil';
+import { settingsState } from '../../atoms/settingsState';
+import './LandmarkDebugCanvas.scss';
 
 const LandmarkDebugCanvas = forwardRef((props: any, ref) => {
   const settings = useRecoilValue(settingsState);
@@ -19,34 +14,22 @@ const LandmarkDebugCanvas = forwardRef((props: any, ref) => {
 
   useEffect(() => {
     if (debugCanvas.current)
-      debugCanvasCtx.current = (
-        debugCanvas.current as HTMLCanvasElement
-      ).getContext("2d");
+      debugCanvasCtx.current = (debugCanvas.current as HTMLCanvasElement).getContext('2d');
   }, [debugCanvas]);
 
   useImperativeHandle(ref, () => ({
     draw(results: any) {
       if (!debugCanvasCtx.current) return;
       debugCanvasCtx.current.save();
-      debugCanvasCtx.current.clearRect(
-        0,
-        0,
-        debugCanvas.current.width,
-        debugCanvas.current.height
-      );
+      debugCanvasCtx.current.clearRect(0, 0, debugCanvas.current.width, debugCanvas.current.height);
 
       // Only overwrite existing pixels.
-      debugCanvasCtx.current.globalCompositeOperation = "source-in";
-      debugCanvasCtx.current.fillStyle = "#00FF00";
-      debugCanvasCtx.current.fillRect(
-        0,
-        0,
-        debugCanvas.current.width,
-        debugCanvas.current.height
-      );
+      debugCanvasCtx.current.globalCompositeOperation = 'source-in';
+      debugCanvasCtx.current.fillStyle = '#00FF00';
+      debugCanvasCtx.current.fillRect(0, 0, debugCanvas.current.width, debugCanvas.current.height);
 
       // Only overwrite missing pixels.
-      debugCanvasCtx.current.globalCompositeOperation = "destination-atop";
+      debugCanvasCtx.current.globalCompositeOperation = 'destination-atop';
       debugCanvasCtx.current.drawImage(
         results.image,
         0,
@@ -55,17 +38,15 @@ const LandmarkDebugCanvas = forwardRef((props: any, ref) => {
         debugCanvas.current.height
       );
 
-      debugCanvasCtx.current.globalCompositeOperation = "source-over";
+      debugCanvasCtx.current.globalCompositeOperation = 'source-over';
 
       // Draws the landmarks of interest
       drawLandmarks(
         debugCanvasCtx.current,
-        [13, 14, 15, 16, 25, 26, 27, 28].map(
-          (index) => results.poseLandmarks[index]
-        ),
+        [13, 14, 15, 16, 25, 26, 27, 28].map((index) => results.poseLandmarks[index]),
         {
-          color: "white",
-          fillColor: "white",
+          color: 'white',
+          fillColor: 'white'
         }
       );
 
@@ -78,17 +59,17 @@ const LandmarkDebugCanvas = forwardRef((props: any, ref) => {
           [14, 16],
           [13, 15],
           [25, 27],
-          [26, 28],
+          [26, 28]
         ],
         {
-          color: "white",
-          lineWidth: 4,
+          color: 'white',
+          lineWidth: 4
         }
       );
 
       debugCanvasCtx.current.restore();
       debugCanvasCtx.current.restore();
-    },
+    }
   }));
 
   return (

@@ -1,5 +1,5 @@
-import React from "react";
-import "./EditorObstacle.scss";
+import React from 'react';
+import './EditorObstacle.scss';
 
 const EditorObstacle = () => (
   <div className="EditorObstacle" data-testid="EditorObstacle">

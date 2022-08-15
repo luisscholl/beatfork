@@ -6,7 +6,7 @@ import LevelCompleted from './LevelCompleted';
 describe('<LevelCompleted />', () => {
   test('it should mount', () => {
     render(<LevelCompleted />);
-    
+
     const levelCompleted = screen.getByTestId('LevelCompleted');
 
     expect(levelCompleted).toBeInTheDocument();

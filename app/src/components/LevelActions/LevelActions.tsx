@@ -1,11 +1,11 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
-import { useRecoilState } from "recoil";
-import { Link, useNavigate } from "react-router-dom";
-import { faEdit, faList, faPlay } from "@fortawesome/free-solid-svg-icons";
-import { useAuth } from "react-oidc-context";
-import { viewState } from "../../atoms/viewState";
-import "./LevelActions.scss";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { useRecoilState } from 'recoil';
+import { Link, useNavigate } from 'react-router-dom';
+import { faEdit, faList, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from 'react-oidc-context';
+import { viewState } from '../../atoms/viewState';
+import './LevelActions.scss';
 
 const LevelActions = () => {
   const auth = useAuth();

@@ -1,9 +1,9 @@
-import { User } from "oidc-client-ts";
-import Level from "../models/Level";
-import LevelPartial from "../models/LevelPartial";
-import LevelVersion from "../models/LevelVersion";
-import LevelVersionPartial from "../models/LevelVersionPartial";
-import oidcConfig from "../config/config.json";
+import { User } from 'oidc-client-ts';
+import Level from '../models/Level';
+import LevelPartial from '../models/LevelPartial';
+import LevelVersion from '../models/LevelVersion';
+import LevelVersionPartial from '../models/LevelVersionPartial';
+import oidcConfig from '../config/config.json';
 
 const levels: Map<string, Level> = new Map();
 const levelPartials: Map<string, LevelPartial> = new Map();
@@ -21,8 +21,8 @@ export type SearchOptions = {
   minPersonalBest?: number;
   maxPersonalBest?: number;
   minRating?: number;
-  orderBy?: "rating" | "difficulty" | "length" | "personalBest" | "title";
-  direction?: "ascending" | "descending";
+  orderBy?: 'averageRating' | 'difficulty' | 'length' | 'personalBest' | 'title';
+  direction?: 'ascending' | 'descending';
 };
 
 function getAuthToken() {
@@ -48,7 +48,7 @@ function getLevel(id: string, version?: string): Promise<Level> {
   const headers = token ? { Authorization: token } : {};
 
   // If no level partial cached, we need to get the whole level.
-  if (typeof version !== "undefined" && levelPartials.get(id)) {
+  if (typeof version !== 'undefined' && levelPartials.get(id)) {
     // If version is cached -> Dandy!
     if ((levelPartials.get(id).versions[version] as any).objects) {
       return new Promise((resolve) => {
@@ -57,7 +57,7 @@ function getLevel(id: string, version?: string): Promise<Level> {
     }
     // Get, cache and return version.
     return fetch(`${process.env.REACT_APP_API_URL}/levels/${id}/${version}`, {
-      headers,
+      headers
     })
       .then((result) => result.json())
       .then((result) => {
@@ -69,7 +69,7 @@ function getLevel(id: string, version?: string): Promise<Level> {
   }
   // Get, cache and return full level.
   return fetch(`${process.env.REACT_APP_API_URL}/levels/${id}`, {
-    headers,
+    headers
   })
     .then((result) => result.json())
     .then((result) => {
@@ -83,27 +83,22 @@ function getLevel(id: string, version?: string): Promise<Level> {
     });
 }
 
-function searchLevel(
-  options: SearchOptions,
-  page: number
-): Promise<LevelPartial[]> {
+function searchLevel(options: SearchOptions, page: number): Promise<LevelPartial[]> {
   const token = getAuthToken();
   const headers = token ? { Authorization: token } : {};
   let url = `${process.env.REACT_APP_API_URL}/levels?currentPage=${page}`;
   for (const [key, value] of Object.entries(options)) {
-    if (["minPersonalBest", "maxPersonalBest"].includes(key) && !token)
-      continue;
-    if (["title", "author", "artist"].includes(key) && !value) continue;
+    if (['minPersonalBest', 'maxPersonalBest'].includes(key) && !token) continue;
+    if (['title', 'author', 'artist'].includes(key) && !value) continue;
     url += `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
   }
   return fetch(url, {
-    headers,
+    headers
   })
     .then((response) => response.json())
     .then((result) => {
       result.levels = result.levels.map((levelPartial: any) => {
-        if (levelPartials.get(levelPartial.id))
-          return levelPartials.get(levelPartial.id);
+        if (levelPartials.get(levelPartial.id)) return levelPartials.get(levelPartial.id);
         const versions: { [key: string]: LevelVersionPartial } = {};
         for (const v of (levelPartial as any).versions) {
           versions[v.id] = v;
@@ -118,7 +113,7 @@ function searchLevel(
 
 const LevelService = {
   getLevel,
-  searchLevel,
+  searchLevel
 };
 
 export { LevelService };

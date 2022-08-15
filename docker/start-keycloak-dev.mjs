@@ -1,10 +1,10 @@
 // This is a script, because we need the absolute path to bind the volume.
 
-import dotenv from "dotenv-flow";
-import { exec } from "child_process";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import { exit } from "process";
+import dotenv from 'dotenv-flow';
+import { exec } from 'child_process';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { exit } from 'process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,4 +20,4 @@ exec(
   }
 );
 
-console.log("Starting Keycloak on http://localhost:9090/auth ...");
+console.log('Starting Keycloak on http://localhost:9090/auth ...');

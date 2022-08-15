@@ -5,8 +5,8 @@
   },
   "extends": [
     "airbnb",
-    "plugin:@typescript-eslint/recommended",
     "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:prettier/recommended"
   ],
@@ -21,7 +21,8 @@
   "plugins": [
     "react",
     "react-hooks",
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "prettier"
   ],
   "rules": {
     "react/function-component-definition": [

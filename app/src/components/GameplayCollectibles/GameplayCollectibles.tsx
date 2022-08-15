@@ -7,16 +7,16 @@ import React, {
   useCallback,
   useImperativeHandle,
   useMemo,
-  useRef,
-} from "react";
-import { useRecoilValue } from "recoil";
-import * as THREE from "three";
-import { InstancedMesh } from "three";
-import gameplayCollectibleFragmentShader from "../../shaders/gameplayCollectibleFragmentShader.glsl";
-import gameplayCollectibleVertexShader from "../../shaders/gameplayCollectibleVertexShader.glsl";
-import { settingsState } from "../../atoms/settingsState";
-import Collectible from "../../models/Collectible";
-import "./GameplayCollectibles.scss";
+  useRef
+} from 'react';
+import { useRecoilValue } from 'recoil';
+import * as THREE from 'three';
+import { InstancedMesh } from 'three';
+import gameplayCollectibleFragmentShader from '../../shaders/gameplayCollectibleFragmentShader.glsl';
+import gameplayCollectibleVertexShader from '../../shaders/gameplayCollectibleVertexShader.glsl';
+import { settingsState } from '../../atoms/settingsState';
+import Collectible from '../../models/Collectible';
+import './GameplayCollectibles.scss';
 
 export interface GameplayCollectiblesRefAttributes {
   hide(targets: number[]): void;
@@ -30,8 +30,7 @@ export interface GameplayCollectiblesProps {
 const tempObject = new THREE.Object3D();
 
 const GameplayCollectibles: ForwardRefExoticComponent<
-  PropsWithoutRef<GameplayCollectiblesProps> &
-    RefAttributes<GameplayCollectiblesRefAttributes>
+  PropsWithoutRef<GameplayCollectiblesProps> & RefAttributes<GameplayCollectiblesRefAttributes>
 > = forwardRef((props, ref) => {
   const settings = useRecoilValue(settingsState);
   const meshRef = useRef<InstancedMesh>(null);
@@ -53,9 +52,7 @@ const GameplayCollectibles: ForwardRefExoticComponent<
   }, []);
 
   const collectibleTypeArray = useRef<Float32Array>(
-    Float32Array.from(
-      props.collectibles.map((collectible) => collectible.collectibleType)
-    )
+    Float32Array.from(props.collectibles.map((collectible) => collectible.collectibleType))
   );
 
   const shaderData = useMemo(
@@ -64,35 +61,30 @@ const GameplayCollectibles: ForwardRefExoticComponent<
       fragmentShader: gameplayCollectibleFragmentShader,
       uniforms: {
         collectibleTexture: {
-          value: new THREE.TextureLoader().load("/assets/collectibles.png"),
-        },
-      },
+          value: new THREE.TextureLoader().load('/assets/collectibles.png')
+        }
+      }
     }),
     []
   );
 
   useImperativeHandle(ref, () => ({
     hide(targets: number[]): void {
-      targets = targets.map((target) =>
-        target < 0 ? meshRef.current.count + target : target
-      );
+      targets = targets.map((target) => (target < 0 ? meshRef.current.count + target : target));
       tempObject.position.z = -1000;
       tempObject.updateMatrix();
       for (const target of targets) {
         meshRef.current.setMatrixAt(target, tempObject.matrix);
       }
       meshRef.current.instanceMatrix.needsUpdate = true;
-    },
+    }
   }));
 
   return (
-    <instancedMesh
-      ref={meshRefCallback}
-      args={[null, null, props.collectibles.length]}
-    >
+    <instancedMesh ref={meshRefCallback} args={[null, null, props.collectibles.length]}>
       <boxBufferGeometry args={[0.25, 0.25, 0.25]}>
         <instancedBufferAttribute
-          attachObject={["attributes", "collectibleType"]}
+          attachObject={['attributes', 'collectibleType']}
           args={[collectibleTypeArray.current, 1]}
         />
       </boxBufferGeometry>

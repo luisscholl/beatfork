@@ -1,8 +1,8 @@
-import React, { FC } from "react";
-import { Link } from "react-router-dom";
-import { useRecoilState } from "recoil";
-import { viewState } from "../../atoms/viewState";
-import "./GameOver.scss";
+import React, { FC } from 'react';
+import { Link } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
+import { viewState } from '../../atoms/viewState';
+import './GameOver.scss';
 
 interface GameOverProps {}
 

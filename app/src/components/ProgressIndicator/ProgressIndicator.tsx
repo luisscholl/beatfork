@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
-import React, { forwardRef, useImperativeHandle, useRef } from "react";
-import "./ProgressIndicator.scss";
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import './ProgressIndicator.scss';
 
 const ProgressIndicator = forwardRef((props: { max: number }, ref) => {
   const { max } = props;
@@ -12,7 +12,7 @@ const ProgressIndicator = forwardRef((props: { max: number }, ref) => {
       if (progressRef.current) {
         progressRef.current.value = t;
       }
-    },
+    }
   }));
 
   return (

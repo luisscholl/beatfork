@@ -1,5 +1,5 @@
-declare module "multi-range-slider-react" {
-  import { FunctionComponent } from "react";
+declare module 'multi-range-slider-react' {
+  import { FunctionComponent } from 'react';
 
   interface Props {
     min?: number = 0;
@@ -9,7 +9,7 @@ declare module "multi-range-slider-react" {
     step?: number = 5;
     ruler?: boolean = true;
     label?: boolean = true;
-    baseClassName?: string = "multi-range-slider";
+    baseClassName?: string = 'multi-range-slider';
     onChange: (e: { minValue: number; maxValue: number }) => void;
   }
 

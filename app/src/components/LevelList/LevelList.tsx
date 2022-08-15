@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { generateUUID } from "three/src/math/MathUtils";
-import { FixedSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
-import InfiniteLoader from "react-window-infinite-loader";
-import { useAuth } from "react-oidc-context";
-import { viewState } from "../../atoms/viewState";
-import Level from "../../models/Level";
-import "./LevelList.scss";
-import LevelListStories from "./LevelList.stories";
-import LevelPartial from "../../models/LevelPartial";
-import { searchCriteriaState } from "../../atoms/searchCriteriaState";
-import { LevelService } from "../../services/LevelService";
+import React, { useEffect, useRef, useState } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { generateUUID } from 'three/src/math/MathUtils';
+import { FixedSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import InfiniteLoader from 'react-window-infinite-loader';
+import { useAuth } from 'react-oidc-context';
+import { viewState } from '../../atoms/viewState';
+import Level from '../../models/Level';
+import './LevelList.scss';
+import LevelListStories from './LevelList.stories';
+import LevelPartial from '../../models/LevelPartial';
+import { searchCriteriaState } from '../../atoms/searchCriteriaState';
+import { LevelService } from '../../services/LevelService';
 
 const LevelList = () => {
   const auth = useAuth();
@@ -52,15 +52,14 @@ const LevelList = () => {
   const loadMoreRows = isNextPageLoading ? () => {} : loadNextPage;
 
   // Every row is loaded except for our loading indicator row.
-  const isRowLoaded = ({ index }: { index: number }) =>
-    !hasNextPage || index < levels.length;
+  const isRowLoaded = ({ index }: { index: number }) => !hasNextPage || index < levels.length;
 
   // Render a list item or a loading indicator.
   const rowRenderer = ({ index, style }: { index: number; style: any }) => {
     let content;
 
     if (!isRowLoaded({ index })) {
-      content = "Loading...";
+      content = 'Loading...';
     } else {
       content = levels[index].title;
     }
@@ -70,25 +69,23 @@ const LevelList = () => {
         type="button"
         style={style}
         className={
-          ((view as any).level && (view as any).level.id) ===
-          (levels[index] && levels[index].id)
-            ? "active"
-            : "inactive"
+          ((view as any).level && (view as any).level.id) === (levels[index] && levels[index].id)
+            ? 'active'
+            : 'inactive'
         }
         onClick={(event) => {
           setView((old) => ({
             ...old,
-            level: levels[index],
+            level: levels[index]
           }));
-        }}
-      >
+        }}>
         <div>{content}</div>
       </button>
     );
   };
 
   useEffect(() => {
-    if (typeof searchCriteriaChangedTimeout.current === "number")
+    if (typeof searchCriteriaChangedTimeout.current === 'number')
       clearTimeout(searchCriteriaChangedTimeout.current);
     searchCriteriaChangedTimeout.current = setTimeout(() => {
       lastPage.current = 0;
@@ -103,14 +100,12 @@ const LevelList = () => {
       data-testid="LevelList"
       ref={(ref) => {
         scrollParentRef.current = ref;
-      }}
-    >
+      }}>
       <InfiniteLoader
         isItemLoaded={isRowLoaded as any}
         loadMoreItems={loadMoreRows as any}
         itemCount={rowCount}
-        ref={infiniteLoader}
-      >
+        ref={infiniteLoader}>
         {({ onItemsRendered, ref }) => {
           return (
             <AutoSizer>
@@ -122,8 +117,7 @@ const LevelList = () => {
                     width={width}
                     height={height}
                     itemCount={rowCount}
-                    itemSize={50}
-                  >
+                    itemSize={50}>
                     {rowRenderer}
                   </List>
                 );

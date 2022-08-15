@@ -1,7 +1,7 @@
-import React, { ChangeEvent, useCallback } from "react";
-import "./SearchCriteria.scss";
-import { useRecoilState } from "recoil";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { ChangeEvent, useCallback } from 'react';
+import './SearchCriteria.scss';
+import { useRecoilState } from 'recoil';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCheckSquare,
   faClock,
@@ -13,98 +13,97 @@ import {
   faSortAlphaUp,
   faSquare,
   faStar,
-  faTrophy,
-} from "@fortawesome/free-solid-svg-icons";
-import { useAuth } from "react-oidc-context";
-import Select from "react-select";
-import MultiRangeSlider from "../../vendor/components/MultiRangeSlider/MultiRangeSlider";
-import { viewState } from "../../atoms/viewState";
-import { searchCriteriaState } from "../../atoms/searchCriteriaState";
+  faTrophy
+} from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from 'react-oidc-context';
+import Select from 'react-select';
+import MultiRangeSlider from '../../vendor/components/MultiRangeSlider/MultiRangeSlider';
+import { viewState } from '../../atoms/viewState';
+import { searchCriteriaState } from '../../atoms/searchCriteriaState';
 
 const SearchCriteria = () => {
-  const [searchCriteria, setSearchCritera] =
-    useRecoilState(searchCriteriaState);
+  const [searchCriteria, setSearchCritera] = useRecoilState(searchCriteriaState);
   const auth = useAuth();
 
   const orderByOptions = [
     {
-      value: "rating",
+      value: 'averageRating',
       label: (
         <>
           <FontAwesomeIcon icon={faStar} />
           <span>Rating</span>
         </>
-      ),
+      )
     },
     {
-      value: "difficulty",
+      value: 'difficulty',
       label: (
         <>
           <FontAwesomeIcon icon={faDumbbell} />
           <span>Difficulty</span>
         </>
-      ),
+      )
     },
     {
-      value: "title",
+      value: 'title',
       label: (
         <>
           <FontAwesomeIcon icon={faFont} />
           <span>Alphabetical</span>
         </>
-      ),
+      )
     },
     {
-      value: "length",
+      value: 'length',
       label: (
         <>
           <FontAwesomeIcon icon={faClock} />
           <span>Length</span>
         </>
-      ),
+      )
     },
     ...(auth.isAuthenticated
       ? [
           {
-            value: "personalBest",
+            value: 'personalBest',
             label: (
               <>
                 <FontAwesomeIcon icon={faTrophy} />
                 <span>Personal Best</span>
               </>
-            ),
-          },
+            )
+          }
         ]
-      : []),
+      : [])
   ];
 
   const directionOptions = [
     {
-      value: "ascending",
+      value: 'ascending',
       label: (
         <>
-          {searchCriteria.orderBy === "title" ? (
+          {searchCriteria.orderBy === 'title' ? (
             <FontAwesomeIcon icon={faSortAlphaUp} />
           ) : (
             <FontAwesomeIcon icon={faLongArrowAltUp} />
           )}
           <span>Ascending</span>
         </>
-      ),
+      )
     },
     {
-      value: "descending",
+      value: 'descending',
       label: (
         <>
-          {searchCriteria.orderBy === "title" ? (
+          {searchCriteria.orderBy === 'title' ? (
             <FontAwesomeIcon icon={faSortAlphaDown} />
           ) : (
             <FontAwesomeIcon icon={faLongArrowAltDown} />
           )}
           <span>Descending</span>
         </>
-      ),
-    },
+      )
+    }
   ];
 
   const wrapperFormatter = useCallback((val: number) => {
@@ -112,7 +111,7 @@ const SearchCriteria = () => {
   }, []);
 
   const secondsMinutesFormatter = useCallback((seconds: number) => {
-    if (seconds === 5 * 60) return "5min+";
+    if (seconds === 5 * 60) return '5min+';
     return `${Math.floor(seconds / 60)}min`;
   }, []);
 
@@ -121,7 +120,7 @@ const SearchCriteria = () => {
     return (
       <div>{`${Math.floor(seconds / 60)}:${Math.round(seconds % 60)
         .toString()
-        .padStart(2, "0")}`}</div>
+        .padStart(2, '0')}`}</div>
     );
   }, []);
 
@@ -138,20 +137,14 @@ const SearchCriteria = () => {
       <div className="row">Order By</div>
       <div className="row">
         <Select
-          value={
-            orderByOptions.filter(
-              (option) => searchCriteria.orderBy === option.value
-            )[0]
-          }
+          value={orderByOptions.filter((option) => searchCriteria.orderBy === option.value)[0]}
           onChange={(selectedOption) =>
             setSearchCritera((old) => {
               return {
                 ...old,
                 orderBy: (selectedOption as any).value,
                 direction:
-                  (selectedOption as any).value === "rating"
-                    ? "descending"
-                    : "ascending",
+                  (selectedOption as any).value === 'averageRating' ? 'descending' : 'ascending'
               };
             })
           }
@@ -163,11 +156,7 @@ const SearchCriteria = () => {
       </div>
       <div className="row">
         <Select
-          value={
-            directionOptions.filter(
-              (option) => searchCriteria.direction === option.value
-            )[0]
-          }
+          value={directionOptions.filter((option) => searchCriteria.direction === option.value)[0]}
           onChange={(selectedOption) =>
             setSearchCritera((old) => {
               return { ...old, direction: (selectedOption as any).value };
@@ -196,7 +185,7 @@ const SearchCriteria = () => {
               return {
                 ...old,
                 minDifficulty: e.minValue,
-                maxDifficulty: e.maxValue,
+                maxDifficulty: e.maxValue
               };
             })
           }
@@ -222,7 +211,7 @@ const SearchCriteria = () => {
               return {
                 ...old,
                 minLength: e.minValue,
-                maxLength: e.maxValue,
+                maxLength: e.maxValue
               };
             })
           }
@@ -249,7 +238,7 @@ const SearchCriteria = () => {
                 return {
                   ...old,
                   minPersonalBest: e.minValue,
-                  maxPersonalBest: e.maxValue,
+                  maxPersonalBest: e.maxValue
                 };
               })
             }
@@ -259,10 +248,7 @@ const SearchCriteria = () => {
       <div className="row">
         <label
           htmlFor="show-playlists"
-          className={`checkbox${
-            searchCriteria.showPlaylists ? " checked" : ""
-          }`}
-        >
+          className={`checkbox${searchCriteria.showPlaylists ? ' checked' : ''}`}>
           <input
             type="checkbox"
             id="show-playlists"
