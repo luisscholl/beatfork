@@ -1,5 +1,5 @@
-import Collectible from "./Collectible";
-import Obstacle from "./Obstacle";
+import Collectible from './Collectible';
+import Obstacle from './Obstacle';
 
 export default interface LevelVersion {
   id: string;

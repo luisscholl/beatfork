@@ -94,13 +94,18 @@ paths:
             type: number
             minimum: 0
             maximum: 1
+        - name: onlyLiked
+          description: Show only levels liked by the user
+          in: query
+          schema:
+            type: boolean
         - name: orderBy 
-          description: By what attribute the levels are ordered. If levels are sorted ascending by difficulty, they are sorted by their easiest version. If levels are sorted descending by difficulty, they are sorted by their most difficult version.
+          description: By what attribute the levels are ordered. If levels are sorted ascending by difficulty/personal best, they are sorted by their easiest version/lowest personal best. If levels are sorted descending by difficulty/personal best, they are sorted by their most difficult version/highest personal best.
           in: query
           schema:
             type: string
             enum:
-            - rating
+            - averageRating
             - difficulty
             - length
             - personalBest
@@ -162,8 +167,12 @@ paths:
                         published:
                           type: boolean
                           example: true
-                        rating:
+                        averageRating:
                           $ref: "#/components/schemas/Rating"
+                        ownRating:
+                          type: integer
+                          minimum: 0
+                          maximum: 1
                         versions:
                           type: array
                           items:
@@ -173,6 +182,10 @@ paths:
                                 type: integer
                                 minimum: 1
                                 maximum: 20
+                              personalBest:
+                                type: integer
+                                minimum: 0
+                                maximum: 100
                               id:
                                 type: integer
                                 minimum: 1
@@ -288,6 +301,24 @@ paths:
           description: User needs to be logged in.
         451:
           description: Audio links to domains on block list not allowed.
+    delete:
+      description: Delete all levels of an author
+      parameters:
+        - name: authorId
+          description: The id of the author
+          in: query
+          schema:
+            type: string
+            minLength: 1
+            example: 2005F616-F913-45E1-9540-E9646A67219C
+          required: true
+      responses:
+        200:
+          description: Ok
+        401:
+          description: User needs to be logged in.
+        403:
+          description: User must be level author or admin.
   /levels/{levelId}:
     get:
       description: Get a level by id
@@ -323,8 +354,12 @@ paths:
                   published:
                     type: boolean
                     example: true
-                  rating:
+                  averageRating:
                     $ref: "#/components/schemas/Rating"
+                  ownRating:
+                    type: integer
+                    minimum: 0
+                    maximum: 1
                   artists:
                     type: array
                     items:
@@ -363,6 +398,10 @@ paths:
                           type: integer
                           minimum: 1
                           example: 1
+                        personalBest:
+                                type: integer
+                                minimum: 0
+                                maximum: 100
                         difficulty:
                           type: integer
                           minimum: 1
@@ -444,6 +483,12 @@ paths:
                     description: Link to a music shop for buying the audio file. Domain may not be on block list.
                     type: string
                     minLength: 1
+              required:
+              - title
+              - bpm
+              - length
+              - published
+              - versions
       responses:
         200:
           description: Ok
@@ -471,6 +516,41 @@ paths:
           description: User needs to be logged in.
         403:
           description: User must be level author or admin.
+        404:
+          description: Level not found.
+  /levels/{levelId}/rating:
+    put:
+      description: Set a users rating for a level. If no userId is given, the requesting user's rating is updated
+      parameters:
+        - in: path
+          name: levelId
+          schema:
+            type: string
+          required: true
+          description: UUID of the level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  minimum: 0
+                  maximum: 1
+                userId:
+                  type: string
+                  minLength: 1
+                  example: 2005F616-F913-45E1-9540-E9646A67219C
+              required:
+              - rating
+      responses:
+        200:
+          description: Ok
+        401:
+          description: User needs to be logged in.
+        403:
+          description: User must be admin to set the rating for another user.
         404:
           description: Level not found.
   /levels/{levelId}/{versionId}:
@@ -501,6 +581,10 @@ paths:
                     type: integer
                     minimum: 1
                     example: 1
+                  personalBest:
+                    type: integer
+                    minimum: 0
+                    maximum: 100
                   difficulty:
                     type: integer
                     minimum: 1
@@ -513,6 +597,47 @@ paths:
                         - $ref: "#/components/schemas/Obstacle"
         403:
           description: User must be level author or admin.
+  /levels/{levelId}/{versionId}/personalBest:
+    put:
+      description: Set a users personal best on a version of a level. If no userId is given, the requesting user's best is updated
+      parameters:
+        - in: path
+          name: levelId
+          schema:
+            type: string
+          required: true
+          description: UUID of the level
+        - in: path
+          name: versionId
+          schema:
+            type: integer
+          required: true
+          description: ID of the version
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                personalBest:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                userId:
+                  type: string
+                  minLength: 1
+                  example: 2005F616-F913-45E1-9540-E9646A67219C
+              required:
+              - personalBest
+      responses:
+        200:
+          description: Ok
+        401:
+          description: User needs to be logged in.
+        403:
+          description: User must be admin to set the personal best of another user.
+        404:
+          description: Level or version not found.
 components:
   schemas:
     Vector3D:

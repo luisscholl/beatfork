@@ -14,7 +14,7 @@ export const searchCriteriaState = atom({
     minPersonalBest: 0,
     maxPersonalBest: 100,
     minRating: 0,
-    orderBy: "rating",
+    orderBy: "averageRating",
     direction: "descending",
     title: "",
     author: "",
@@ -28,7 +28,7 @@ export const searchCriteriaState = atom({
     minPersonalBest: number;
     maxPersonalBest: number;
     minRating: number;
-    orderBy: "rating" | "difficulty" | "length" | "title" | "personalBest";
+    orderBy: "averageRating" | "difficulty" | "length" | "title" | "personalBest";
     direction: "ascending" | "descending";
     title: string;
     author: string;

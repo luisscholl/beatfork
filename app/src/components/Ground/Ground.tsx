@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { Box, RoundedBox } from "@react-three/drei";
+import { Box, RoundedBox } from '@react-three/drei';
 import React, {
   forwardRef,
   ForwardRefRenderFunction,
@@ -7,33 +7,28 @@ import React, {
   useCallback,
   useImperativeHandle,
   useMemo,
-  useRef,
-} from "react";
-import { useRecoilValue } from "recoil";
-import * as THREE from "three";
-import { InstancedMesh, Mesh, Vector3 } from "three";
-import { settingsState } from "../../atoms/settingsState";
-import "./Ground.scss";
+  useRef
+} from 'react';
+import { useRecoilValue } from 'recoil';
+import * as THREE from 'three';
+import { InstancedMesh, Mesh, Vector3 } from 'three';
+import { settingsState } from '../../atoms/settingsState';
+import './Ground.scss';
 
 const noBeatIndicators = 20;
 const tempObject = new THREE.Object3D();
 const tempColor = new THREE.Color();
-const beatIndicatorsStartColor = tempColor.set("#8ed667").toArray();
-const beatIndicatorsEndColor = tempColor.set("#72b54e").toArray();
+const beatIndicatorsStartColor = tempColor.set('#8ed667').toArray();
+const beatIndicatorsEndColor = tempColor.set('#72b54e').toArray();
 
 const Ground = forwardRef(
-  (
-    props: { bpm: number; timeScaleFactor: number },
-    ref: Ref<{ animate: (t: number) => void }>
-  ) => {
+  (props: { bpm: number; timeScaleFactor: number }, ref: Ref<{ animate: (t: number) => void }>) => {
     const settings = useRecoilValue(settingsState);
 
     const colorArray = useMemo(
       () =>
         Float32Array.from(
-          new Array(noBeatIndicators)
-            .fill(null)
-            .flatMap((_, i) => beatIndicatorsStartColor)
+          new Array(noBeatIndicators).fill(null).flatMap((_, i) => beatIndicatorsStartColor)
         ),
       []
     );
@@ -41,18 +36,10 @@ const Ground = forwardRef(
     useImperativeHandle(ref, () => ({
       animate(t: number) {
         if (groundMesh.current) {
-          groundMesh.current.position.set(
-            0,
-            -5.75,
-            -props.timeScaleFactor * t - 495
-          );
+          groundMesh.current.position.set(0, -5.75, -props.timeScaleFactor * t - 495);
         }
         if (hitPlaneIndicatorMesh.current) {
-          hitPlaneIndicatorMesh.current.position.set(
-            0,
-            -0.75,
-            -props.timeScaleFactor * t
-          );
+          hitPlaneIndicatorMesh.current.position.set(0, -0.75, -props.timeScaleFactor * t);
         }
         if (beatIndicatorMesh.current) {
           const tBase = t - (t % (60 / props.bpm));
@@ -63,8 +50,7 @@ const Ground = forwardRef(
               -0.75,
               -props.timeScaleFactor * (tBase + (i * 60) / props.bpm)
             );
-            const percentage =
-              1 - (-(t % 1) + (i + 1)) / (noBeatIndicators + 1);
+            const percentage = 1 - (-(t % 1) + (i + 1)) / (noBeatIndicators + 1);
             tempColor
               .setRGB(
                 beatIndicatorsStartColor[0] * percentage +
@@ -79,10 +65,9 @@ const Ground = forwardRef(
             beatIndicatorMesh.current.setMatrixAt(i, tempObject.matrix);
           }
           beatIndicatorMesh.current.instanceMatrix.needsUpdate = true;
-          beatIndicatorMesh.current.geometry.attributes.color.needsUpdate =
-            true;
+          beatIndicatorMesh.current.geometry.attributes.color.needsUpdate = true;
         }
-      },
+      }
     }));
 
     const beatIndicatorMesh = useRef<InstancedMesh>();
@@ -97,14 +82,10 @@ const Ground = forwardRef(
         <Box ref={hitPlaneIndicatorMesh} args={[2, 0.05, 0.05]} receiveShadow>
           <meshStandardMaterial attach="material" color="#ff3639" />
         </Box>
-        <instancedMesh
-          ref={beatIndicatorMesh}
-          args={[null, null, noBeatIndicators]}
-          receiveShadow
-        >
+        <instancedMesh ref={beatIndicatorMesh} args={[null, null, noBeatIndicators]} receiveShadow>
           <boxGeometry args={[2, 0.04, 0.02]}>
             <instancedBufferAttribute
-              attachObject={["attributes", "color"]}
+              attachObject={['attributes', 'color']}
               args={[colorArray, 3]}
             />
           </boxGeometry>

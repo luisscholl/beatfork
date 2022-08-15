@@ -1,6 +1,6 @@
-import Artist from "./Artist";
-import LevelVersionPartial from "./LevelVersionPartial";
-import User from "./User";
+import Artist from './Artist';
+import LevelVersionPartial from './LevelVersionPartial';
+import User from './User';
 
 export default interface LevelPartial {
   id: string;

@@ -1,5 +1,5 @@
-import React from "react";
-import "./Preview.scss";
+import React from 'react';
+import './Preview.scss';
 
 const Preview = () => (
   <div className="Preview" data-testid="Preview">

@@ -1,4 +1,4 @@
-import { Vector2 } from "three";
+import { Vector2 } from 'three';
 /**
  * Calculates the angles between two landmarks which are represented as position vectors.
  * @param {2-tuple} point1        Elbow/Knee

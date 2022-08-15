@@ -1,7 +1,7 @@
-import React, { FC } from "react";
-import { useAuth } from "react-oidc-context";
-import NavBar from "../NavBar/NavBar";
-import "./Profile.scss";
+import React, { FC } from 'react';
+import { useAuth } from 'react-oidc-context';
+import NavBar from '../NavBar/NavBar';
+import './Profile.scss';
 
 interface ProfileProps {}
 

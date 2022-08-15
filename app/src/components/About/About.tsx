@@ -1,7 +1,7 @@
-import React, { FC } from "react";
-import LazyMarkdown from "../LazyMarkdown/LazyMarkdown";
-import NavBar from "../NavBar/NavBar";
-import "./About.scss";
+import React, { FC } from 'react';
+import LazyMarkdown from '../LazyMarkdown/LazyMarkdown';
+import NavBar from '../NavBar/NavBar';
+import './About.scss';
 
 interface AboutProps {}
 

@@ -1,5 +1,5 @@
-import React from "react";
-import "./LevelDifficultyMeta.scss";
+import React from 'react';
+import './LevelDifficultyMeta.scss';
 
 const LevelDifficultyMeta = () => (
   <div className="LevelDifficultyMeta" data-testid="LevelDifficultyMeta">
