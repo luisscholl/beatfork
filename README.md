@@ -1,4 +1,4 @@
-# sg
+# BeatFork
 
 This is a rhythm game created as part of the Serious Games course at Technische Universität Darmstadt.
 
@@ -58,17 +58,19 @@ If you did not install the VS Code Stylelint extension, run from app
 
 for linting in .scss files. With the extension stylelint will be run automatically on save.
 
-## Building and Deployment
+## Deployment
 
-```npm run bd```
+```npm run deploy```
 
-## Testing
+### Backup
 
-```cd app && npm test```
+For backup, put 30 4 * * * docker exec mongo mongodump --out /backup/ into your crontab.
 
-## Documentation
+Backup will be created for the application database (MongoDB) and the Keycloak database (PostgreSQL) daily at ~/backup.
 
-Documentation, which does not naturally fit into a comment goes into the documentation folder.
+Having backup on the same server is very undesirable. The ~/backup folder only serves as a temporary location from which you can transfer backups to e.g. a backup server.
+
+The default backup interval is once a day at 4:30 AM. You can adjust this by putting a different frequency into your crontab for the Mongo DB and docker/production.yml.
 
 ## COPYING
 
