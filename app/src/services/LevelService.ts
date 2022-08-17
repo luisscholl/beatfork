@@ -111,9 +111,14 @@ function searchLevel(options: SearchOptions, page: number): Promise<LevelPartial
     });
 }
 
+function upsertLevelVersion(levelPartial: LevelPartial) {
+  console.log('todo');
+}
+
 const LevelService = {
   getLevel,
-  searchLevel
+  searchLevel,
+  upsertLevelVersion
 };
 
 export { LevelService };

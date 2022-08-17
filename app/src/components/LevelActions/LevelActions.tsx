@@ -22,7 +22,7 @@ const LevelActions = () => {
           <FontAwesomeIcon icon={faList} />
           Add to playlist
         </button>
-        <Link to="/edit">
+        <Link to={`/edit/${view.level.id}/${view.version}`}>
           <FontAwesomeIcon icon={faEdit} />
           Edit
         </Link>

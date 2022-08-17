@@ -280,7 +280,7 @@ const EditorCollectibles: ForwardRefExoticComponent<
       fragmentShader: editorCollectibleFragmentShader,
       uniforms: {
         collectibleTexture: {
-          value: new THREE.TextureLoader().load('./assets/collectibles.png')
+          value: new THREE.TextureLoader().load('/assets/collectibles.png')
         }
       }
     }),
