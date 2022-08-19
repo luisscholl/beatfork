@@ -72,6 +72,10 @@ Having backup on the same server is very undesirable. The ~/backup folder only s
 
 The default backup interval is once a day at 4:30 AM. You can adjust this by putting a different frequency into your crontab for the Mongo DB and docker/production.yml.
 
+## Difficulty Estimation
+
+As a Bachelor's thesis Luis is developing an approach to automatically estimate difficulty of levels of rhythm-based exergames like BeatFork with BeatFork as a case study. The code for that is mostly separate from the main project right now. You can find more information at difficulty-estimation/README.md.
+
 ## COPYING
 
 All source files except files in the /app/legal folder, the /app/audio folder and the /app/src/vendors folder are licensed under the Apache License, Version 2.0. The full text of the license may be found in the LICENSE.txt file. (We plan to remove the vendor folder in the future. We are currently waiting on this pull request being approved and the corresponding npm package being updated: https://github.com/developergovindgupta/multi-range-slider-react/pull/1) See LICENSE-SONGS.txt for a list of the used songs, their licenses and attribution to their authors.

@@ -1,0 +1,19 @@
+{
+  "name": "difficulty-estimation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "dotenv cmd /c \"echo %SAY_HI% && echo %SAY_HI%\"",
+    "postinstall": "run-script-os",
+    "postinstall:windows": "dotenv cmd /c \"pushd %VIRTUALENV_PATH% && virtualenv --python=python3.10 beatfork && popd && %VIRTUALENV_PATH%/beatfork/Scripts/activate && pip install -r requirements.txt && python -m ipykernel install --user --name=beatfork\"",
+    "postinstall:nix": "dotenv-flow source $BEATFORK_VIRTUALENV_PATH/beatfork/bin/activate"
+  },
+  "author": "Luis Scholl",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "dotenv-cli": "^6.0.0",
+    "dotenv-flow-cli": "^1.0.0",
+    "run-script-os": "^1.1.6"
+  }
+}
