@@ -469,7 +469,7 @@ const Editor = () => {
     setPlaying(false);
   };
 
-  const save = () => {
+  const save = async () => {
     const objects = [collectibles.current.export(), obstacles.current.export()]
       .flat()
       .sort((a, b) => a.position.z - b.position.z);
@@ -477,9 +477,13 @@ const Editor = () => {
       // todo: Warn user that level upload is only possible while logged in.
       return;
     }
-    if (levelId && versionId) {
-      console.log('todo');
-      console.log('pika');
+    const isAuthor = await LevelService.isAuthor(levelId);
+    if (levelId && isAuthor && versionId) {
+      LevelService.updateVersion(levelId, {
+        id: versionId,
+        difficulty,
+        objects
+      });
     } else {
       const level = {
         title,

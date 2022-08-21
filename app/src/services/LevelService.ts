@@ -110,8 +110,29 @@ function search(options: SearchOptions, page: number): Promise<LevelPartial[]> {
     });
 }
 
-function upsertVersion(levelId: string, version: LevelVersion) {
-  console.log('todo');
+function updateVersion(levelId: string, version: LevelVersion) {
+  get(levelId).then((level) => {
+    const uploadLevel = JSON.parse(JSON.stringify(level));
+    uploadLevel.versions[version.id] = version;
+    uploadLevel.versions = Object.values(uploadLevel.versions).map((v: any) => {
+      return {
+        ...v,
+        id: parseInt(v.id, 10)
+      };
+    });
+    uploadLevel.artistIds = level.artists.map((artist) => artist.id);
+    delete uploadLevel.artists;
+
+    const url = `${process.env.REACT_APP_API_URL}/levels/${levelId}`;
+    const token = getAuthToken();
+    const options: any = {};
+    options.headers = token ? { Authorization: token } : {};
+    options.headers['Content-Type'] = 'application/json';
+    options.method = 'PUT';
+    options.body = JSON.stringify(uploadLevel);
+
+    fetch(url, options);
+  });
 }
 
 function upload(level: UploadLevel) {
@@ -125,7 +146,17 @@ function upload(level: UploadLevel) {
 }
 
 function isAuthor(levelId: string) {
-  console.log('todo');
+  const oidcStorage = sessionStorage.getItem(
+    `oidc.user:${oidcConfig.authority}:${oidcConfig.client_id}`
+  );
+  if (!oidcStorage) {
+    return new Promise((resolve) => {
+      resolve(null);
+    });
+  }
+
+  const userId = User.fromStorageString(oidcStorage)?.profile.sub;
+  return get(levelId).then((level) => level.author.id === userId);
 }
 
 function remove(levelId: string) {
@@ -140,7 +171,7 @@ function remove(levelId: string) {
 const LevelService = {
   get,
   search,
-  upsertVersion,
+  updateVersion,
   upload,
   isAuthor,
   remove
