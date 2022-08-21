@@ -59,6 +59,7 @@ const Editor = () => {
   const [id, setId] = useState<string>(generateUUID());
   const [title, setTitle] = useState<string>('My Level');
   const [bpm, setBpm] = useState<number>(120);
+  const [difficulty, setDifficulty] = useState<number>(1);
   const audio = useRef<Howl>(null);
   const [audioPath, setAudioPath] = useState<string>('/levels/Für Elise/silence.mp3');
   // Holds indexes of selected collectibles and obstacles
@@ -488,7 +489,7 @@ const Editor = () => {
         versions: [
           {
             id: 1,
-            difficulty: 1, // todo
+            difficulty,
             objects
           }
         ],
@@ -793,6 +794,12 @@ const Editor = () => {
               <SettingsRow title="Title" value={title} setter={setTitle} type="text" />
               <SettingsRow title="BPM" value={bpm} setter={setBpm} type="number" />
               <SettingsRow title="Audio Path" value={audioPath} setter={setAudioPath} type="text" />
+              <SettingsRow
+                title="Difficulty"
+                value={difficulty}
+                setter={(n) => setDifficulty(Math.max(1, Math.min(Math.round(n), 20)))}
+                type="number"
+              />
             </div>
           </div>
         )}
