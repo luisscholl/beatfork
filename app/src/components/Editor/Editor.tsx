@@ -21,6 +21,7 @@ import * as THREE from 'three';
 import { useParams } from 'react-router-dom';
 import { DoubleSide, Mesh, Raycaster, Vector2 } from 'three';
 import { generateUUID } from 'three/src/math/MathUtils';
+import { useAuth } from 'react-oidc-context';
 import {
   // eslint-disable-next-line camelcase
   useRecoilBridgeAcrossReactRoots_UNSTABLE,
@@ -45,6 +46,7 @@ import { LevelService } from '../../services/LevelService';
 import Artist from '../../models/Artist';
 
 const Editor = () => {
+  const auth = useAuth();
   const { levelId, versionId } = useParams();
   const lastLevelIdAndVersionId = useRef<string>('null');
 
@@ -150,7 +152,7 @@ const Editor = () => {
     )
       return;
     lastLevelIdAndVersionId.current = `${levelId}:${versionId}`;
-    LevelService.getLevel(levelId, versionId).then((levelData) => {
+    LevelService.get(levelId, versionId).then((levelData) => {
       if (levelData.id) setId(levelData.id);
       if (levelData.title) setTitle(levelData.title);
       if (levelData.bpm) setBpm(levelData.bpm);
@@ -470,41 +472,38 @@ const Editor = () => {
     const objects = [collectibles.current.export(), obstacles.current.export()]
       .flat()
       .sort((a, b) => a.position.z - b.position.z);
-    // todo: Putting some of this in LevelService should be beneficial
+    if (!auth.isAuthenticated) {
+      // todo: Warn user that level upload is only possible while logged in.
+      return;
+    }
     if (levelId && versionId) {
-      const level = {
-        id: levelId, // todo
-        title,
-        bpm,
-        audioLinks: [audioPath], // todo
-        versions: {
-          [versionId]: {
-            id: versionId,
-            difficulty: 0, // todo
-            objects
-          }
-        },
-        length: 0, // todo
-        published: false, // todo,
-        artists: [] as Artist[] // todo
-      };
+      console.log('todo');
+      console.log('pika');
     } else {
       const level = {
-        id, // todo
         title,
         bpm,
-        audioLinks: [audioPath], // todo
-        versions: {
-          [versionId]: {
-            id: versionId,
-            difficulty: 0, // todo
+        published: false,
+        artistIds: [] as string[],
+        versions: [
+          {
+            id: 1,
+            difficulty: 1, // todo
             objects
           }
-        },
-        length: 0, // todo
-        published: false, // todo,
-        artists: [] as Artist[] // todo
+        ],
+        audioLinks: [audioPath],
+        length: audio.current.duration()
       };
+      LevelService.upload(level).then((result) => {
+        if (result.ok) {
+          result.json().then((levelInfo) => {
+            window.history.pushState('', '', `/edit/${levelInfo.id}/1`);
+            window.history.forward();
+            window.location.reload();
+          });
+        }
+      });
     }
   };
 

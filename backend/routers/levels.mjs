@@ -614,7 +614,8 @@ router.get('/:levelId', async (req, res, next) => {
   if (
     !(
       level.published ||
-      res.locals.admin(res.locals.authenticated && res.locals.userId === level.author.id)
+      res.locals.admin ||
+      (res.locals.authenticated && res.locals.userId === level.author.id)
     )
   ) {
     const userNotAuthorized = new Error();

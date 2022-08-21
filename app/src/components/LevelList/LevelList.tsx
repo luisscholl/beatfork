@@ -33,7 +33,7 @@ const LevelList = () => {
     const options = JSON.parse(JSON.stringify(searchCriteria));
     if (options.maxLength === 300) options.maxLength = Infinity;
     delete options.showPlaylists;
-    LevelService.searchLevel(options, lastPage.current).then((results) => {
+    LevelService.search(options, lastPage.current).then((results) => {
       setIsNextPageLoading(false);
       if (results.length > 0) {
         setLevels((old) => [...old, ...results]);
