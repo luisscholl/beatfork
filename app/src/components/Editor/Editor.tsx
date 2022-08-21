@@ -46,6 +46,7 @@ import Artist from '../../models/Artist';
 
 const Editor = () => {
   const { levelId, versionId } = useParams();
+  const lastLevelIdAndVersionId = useRef<string>('null');
 
   const settings = useRecoilValue(settingsState);
   const RecoilBridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
@@ -140,7 +141,15 @@ const Editor = () => {
   const [isOpen, setOpen] = useState(JSON.parse(localStorage.getItem('templates')) || false);
 
   const loadLevel = () => {
-    if (!levelId || !versionId || !collectibles.current || !obstacles.current) return;
+    if (
+      !levelId ||
+      !versionId ||
+      `${levelId}:${versionId}` === lastLevelIdAndVersionId.current ||
+      !collectibles.current ||
+      !obstacles.current
+    )
+      return;
+    lastLevelIdAndVersionId.current = `${levelId}:${versionId}`;
     LevelService.getLevel(levelId, versionId).then((levelData) => {
       if (levelData.id) setId(levelData.id);
       if (levelData.title) setTitle(levelData.title);
@@ -303,13 +312,11 @@ const Editor = () => {
     // localStorage.clear();
 
     for (const elem of template) {
-      // console.log(elem.position);
       const pos = {
         x: elem.position.x,
         y: elem.position.y,
         z: elem.position.z
       };
-      console.log(pos);
       pos.z /= -settings.editorTimeScaleFactor;
       if (elem.type === 'Collectible') {
         collectibles.current.addCollectible({
@@ -459,10 +466,6 @@ const Editor = () => {
     setPlaying(false);
   };
 
-  const openLoadDialog = () => {
-    fileInput.current.click();
-  };
-
   const save = () => {
     const objects = [collectibles.current.export(), obstacles.current.export()]
       .flat()
@@ -541,7 +544,6 @@ const Editor = () => {
 
   const mapSidebarItem = (type: number | Array<Collectible | Obstacle>) => {
     if (typeof type === 'number') {
-      console.log(type);
       if (type === 0) {
         return (
           <button type="button" onMouseDown={(event) => onSidebarObstacleMouseDown(event)}>
