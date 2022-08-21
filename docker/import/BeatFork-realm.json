@@ -2,6 +2,7 @@
   "users": [
     {
       "username": "harry",
+      "id": "harry-userid-uuid-in-prod",
       "email": "test-user-harry@beatfork.com",
       "emailVerified": true,
       "enabled": true,
@@ -17,6 +18,7 @@
     },
     {
       "username": "ron",
+      "id": "ron-userid-uuid-in-prod",
       "email": "test-user-ron@beatfork.com",
       "emailVerified": true,
       "enabled": true,
@@ -32,6 +34,7 @@
     },
     {
       "username": "albus",
+      "id": "albus-userid-uuid-in-prod",
       "email": "test-user-albus@beatfork.com",
       "emailVerified": true,
       "enabled": true,

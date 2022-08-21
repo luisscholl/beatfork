@@ -128,12 +128,22 @@ function isAuthor(levelId: string) {
   console.log('todo');
 }
 
+function remove(levelId: string) {
+  const url = `${process.env.REACT_APP_API_URL}/levels/${levelId}`;
+  const token = getAuthToken();
+  const options: any = {};
+  options.headers = token ? { Authorization: token } : {};
+  options.method = 'DELETE';
+  return fetch(url, options);
+}
+
 const LevelService = {
   get,
   search,
   upsertVersion,
   upload,
-  isAuthor
+  isAuthor,
+  remove
 };
 
 export { LevelService };
