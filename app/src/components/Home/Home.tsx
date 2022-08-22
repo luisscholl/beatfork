@@ -12,19 +12,17 @@ import './Home.scss';
 
 const Home = () => (
   <div className="Home" data-testid="Home">
-    <div className="content">
-      <SearchCriteria />
-      <div>
-        <SearchBar />
-        <LevelList />
-        <Preview />
-      </div>
-      <div>
-        <LevelMeta />
-        <LevelDifficulty />
-        <LevelDifficultyMeta />
-        <LevelActions />
-      </div>
+    <SearchCriteria />
+    <div>
+      <SearchBar />
+      <LevelList type="home" />
+      <Preview />
+    </div>
+    <div>
+      <LevelMeta />
+      <LevelDifficulty />
+      <LevelDifficultyMeta />
+      <LevelActions />
     </div>
   </div>
 );

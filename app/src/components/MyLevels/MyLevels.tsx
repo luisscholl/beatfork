@@ -14,19 +14,17 @@ interface MyLevelsProps {}
 
 const MyLevels: FC<MyLevelsProps> = () => (
   <div className="MyLevels" data-testid="MyLevels">
-    <div className="content">
-      <SearchCriteria />
-      <div>
-        <SearchBar />
-        <LevelList />
-        <Preview />
-      </div>
-      <div>
-        <LevelMeta />
-        <LevelDifficulty />
-        <LevelDifficultyMeta />
-        <LevelActions />
-      </div>
+    <SearchCriteria />
+    <div>
+      <SearchBar />
+      <LevelList type="my-levels" />
+      <Preview />
+    </div>
+    <div>
+      <LevelMeta />
+      <LevelDifficulty />
+      <LevelDifficultyMeta />
+      <LevelActions />
     </div>
   </div>
 );
