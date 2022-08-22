@@ -477,7 +477,7 @@ const Editor = () => {
       // todo: Warn user that level upload is only possible while logged in.
       return;
     }
-    const isAuthor = await LevelService.isAuthor(levelId);
+    const isAuthor = levelId && (await LevelService.isAuthor(levelId));
     if (levelId && isAuthor && versionId) {
       LevelService.updateVersion(levelId, {
         id: versionId,
