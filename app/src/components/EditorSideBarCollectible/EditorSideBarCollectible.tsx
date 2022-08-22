@@ -14,7 +14,7 @@ const EditorSideBarCollectible = (props: { type: CollectibleType }) => {
       vertexShader: editorCollectibleVertexShader,
       uniforms: {
         collectibleTexture: {
-          value: new THREE.TextureLoader().load('./assets/collectibles.png')
+          value: new THREE.TextureLoader().load('/assets/collectibles.png')
         }
       }
     }),

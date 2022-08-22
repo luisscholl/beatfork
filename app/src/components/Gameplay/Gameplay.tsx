@@ -203,7 +203,7 @@ const Gameplay = (props: { debug: boolean }) => {
         version: versionId
       };
     });
-    LevelService.getLevel(levelId, versionId).then((result) => {
+    LevelService.get(levelId, versionId).then((result) => {
       setView((old) => {
         return {
           ...old,

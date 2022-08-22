@@ -1,5 +1,5 @@
 import { User } from 'oidc-client-ts';
-import Level from '../models/Level';
+import Level, { UploadLevel } from '../models/Level';
 import LevelPartial from '../models/LevelPartial';
 import LevelVersion from '../models/LevelVersion';
 import LevelVersionPartial from '../models/LevelVersionPartial';
@@ -29,7 +29,6 @@ function getAuthToken() {
   const oidcStorage = sessionStorage.getItem(
     `oidc.user:${oidcConfig.authority}:${oidcConfig.client_id}`
   );
-  console.log(oidcStorage);
   if (!oidcStorage) {
     return null;
   }
@@ -38,7 +37,7 @@ function getAuthToken() {
 }
 
 // If version is specified, the returned level is only guaranteed to contain the specified full version. Other values of the version dictionary can be LevelVersionPartials.
-function getLevel(id: string, version?: string): Promise<Level> {
+function get(id: string, version?: string): Promise<Level> {
   // If level is cached -> Dandy!
   if (levels.get(id))
     return new Promise((resolve) => {
@@ -83,7 +82,7 @@ function getLevel(id: string, version?: string): Promise<Level> {
     });
 }
 
-function searchLevel(options: SearchOptions, page: number): Promise<LevelPartial[]> {
+function search(options: SearchOptions, page: number): Promise<LevelPartial[]> {
   const token = getAuthToken();
   const headers = token ? { Authorization: token } : {};
   let url = `${process.env.REACT_APP_API_URL}/levels?currentPage=${page}`;
@@ -111,9 +110,71 @@ function searchLevel(options: SearchOptions, page: number): Promise<LevelPartial
     });
 }
 
+function updateVersion(levelId: string, version: LevelVersion) {
+  get(levelId).then((level) => {
+    const uploadLevel = JSON.parse(JSON.stringify(level));
+    uploadLevel.versions[version.id] = version;
+    uploadLevel.versions = Object.values(uploadLevel.versions).map((v: any) => {
+      return {
+        ...v,
+        id: parseInt(v.id, 10)
+      };
+    });
+    uploadLevel.artistIds = level.artists.map((artist) => artist.id);
+    delete uploadLevel.artists;
+
+    const url = `${process.env.REACT_APP_API_URL}/levels/${levelId}`;
+    const token = getAuthToken();
+    const options: any = {};
+    options.headers = token ? { Authorization: token } : {};
+    options.headers['Content-Type'] = 'application/json';
+    options.method = 'PUT';
+    options.body = JSON.stringify(uploadLevel);
+
+    fetch(url, options);
+  });
+}
+
+function upload(level: UploadLevel) {
+  const token = getAuthToken();
+  const options: any = {};
+  options.headers = token ? { Authorization: token } : {};
+  options.headers['Content-Type'] = 'application/json';
+  options.method = 'POST';
+  options.body = JSON.stringify(level);
+  return fetch(`${process.env.REACT_APP_API_URL}/levels`, options);
+}
+
+function isAuthor(levelId: string) {
+  const oidcStorage = sessionStorage.getItem(
+    `oidc.user:${oidcConfig.authority}:${oidcConfig.client_id}`
+  );
+  if (!oidcStorage) {
+    return new Promise((resolve) => {
+      resolve(null);
+    });
+  }
+
+  const userId = User.fromStorageString(oidcStorage)?.profile.sub;
+  return get(levelId).then((level) => level.author.id === userId);
+}
+
+function remove(levelId: string) {
+  const url = `${process.env.REACT_APP_API_URL}/levels/${levelId}`;
+  const token = getAuthToken();
+  const options: any = {};
+  options.headers = token ? { Authorization: token } : {};
+  options.method = 'DELETE';
+  return fetch(url, options);
+}
+
 const LevelService = {
-  getLevel,
-  searchLevel
+  get,
+  search,
+  updateVersion,
+  upload,
+  isAuthor,
+  remove
 };
 
 export { LevelService };
