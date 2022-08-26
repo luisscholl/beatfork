@@ -69,8 +69,8 @@ ReactDOM.render(
                 />
                 <Route path="/legal/treat" element={<LazyMarkdown url="/legal/treat.md" />} />
               </Route>
-              <Route path="/game-over" element={<GameOver />} />
-              <Route path="/level-completed" element={<LevelCompleted />} />
+              <Route path="/game-over/:levelId/:versionId" element={<GameOver />} />
+              <Route path="/level-completed/:levelId/:versionId" element={<LevelCompleted />} />
             </Route>
             <Route
               path="/gameplay/:levelId/:versionId"

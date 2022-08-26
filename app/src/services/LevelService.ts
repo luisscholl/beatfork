@@ -7,6 +7,7 @@ import oidcConfig from '../config/config.json';
 
 const levels: Map<string, Level> = new Map();
 const levelPartials: Map<string, LevelPartial> = new Map();
+let temporaryLevel: Level;
 
 export type SearchOptions = {
   currentPage?: number;
@@ -168,13 +169,23 @@ function remove(levelId: string) {
   return fetch(url, options);
 }
 
+function setTemporaryLevel(level: Level) {
+  temporaryLevel = level;
+}
+
+function getTemporaryLevel(): Level {
+  return temporaryLevel;
+}
+
 const LevelService = {
   get,
   search,
   updateVersion,
   upload,
   isAuthor,
-  remove
+  remove,
+  setTemporaryLevel,
+  getTemporaryLevel
 };
 
 export { LevelService };

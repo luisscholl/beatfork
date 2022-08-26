@@ -21,7 +21,8 @@
     // Otherwise, the Three.js canvas cannot received clicks. Need to reenable pointer-events for buttons with another rule.
     pointer-events: none;
 
-    button {
+    button,
+    a {
       pointer-events: all;
     }
 
@@ -94,12 +95,14 @@
       }
 
       .others {
-        button {
+        button,
+        a {
           @include button;
 
           font-size: 3.3rem;
           width: 5rem;
           height: 5rem;
+          color: var(--editor-button-text-color);
         }
 
         .file-input {

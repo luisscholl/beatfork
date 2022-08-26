@@ -15,17 +15,20 @@ import {
   faCopy,
   faToggleOn,
   faToggleOff,
-  faThLarge
+  faThLarge,
+  faHome,
+  faRunning
 } from '@fortawesome/free-solid-svg-icons';
 import * as THREE from 'three';
-import { useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { DoubleSide, Mesh, Raycaster, Vector2 } from 'three';
 import { generateUUID } from 'three/src/math/MathUtils';
 import { useAuth } from 'react-oidc-context';
 import {
   // eslint-disable-next-line camelcase
   useRecoilBridgeAcrossReactRoots_UNSTABLE,
-  useRecoilValue
+  useRecoilValue,
+  useSetRecoilState
 } from 'recoil';
 import { Howl } from 'howler';
 import Collectible, { CollectibleType } from '../../models/Collectible';
@@ -44,9 +47,13 @@ import EditorObstacles, { EditorObstaclesRefAttributes } from '../EditorObstacle
 import SettingsRow from '../SettingsRow/SettingsRow';
 import { LevelService } from '../../services/LevelService';
 import Artist from '../../models/Artist';
+import User from '../../models/User';
+import { viewState } from '../../atoms/viewState';
 
 const Editor = () => {
   const auth = useAuth();
+  const navigate = useNavigate();
+  const setView = useSetRecoilState(viewState);
   const { levelId, versionId } = useParams();
   const lastLevelIdAndVersionId = useRef<string>('null');
 
@@ -145,34 +152,58 @@ const Editor = () => {
 
   const loadLevel = () => {
     if (
-      !levelId ||
-      !versionId ||
       `${levelId}:${versionId}` === lastLevelIdAndVersionId.current ||
       !collectibles.current ||
       !obstacles.current
     )
       return;
-    lastLevelIdAndVersionId.current = `${levelId}:${versionId}`;
-    LevelService.get(levelId, versionId).then((levelData) => {
-      if (levelData.id) setId(levelData.id);
-      if (levelData.title) setTitle(levelData.title);
-      if (levelData.bpm) setBpm(levelData.bpm);
+    const temporaryLevel = LevelService.getTemporaryLevel();
+    if (!levelId || !versionId) {
+      // no level in db, but temporary level
+      setTitle(temporaryLevel.title);
+      setBpm(temporaryLevel.bpm);
       collectibles.current.remove(
         Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
       );
       obstacles.current.remove(
         Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
       );
-      levelData.versions[versionId].objects.forEach((f: Collectible | Obstacle) => {
+      temporaryLevel.versions['1'].objects.forEach((f: Collectible | Obstacle) => {
         if (f.type === 'Collectible') {
           collectibles.current.addCollectible(f);
         } else if (f.type === 'Obstacle') {
           obstacles.current.addObstacle(f);
         }
       });
-      if (levelData.audioLinks.length > 0) setAudioPath(levelData.audioLinks[0]);
+      if (temporaryLevel.audioLinks.length > 0) setAudioPath(temporaryLevel.audioLinks[0]);
       renderAtTime(0);
-    });
+    } else {
+      lastLevelIdAndVersionId.current = `${levelId}:${versionId}`;
+      LevelService.get(levelId, versionId).then((levelData) => {
+        if (levelData.id) setId(levelData.id);
+        if (levelData.title) setTitle((temporaryLevel || levelData).title);
+        if (levelData.bpm) setBpm((temporaryLevel || levelData).bpm);
+        collectibles.current.remove(
+          Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
+        );
+        obstacles.current.remove(
+          Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
+        );
+        (temporaryLevel || levelData).versions[temporaryLevel ? '1' : versionId].objects.forEach(
+          (f: Collectible | Obstacle) => {
+            if (f.type === 'Collectible') {
+              collectibles.current.addCollectible(f);
+            } else if (f.type === 'Obstacle') {
+              obstacles.current.addObstacle(f);
+            }
+          }
+        );
+        if ((temporaryLevel || levelData).audioLinks.length > 0)
+          setAudioPath((temporaryLevel || levelData).audioLinks[0]);
+        renderAtTime(0);
+      });
+    }
+    LevelService.setTemporaryLevel(null);
   };
 
   // Load level
@@ -512,6 +543,38 @@ const Editor = () => {
     }
   };
 
+  const switchToGameplay = () => {
+    const objects = [collectibles.current.export(), obstacles.current.export()]
+      .flat()
+      .sort((a, b) => a.position.z - b.position.z);
+    const level = {
+      id: 'preview',
+      title,
+      bpm,
+      published: false,
+      averageRating: 0,
+      artists: [] as Artist[],
+      author: null as User,
+      versions: {
+        '1': {
+          id: '1',
+          difficulty,
+          objects
+        }
+      },
+      audioLinks: [audioPath],
+      length: audio.current.duration()
+    };
+    LevelService.setTemporaryLevel(level);
+    setView((old) => {
+      return {
+        ...old,
+        returnView: levelId && versionId ? `/edit/${levelId}/${versionId}` : 'edit'
+      };
+    });
+    navigate('/gameplay/preview/1');
+  };
+
   const animate = () => {
     animationFrameRequest.current = requestAnimationFrame(animate);
     renderAtTime(audio.current.seek());
@@ -765,14 +828,20 @@ const Editor = () => {
             </button>
           </div>
           <div className="others">
+            <Link to="/browse">
+              <FontAwesomeIcon icon={faHome} />
+            </Link>
             <button type="button" onClick={() => toggleSettings()}>
               <FontAwesomeIcon icon={faCogs} />
             </button>
-            <button type="button" onClick={() => stop()}>
-              <FontAwesomeIcon icon={faStop} />
-            </button>
             <button type="button" onClick={() => save()}>
               <FontAwesomeIcon icon={faSave} />
+            </button>
+            <button type="button" onClick={() => switchToGameplay()}>
+              <FontAwesomeIcon icon={faRunning} />
+            </button>
+            <button type="button" onClick={() => stop()}>
+              <FontAwesomeIcon icon={faStop} />
             </button>
             {playing ? (
               <button type="button" onClick={() => pause()}>
