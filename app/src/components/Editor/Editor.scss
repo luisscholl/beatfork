@@ -92,6 +92,27 @@
             margin-top: -5.3rem;
           }
         }
+
+        .xy-snap-menu {
+          position: relative;
+
+          &.active {
+            overflow: visible;
+
+            .dropdown {
+              position: absolute;
+              display: flex;
+              flex-direction: column;
+              top: 100%;
+              left: 0;
+              width: 100%;
+
+              button {
+                background-color: #ffffff80;
+              }
+            }
+          }
+        }
       }
 
       .others {

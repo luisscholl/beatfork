@@ -17,7 +17,8 @@ import {
   faToggleOff,
   faThLarge,
   faHome,
-  faRunning
+  faRunning,
+  faCircle
 } from '@fortawesome/free-solid-svg-icons';
 import * as THREE from 'three';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -798,26 +799,34 @@ const Editor = () => {
               onClick={() => toggleTripletSnapping()}>
               <MusicIcon type="triplet" />
             </button>
-            <button
-              className={snappingModulusXY === 0.1 ? 'active' : ''}
-              type="button"
-              style={{ fontSize: '150%' }}
-              onClick={() => setSnappingxy(0.1)}>
+            <button type="button" className="xy-snap-menu active">
               <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />1
-            </button>
-            <button
-              className={snappingModulusXY === 0.3 ? 'active' : ''}
-              type="button"
-              style={{ fontSize: '150%' }}
-              onClick={() => setSnappingxy(0.3)}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />2
-            </button>
-            <button
-              className={snappingModulusXY === 0.5 ? 'active' : ''}
-              type="button"
-              style={{ fontSize: '150%' }}
-              onClick={() => setSnappingxy(0.5)}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />3
+              <div className="dropdown">
+                <button
+                  className={snappingModulusXY === 0.1 ? 'active' : ''}
+                  type="button"
+                  onClick={() => setSnappingxy(0.1)}>
+                  <FontAwesomeIcon icon={faBorderAll} />
+                  <FontAwesomeIcon icon={faCircle} />
+                  <div>1</div>
+                </button>
+                <button
+                  className={snappingModulusXY === 0.3 ? 'active' : ''}
+                  type="button"
+                  style={{ fontSize: '150%' }}
+                  onClick={() => setSnappingxy(0.3)}>
+                  <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />
+                  <div>2</div>
+                </button>
+                <button
+                  className={snappingModulusXY === 0.5 ? 'active' : ''}
+                  type="button"
+                  style={{ fontSize: '150%' }}
+                  onClick={() => setSnappingxy(0.5)}>
+                  <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />
+                  <div>3</div>
+                </button>
+              </div>
             </button>
             <button className="" type="button" style={{ fontSize: '150%' }} onClick={() => copy()}>
               <FontAwesomeIcon style={{ width: '50%' }} icon={faCopy} />
