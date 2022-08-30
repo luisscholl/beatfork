@@ -5,6 +5,10 @@
   &.active {
     background-color: white;
   }
+
+  &:hover > * {
+    transform: translateY(-2px);
+  }
 }
 
 .Editor {
@@ -96,7 +100,21 @@
         .xy-snap-menu {
           position: relative;
 
-          &.active {
+          button {
+            @include button;
+          }
+
+          img {
+            width: 100%;
+            transform: scale(0.9) translateY(6%);
+          }
+
+          .dropdown {
+            display: none;
+          }
+
+          &.active,
+          &:hover {
             overflow: visible;
 
             .dropdown {
@@ -106,8 +124,11 @@
               top: 100%;
               left: 0;
               width: 100%;
+              opacity: 100%;
 
               button {
+                @include button;
+
                 background-color: #ffffff80;
               }
             }

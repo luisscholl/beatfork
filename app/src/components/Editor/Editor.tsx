@@ -18,7 +18,9 @@ import {
   faThLarge,
   faHome,
   faRunning,
-  faCircle
+  faCircle,
+  faPaste,
+  faArchive
 } from '@fortawesome/free-solid-svg-icons';
 import * as THREE from 'three';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -50,6 +52,8 @@ import { LevelService } from '../../services/LevelService';
 import Artist from '../../models/Artist';
 import User from '../../models/User';
 import { viewState } from '../../atoms/viewState';
+
+const snappingModuliXY = [0.1, 0.3, 0.5];
 
 const Editor = () => {
   const auth = useAuth();
@@ -86,6 +90,7 @@ const Editor = () => {
   // const [importedFile, setFile] = useState<File>();
   const [snappingDivider, setSnappingDivider] = useState<4 | 8 | 16 | 32>();
   const [tripletSnappingDivider, setTripletSnappingDivider] = useState<1 | 1.5>(1);
+  const [snapMenuActive, setSnapMenuActive] = useState<boolean>(false);
 
   const collectibles = useRef<EditorCollectiblesRefAttributes>(null);
   const collectiblesCb = useCallback((node) => {
@@ -459,7 +464,7 @@ const Editor = () => {
     }
   };
 
-  const setSnappingxy = (snapTo: 0.1 | 0.3 | 0.5) => {
+  const setSnappingXY = (snapTo: 0.1 | 0.3 | 0.5) => {
     setSnappingModulusXY(snapTo);
     collectibles.current.setSnappingxy(snapTo);
   };
@@ -698,6 +703,33 @@ const Editor = () => {
     }
   };
 
+  const snapMenuOnWheel = (event: React.WheelEvent) => {
+    event.stopPropagation();
+    if (event.deltaY < 0) {
+      switch (snappingModulusXY) {
+        case snappingModuliXY[1]:
+          setSnappingXY(snappingModuliXY[0] as any);
+          break;
+        case snappingModuliXY[2]:
+          setSnappingXY(snappingModuliXY[1] as any);
+          break;
+        default:
+          break;
+      }
+    } else {
+      switch (snappingModulusXY) {
+        case snappingModuliXY[0]:
+          setSnappingXY(snappingModuliXY[1] as any);
+          break;
+        case snappingModuliXY[1]:
+          setSnappingXY(snappingModuliXY[2] as any);
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
   return (
     <div
       className="Editor"
@@ -801,41 +833,59 @@ const Editor = () => {
               onClick={() => toggleTripletSnapping()}>
               <MusicIcon type="triplet" />
             </button>
-            <button type="button" className="xy-snap-menu active">
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />1
+            <div
+              className={`xy-snap-menu ${snapMenuActive ? 'active' : ''}`}
+              onClick={(e) => setSnapMenuActive((old) => !old)}
+              onWheel={(e) => snapMenuOnWheel(e)}>
+              <button type="button">
+                {snappingModulusXY === snappingModuliXY[0] && (
+                  <img src="/assets/grid-icon-1.svg" alt="grid size 1" />
+                )}
+                {snappingModulusXY === snappingModuliXY[1] && (
+                  <img src="/assets/grid-icon-2.svg" alt="grid size 1" />
+                )}
+                {snappingModulusXY === snappingModuliXY[2] && (
+                  <img src="/assets/grid-icon-3.svg" alt="grid size 1" />
+                )}
+              </button>
               <div className="dropdown">
                 <button
-                  className={snappingModulusXY === 0.1 ? 'active' : ''}
+                  className={snappingModulusXY === snappingModuliXY[0] ? 'active' : ''}
                   type="button"
-                  onClick={() => setSnappingxy(0.1)}>
-                  <FontAwesomeIcon icon={faBorderAll} />
-                  <FontAwesomeIcon icon={faCircle} />
-                  <div>1</div>
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSnappingXY(snappingModuliXY[0] as any);
+                  }}>
+                  <img src="/assets/grid-icon-1.svg" alt="grid size 1" />
                 </button>
                 <button
-                  className={snappingModulusXY === 0.3 ? 'active' : ''}
+                  className={snappingModulusXY === snappingModuliXY[1] ? 'active' : ''}
                   type="button"
-                  style={{ fontSize: '150%' }}
-                  onClick={() => setSnappingxy(0.3)}>
-                  <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />
-                  <div>2</div>
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSnappingXY(snappingModuliXY[1] as any);
+                  }}>
+                  <img src="/assets/grid-icon-2.svg" alt="grid size 2" />
                 </button>
                 <button
-                  className={snappingModulusXY === 0.5 ? 'active' : ''}
+                  className={snappingModulusXY === snappingModuliXY[2] ? 'active' : ''}
                   type="button"
-                  style={{ fontSize: '150%' }}
-                  onClick={() => setSnappingxy(0.5)}>
-                  <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />
-                  <div>3</div>
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSnappingXY(snappingModuliXY[2] as any);
+                  }}>
+                  <img src="/assets/grid-icon-3.svg" alt="grid size 3" />
                 </button>
               </div>
+            </div>
+            <button type="button" onClick={() => copy()}>
+              <FontAwesomeIcon icon={faCopy} />
             </button>
-            <button className="" type="button" style={{ fontSize: '150%' }} onClick={() => copy()}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faCopy} />
-            </button>
-            <button className="" type="button" onClick={saveTemplate} style={{ fontSize: '150%' }}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faSave} />
-              <FontAwesomeIcon style={{ width: '20%' }} icon={faThLarge} />
+            {/* <button type="button" onClick={() => console.log('todo: implement pasting')}>
+              <FontAwesomeIcon icon={faPaste} />
+            </button> */}
+            <button className="" type="button" onClick={saveTemplate}>
+              <FontAwesomeIcon icon={faArchive} />
             </button>
           </div>
           <div className="others">
