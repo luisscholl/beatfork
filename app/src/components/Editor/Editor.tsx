@@ -160,24 +160,26 @@ const Editor = () => {
       return;
     const temporaryLevel = LevelService.getTemporaryLevel();
     if (!levelId || !versionId) {
-      // no level in db, but temporary level
-      setTitle(temporaryLevel.title);
-      setBpm(temporaryLevel.bpm);
-      collectibles.current.remove(
-        Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
-      );
-      obstacles.current.remove(
-        Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
-      );
-      temporaryLevel.versions['1'].objects.forEach((f: Collectible | Obstacle) => {
-        if (f.type === 'Collectible') {
-          collectibles.current.addCollectible(f);
-        } else if (f.type === 'Obstacle') {
-          obstacles.current.addObstacle(f);
-        }
-      });
-      if (temporaryLevel.audioLinks.length > 0) setAudioPath(temporaryLevel.audioLinks[0]);
-      renderAtTime(0);
+      if (temporaryLevel) {
+        // no level in db, but temporary level
+        setTitle(temporaryLevel.title);
+        setBpm(temporaryLevel.bpm);
+        collectibles.current.remove(
+          Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
+        );
+        obstacles.current.remove(
+          Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
+        );
+        temporaryLevel.versions['1'].objects.forEach((f: Collectible | Obstacle) => {
+          if (f.type === 'Collectible') {
+            collectibles.current.addCollectible(f);
+          } else if (f.type === 'Obstacle') {
+            obstacles.current.addObstacle(f);
+          }
+        });
+        if (temporaryLevel.audioLinks.length > 0) setAudioPath(temporaryLevel.audioLinks[0]);
+        renderAtTime(0);
+      }
     } else {
       lastLevelIdAndVersionId.current = `${levelId}:${versionId}`;
       LevelService.get(levelId, versionId).then((levelData) => {
