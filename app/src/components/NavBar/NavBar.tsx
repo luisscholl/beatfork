@@ -7,16 +7,22 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { viewState } from '../../atoms/viewState';
 import './NavBar.scss';
 
-const links = [
-  { name: 'About', link: '/about' },
-  { name: 'Home', link: '/home' },
-  { name: 'Browse', link: '/browse' },
-  { name: 'My Levels', link: '/my-levels' },
-  { name: 'Legal', link: '/legal' }
-];
-
 const NavBar = () => {
   const auth = useAuth();
+
+  const links = auth.isAuthenticated
+    ? [
+        { name: 'About', link: '/about' },
+        // { name: 'Home', link: '/home' },
+        { name: 'Browse', link: '/browse' },
+        { name: 'My Levels', link: '/my-levels' },
+        { name: 'Legal', link: '/legal' }
+      ]
+    : [
+        { name: 'About', link: '/about' },
+        { name: 'Browse', link: '/browse' },
+        { name: 'Legal', link: '/legal' }
+      ];
 
   return (
     <div className="NavBar" data-testid="NavBar">

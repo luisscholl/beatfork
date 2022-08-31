@@ -22,6 +22,8 @@ import LazyMarkdown from './components/LazyMarkdown/LazyMarkdown';
 import Editor from './components/Editor/Editor';
 import GameOver from './components/GameOver/GameOver';
 import LevelCompleted from './components/LevelCompleted/LevelCompleted';
+import MyLevels from './components/MyLevels/MyLevels';
+import Home from './components/Home/Home';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -34,9 +36,9 @@ ReactDOM.render(
               <Route path="/close-account" element={<CloseAccount />} />
               <Route index element={<Navigate to={`/about${window.location.search}`} />} />
               <Route path="/about" element={<About />} />
-              <Route path="/home" element={<Browse />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/browse" element={<Browse />} />
-              <Route path="/my-levels" element={<Browse />} />
+              <Route path="/my-levels" element={<MyLevels />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/legal" element={<Legal />}>
                 <Route index element={<Navigate to="/legal/credits" />} />
@@ -67,8 +69,8 @@ ReactDOM.render(
                 />
                 <Route path="/legal/treat" element={<LazyMarkdown url="/legal/treat.md" />} />
               </Route>
-              <Route path="/game-over" element={<GameOver />} />
-              <Route path="/level-completed" element={<LevelCompleted />} />
+              <Route path="/game-over/:levelId/:versionId" element={<GameOver />} />
+              <Route path="/level-completed/:levelId/:versionId" element={<LevelCompleted />} />
             </Route>
             <Route
               path="/gameplay/:levelId/:versionId"

@@ -15,17 +15,23 @@ import {
   faCopy,
   faToggleOn,
   faToggleOff,
-  faThLarge
+  faThLarge,
+  faHome,
+  faRunning,
+  faCircle,
+  faPaste,
+  faArchive
 } from '@fortawesome/free-solid-svg-icons';
 import * as THREE from 'three';
-import { useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { DoubleSide, Mesh, Raycaster, Vector2 } from 'three';
 import { generateUUID } from 'three/src/math/MathUtils';
 import { useAuth } from 'react-oidc-context';
 import {
   // eslint-disable-next-line camelcase
   useRecoilBridgeAcrossReactRoots_UNSTABLE,
-  useRecoilValue
+  useRecoilValue,
+  useSetRecoilState
 } from 'recoil';
 import { Howl } from 'howler';
 import Collectible, { CollectibleType } from '../../models/Collectible';
@@ -44,9 +50,15 @@ import EditorObstacles, { EditorObstaclesRefAttributes } from '../EditorObstacle
 import SettingsRow from '../SettingsRow/SettingsRow';
 import { LevelService } from '../../services/LevelService';
 import Artist from '../../models/Artist';
+import User from '../../models/User';
+import { viewState } from '../../atoms/viewState';
+
+const snappingModuliXY = [0.1, 0.3, 0.5];
 
 const Editor = () => {
   const auth = useAuth();
+  const navigate = useNavigate();
+  const setView = useSetRecoilState(viewState);
   const { levelId, versionId } = useParams();
   const lastLevelIdAndVersionId = useRef<string>('null');
 
@@ -78,6 +90,7 @@ const Editor = () => {
   // const [importedFile, setFile] = useState<File>();
   const [snappingDivider, setSnappingDivider] = useState<4 | 8 | 16 | 32>();
   const [tripletSnappingDivider, setTripletSnappingDivider] = useState<1 | 1.5>(1);
+  const [snapMenuActive, setSnapMenuActive] = useState<boolean>(false);
 
   const collectibles = useRef<EditorCollectiblesRefAttributes>(null);
   const collectiblesCb = useCallback((node) => {
@@ -145,34 +158,60 @@ const Editor = () => {
 
   const loadLevel = () => {
     if (
-      !levelId ||
-      !versionId ||
       `${levelId}:${versionId}` === lastLevelIdAndVersionId.current ||
       !collectibles.current ||
       !obstacles.current
     )
       return;
-    lastLevelIdAndVersionId.current = `${levelId}:${versionId}`;
-    LevelService.get(levelId, versionId).then((levelData) => {
-      if (levelData.id) setId(levelData.id);
-      if (levelData.title) setTitle(levelData.title);
-      if (levelData.bpm) setBpm(levelData.bpm);
-      collectibles.current.remove(
-        Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
-      );
-      obstacles.current.remove(
-        Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
-      );
-      levelData.versions[versionId].objects.forEach((f: Collectible | Obstacle) => {
-        if (f.type === 'Collectible') {
-          collectibles.current.addCollectible(f);
-        } else if (f.type === 'Obstacle') {
-          obstacles.current.addObstacle(f);
-        }
+    const temporaryLevel = LevelService.getTemporaryLevel();
+    if (!levelId || !versionId) {
+      if (temporaryLevel) {
+        // no level in db, but temporary level
+        setTitle(temporaryLevel.title);
+        setBpm(temporaryLevel.bpm);
+        collectibles.current.remove(
+          Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
+        );
+        obstacles.current.remove(
+          Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
+        );
+        temporaryLevel.versions['1'].objects.forEach((f: Collectible | Obstacle) => {
+          if (f.type === 'Collectible') {
+            collectibles.current.addCollectible(f);
+          } else if (f.type === 'Obstacle') {
+            obstacles.current.addObstacle(f);
+          }
+        });
+        if (temporaryLevel.audioLinks.length > 0) setAudioPath(temporaryLevel.audioLinks[0]);
+        renderAtTime(0);
+      }
+    } else {
+      lastLevelIdAndVersionId.current = `${levelId}:${versionId}`;
+      LevelService.get(levelId, versionId).then((levelData) => {
+        if (levelData.id) setId(levelData.id);
+        if (levelData.title) setTitle((temporaryLevel || levelData).title);
+        if (levelData.bpm) setBpm((temporaryLevel || levelData).bpm);
+        collectibles.current.remove(
+          Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
+        );
+        obstacles.current.remove(
+          Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
+        );
+        (temporaryLevel || levelData).versions[temporaryLevel ? '1' : versionId].objects.forEach(
+          (f: Collectible | Obstacle) => {
+            if (f.type === 'Collectible') {
+              collectibles.current.addCollectible(f);
+            } else if (f.type === 'Obstacle') {
+              obstacles.current.addObstacle(f);
+            }
+          }
+        );
+        if ((temporaryLevel || levelData).audioLinks.length > 0)
+          setAudioPath((temporaryLevel || levelData).audioLinks[0]);
+        renderAtTime(0);
       });
-      if (levelData.audioLinks.length > 0) setAudioPath(levelData.audioLinks[0]);
-      renderAtTime(0);
-    });
+    }
+    LevelService.setTemporaryLevel(null);
   };
 
   // Load level
@@ -425,7 +464,7 @@ const Editor = () => {
     }
   };
 
-  const setSnappingxy = (snapTo: 0.1 | 0.3 | 0.5) => {
+  const setSnappingXY = (snapTo: 0.1 | 0.3 | 0.5) => {
     setSnappingModulusXY(snapTo);
     collectibles.current.setSnappingxy(snapTo);
   };
@@ -510,6 +549,38 @@ const Editor = () => {
         }
       });
     }
+  };
+
+  const switchToGameplay = () => {
+    const objects = [collectibles.current.export(), obstacles.current.export()]
+      .flat()
+      .sort((a, b) => a.position.z - b.position.z);
+    const level = {
+      id: 'preview',
+      title,
+      bpm,
+      published: false,
+      averageRating: 0,
+      artists: [] as Artist[],
+      author: null as User,
+      versions: {
+        '1': {
+          id: '1',
+          difficulty,
+          objects
+        }
+      },
+      audioLinks: [audioPath],
+      length: audio.current.duration()
+    };
+    LevelService.setTemporaryLevel(level);
+    setView((old) => {
+      return {
+        ...old,
+        returnView: levelId && versionId ? `/edit/${levelId}/${versionId}` : '/edit'
+      };
+    });
+    navigate('/gameplay/preview/1');
   };
 
   const animate = () => {
@@ -632,6 +703,33 @@ const Editor = () => {
     }
   };
 
+  const snapMenuOnWheel = (event: React.WheelEvent) => {
+    event.stopPropagation();
+    if (event.deltaY < 0) {
+      switch (snappingModulusXY) {
+        case snappingModuliXY[1]:
+          setSnappingXY(snappingModuliXY[0] as any);
+          break;
+        case snappingModuliXY[2]:
+          setSnappingXY(snappingModuliXY[1] as any);
+          break;
+        default:
+          break;
+      }
+    } else {
+      switch (snappingModulusXY) {
+        case snappingModuliXY[0]:
+          setSnappingXY(snappingModuliXY[1] as any);
+          break;
+        case snappingModuliXY[1]:
+          setSnappingXY(snappingModuliXY[2] as any);
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
   return (
     <div
       className="Editor"
@@ -735,44 +833,76 @@ const Editor = () => {
               onClick={() => toggleTripletSnapping()}>
               <MusicIcon type="triplet" />
             </button>
-            <button
-              className={snappingModulusXY === 0.1 ? 'active' : ''}
-              type="button"
-              style={{ fontSize: '150%' }}
-              onClick={() => setSnappingxy(0.1)}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />1
+            <div
+              className={`xy-snap-menu ${snapMenuActive ? 'active' : ''}`}
+              onClick={(e) => setSnapMenuActive((old) => !old)}
+              onWheel={(e) => snapMenuOnWheel(e)}>
+              <button type="button">
+                {snappingModulusXY === snappingModuliXY[0] && (
+                  <img src="/assets/grid-icon-1.svg" alt="grid size 1" />
+                )}
+                {snappingModulusXY === snappingModuliXY[1] && (
+                  <img src="/assets/grid-icon-2.svg" alt="grid size 1" />
+                )}
+                {snappingModulusXY === snappingModuliXY[2] && (
+                  <img src="/assets/grid-icon-3.svg" alt="grid size 1" />
+                )}
+              </button>
+              <div className="dropdown">
+                <button
+                  className={snappingModulusXY === snappingModuliXY[0] ? 'active' : ''}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSnappingXY(snappingModuliXY[0] as any);
+                  }}>
+                  <img src="/assets/grid-icon-1.svg" alt="grid size 1" />
+                </button>
+                <button
+                  className={snappingModulusXY === snappingModuliXY[1] ? 'active' : ''}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSnappingXY(snappingModuliXY[1] as any);
+                  }}>
+                  <img src="/assets/grid-icon-2.svg" alt="grid size 2" />
+                </button>
+                <button
+                  className={snappingModulusXY === snappingModuliXY[2] ? 'active' : ''}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSnappingXY(snappingModuliXY[2] as any);
+                  }}>
+                  <img src="/assets/grid-icon-3.svg" alt="grid size 3" />
+                </button>
+              </div>
+            </div>
+            <button type="button" onClick={() => copy()}>
+              <FontAwesomeIcon icon={faCopy} />
             </button>
-            <button
-              className={snappingModulusXY === 0.3 ? 'active' : ''}
-              type="button"
-              style={{ fontSize: '150%' }}
-              onClick={() => setSnappingxy(0.3)}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />2
-            </button>
-            <button
-              className={snappingModulusXY === 0.5 ? 'active' : ''}
-              type="button"
-              style={{ fontSize: '150%' }}
-              onClick={() => setSnappingxy(0.5)}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />3
-            </button>
-            <button className="" type="button" style={{ fontSize: '150%' }} onClick={() => copy()}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faCopy} />
-            </button>
-            <button className="" type="button" onClick={saveTemplate} style={{ fontSize: '150%' }}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faSave} />
-              <FontAwesomeIcon style={{ width: '20%' }} icon={faThLarge} />
+            {/* <button type="button" onClick={() => console.log('todo: implement pasting')}>
+              <FontAwesomeIcon icon={faPaste} />
+            </button> */}
+            <button className="" type="button" onClick={saveTemplate}>
+              <FontAwesomeIcon icon={faArchive} />
             </button>
           </div>
           <div className="others">
+            <Link to="/browse">
+              <FontAwesomeIcon icon={faHome} />
+            </Link>
             <button type="button" onClick={() => toggleSettings()}>
               <FontAwesomeIcon icon={faCogs} />
             </button>
-            <button type="button" onClick={() => stop()}>
-              <FontAwesomeIcon icon={faStop} />
-            </button>
             <button type="button" onClick={() => save()}>
               <FontAwesomeIcon icon={faSave} />
+            </button>
+            <button type="button" onClick={() => switchToGameplay()}>
+              <FontAwesomeIcon icon={faRunning} />
+            </button>
+            <button type="button" onClick={() => stop()}>
+              <FontAwesomeIcon icon={faStop} />
             </button>
             {playing ? (
               <button type="button" onClick={() => pause()}>

@@ -23,7 +23,7 @@ const Browse: FC<BrowseProps> = () => (
         New Level
       </NavLink>
       <SearchBar />
-      <LevelList />
+      <LevelList type="browse" />
       <Preview />
     </div>
     <div>

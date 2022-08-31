@@ -116,7 +116,7 @@ const Gameplay = (props: { debug: boolean }) => {
   const [level, setLevel] = useState<Level>();
 
   function detectedPose(results: any) {
-    if (!results.poseLandmarks) return;
+    if (!results.poseLandmarks || !leftHand.current) return;
     setMediaPipeReady(true);
     /**
      * Calculates the angles between two landmarks which are represented as position vectors.
@@ -191,27 +191,17 @@ const Gameplay = (props: { debug: boolean }) => {
   });
   pose.onResults(detectedPose);
 
-  // todo: only fetch version
   useEffect(() => {
-    setView((old) => {
-      return {
-        ...old,
-        level: {
-          ...old.level,
-          id: levelId
-        },
-        version: versionId
-      };
-    });
-    LevelService.get(levelId, versionId).then((result) => {
-      setView((old) => {
-        return {
-          ...old,
-          level: result
-        };
+    if (levelId === 'preview') {
+      const temporaryLevel = LevelService.getTemporaryLevel();
+      if (temporaryLevel) {
+        setLevel(temporaryLevel);
+      }
+    } else {
+      LevelService.get(levelId, versionId).then((result) => {
+        setLevel(result);
       });
-      setLevel(result);
-    });
+    }
   }, [levelId, versionId]);
 
   useEffect(() => {
@@ -362,7 +352,7 @@ const Gameplay = (props: { debug: boolean }) => {
           score
         };
       });
-      navigate('/level-completed');
+      navigate(`/level-completed/${levelId}/${versionId}`);
     };
     music.current.once('end', musicEndedHandler);
     return () => {
@@ -376,7 +366,7 @@ const Gameplay = (props: { debug: boolean }) => {
       cancelAnimationFrame(animationFrameRequest.current);
     if (typeof physicsIntervalId.current === 'number') clearInterval(physicsIntervalId.current);
     music.current.pause();
-    navigate('/game-over');
+    navigate(`/game-over/${levelId}/${versionId}`);
   }, [health]);
 
   useEffect(() => {
@@ -412,7 +402,7 @@ const Gameplay = (props: { debug: boolean }) => {
     const tSince0 = tCurrent - (t0.current as number);
     ground.current?.animate(tSince0);
     progressIndicator.current?.animate(tSince0);
-    camera.current.position.setZ(-settings.gamePlaytimeScaleFactor * tSince0 + 2);
+    camera.current?.position.setZ(-settings.gamePlaytimeScaleFactor * tSince0 + 2);
   };
 
   // Checks if there is an intersection between a circle and a rectangle and returns true or false

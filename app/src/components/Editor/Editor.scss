@@ -5,6 +5,10 @@
   &.active {
     background-color: white;
   }
+
+  &:hover > * {
+    transform: translateY(-2px);
+  }
 }
 
 .Editor {
@@ -21,7 +25,8 @@
     // Otherwise, the Three.js canvas cannot received clicks. Need to reenable pointer-events for buttons with another rule.
     pointer-events: none;
 
-    button {
+    button,
+    a {
       pointer-events: all;
     }
 
@@ -91,15 +96,55 @@
             margin-top: -5.3rem;
           }
         }
+
+        .xy-snap-menu {
+          position: relative;
+
+          button {
+            @include button;
+          }
+
+          img {
+            width: 100%;
+            transform: scale(0.9) translateY(6%);
+          }
+
+          .dropdown {
+            display: none;
+          }
+
+          &.active,
+          &:hover {
+            overflow: visible;
+
+            .dropdown {
+              position: absolute;
+              display: flex;
+              flex-direction: column;
+              top: 100%;
+              left: 0;
+              width: 100%;
+              opacity: 100%;
+
+              button {
+                @include button;
+
+                background-color: #ffffff80;
+              }
+            }
+          }
+        }
       }
 
       .others {
-        button {
+        button,
+        a {
           @include button;
 
           font-size: 3.3rem;
           width: 5rem;
           height: 5rem;
+          color: var(--editor-button-text-color);
         }
 
         .file-input {
