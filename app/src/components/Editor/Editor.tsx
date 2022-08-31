@@ -577,7 +577,7 @@ const Editor = () => {
     setView((old) => {
       return {
         ...old,
-        returnView: levelId && versionId ? `/edit/${levelId}/${versionId}` : 'edit'
+        returnView: levelId && versionId ? `/edit/${levelId}/${versionId}` : '/edit'
       };
     });
     navigate('/gameplay/preview/1');
