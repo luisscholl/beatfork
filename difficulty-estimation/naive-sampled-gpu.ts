@@ -96,10 +96,10 @@ function getMinIntensity({
         _cumulatedIntensity[2],
         _cumulatedIntensity[3]
       ];
-      const localLastPositionsA = [_lastPositions[0], _lastPositions[1], _lastPositions[2]];
-      const localLastPositionsB = [_lastPositions[3], _lastPositions[4], _lastPositions[5]];
-      const localLastPositionsC = [_lastPositions[6], _lastPositions[7], _lastPositions[8]];
-      const localLastPositionsD = [_lastPositions[9], _lastPositions[10], _lastPositions[11]];
+      let localLastPositionsA = [_lastPositions[0], _lastPositions[1], _lastPositions[2]];
+      let localLastPositionsB = [_lastPositions[3], _lastPositions[4], _lastPositions[5]];
+      let localLastPositionsC = [_lastPositions[6], _lastPositions[7], _lastPositions[8]];
+      let localLastPositionsD = [_lastPositions[9], _lastPositions[10], _lastPositions[11]];
 
       function localLastPositions(
         index: number,
@@ -185,14 +185,32 @@ function getMinIntensity({
           localCumulatedIntensity[1] = Infinity;
           localCumulatedIntensity[2] = Infinity;
           localCumulatedIntensity[3] = Infinity;
-          break;
         }
+        if (j === 0)
+          localLastPositionsA = [_objects[i * 4], _objects[i * 4 + 1], _objects[i * 4 + 2]];
+        else if (j === 1)
+          localLastPositionsB = [_objects[i * 4], _objects[i * 4 + 1], _objects[i * 4 + 2]];
+        else if (j === 2)
+          localLastPositionsC = [_objects[i * 4], _objects[i * 4 + 1], _objects[i * 4 + 2]];
+        else localLastPositionsD = [_objects[i * 4], _objects[i * 4 + 1], _objects[i * 4 + 2]];
       }
       return [
         localCumulatedIntensity[0],
         localCumulatedIntensity[1],
         localCumulatedIntensity[2],
-        localCumulatedIntensity[3]
+        localCumulatedIntensity[3],
+        localLastPositionsA[0],
+        localLastPositionsA[1],
+        localLastPositionsA[2],
+        localLastPositionsB[0],
+        localLastPositionsB[1],
+        localLastPositionsB[2],
+        localLastPositionsC[0],
+        localLastPositionsC[1],
+        localLastPositionsC[2],
+        localLastPositionsD[0],
+        localLastPositionsD[1],
+        localLastPositionsD[2]
       ];
     } as any)
     .setOutput([4 ** depthOnDifferentCores]);
@@ -205,17 +223,23 @@ function getMinIntensity({
     ];
   });
   const transformedLastPositions = Object.values(lastPositions).map((pos: any) => {
-    return [pos.x, pos.y, pos.z, 0];
+    return [pos.x, pos.y, pos.z];
   });
   const t1 = present();
-  const out = kernel(
+  const kernelOutput = kernel(
     transformedObjects.flat(),
     Object.values(cumulatedIntensity),
     transformedLastPositions.flat(),
     depthOnDifferentCores
   );
+  const minOption = {
+    cumulatedIntensity: Infinity
+  };
+  for (const option of kernelOutput as any) {
+    console.log(option);
+  }
   const tEnd = present();
   console.log(`Took ${tEnd - t0}ms to compute, of which ${t1 - t0}ms for setup.`);
   // return kernel(objects, cumulatedIntensity, lastPositions);
-  return out;
+  return minOption;
 }
