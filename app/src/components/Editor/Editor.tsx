@@ -197,6 +197,11 @@ const Editor = () => {
         obstacles.current.remove(
           Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
         );
+        console.log('bark');
+        console.log(temporaryLevel);
+        console.log(levelData);
+        console.log(versionId);
+        console.log('woof');
         (temporaryLevel || levelData).versions[temporaryLevel ? '1' : versionId].objects.forEach(
           (f: Collectible | Obstacle) => {
             if (f.type === 'Collectible') {

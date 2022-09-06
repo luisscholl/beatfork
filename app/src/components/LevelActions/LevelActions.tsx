@@ -21,6 +21,12 @@ const LevelActions = () => {
     });
   };
 
+  const deleteLevelVersion = () => {
+    LevelService.remove(view.level.id, view.version).then(() => {
+      window.location.reload();
+    });
+  };
+
   if (!(view as any).level) return null;
 
   return (
@@ -61,9 +67,13 @@ const LevelActions = () => {
                 <FontAwesomeIcon icon={faBan} />
                 Cancel
               </button>
+              <button className="delete" type="button" onClick={deleteLevelVersion}>
+                <FontAwesomeIcon icon={faTrash} />
+                Delete Version
+              </button>
               <button className="delete" type="button" onClick={deleteLevel}>
                 <FontAwesomeIcon icon={faTrash} />
-                Delete
+                Delete Level
               </button>
             </div>
           </div>
