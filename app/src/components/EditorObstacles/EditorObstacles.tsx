@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { ThreeEvent } from "@react-three/fiber";
+import { ThreeEvent } from '@react-three/fiber';
 import React, {
   forwardRef,
   ForwardRefExoticComponent,
@@ -11,17 +11,17 @@ import React, {
   useImperativeHandle,
   useMemo,
   useRef,
-  useState,
-} from "react";
-import { useRecoilValue } from "recoil";
-import * as THREE from "three";
-import { InstancedMesh } from "three";
-import editorObstacleFragmentShader from "../../shaders/editorObstacleFragmentShader.glsl";
-import editorObstacleVertexShader from "../../shaders/editorObstacleVertexShader.glsl";
-import { settingsState } from "../../atoms/settingsState";
-import Vector3D from "../../models/Vector3D";
-import "./EditorObstacles.scss";
-import Obstacle from "../../models/Obstacle";
+  useState
+} from 'react';
+import { useRecoilValue } from 'recoil';
+import * as THREE from 'three';
+import { InstancedMesh } from 'three';
+import editorObstacleFragmentShader from '../../shaders/editorObstacleFragmentShader.glsl';
+import editorObstacleVertexShader from '../../shaders/editorObstacleVertexShader.glsl';
+import { settingsState } from '../../atoms/settingsState';
+import Vector3D from '../../models/Vector3D';
+import './EditorObstacles.scss';
+import Obstacle from '../../models/Obstacle';
 
 export interface EditorObstaclesRefAttributes {
   addObstacle(obstacle: Obstacle): void;
@@ -30,11 +30,7 @@ export interface EditorObstaclesRefAttributes {
   copy(targets: number[], save: boolean): Obstacle[];
   remove(targets: number[]): void;
   export(): Obstacle[];
-  configureSnap(
-    bpm: number | false,
-    divider?: 4 | 8 | 16 | 32,
-    tripletDivider?: 1 | 1.5
-  ): void;
+  configureSnap(bpm: number | false, divider?: 4 | 8 | 16 | 32, tripletDivider?: 1 | 1.5): void;
   snap(targets: number[]): void;
   select(targets: number[]): void;
   deselect(targets: number[]): void;
@@ -42,7 +38,7 @@ export interface EditorObstaclesRefAttributes {
   resizeBy(
     targets: number[],
     distance: Vector3D,
-    corner: "upper-left" | "upper-right" | "lower-left" | "lower-right",
+    corner: 'upper-left' | 'upper-right' | 'lower-left' | 'lower-right',
     reverseZ: boolean
   ): void;
   getDimensions(target: number): Vector3D;
@@ -53,15 +49,10 @@ export interface EditorObstaclesProps {
   triggerSelectLevelObject: (
     e: ThreeEvent<MouseEvent>,
     i: number,
-    type: "obstacles" | "obstacles"
+    type: 'obstacles' | 'obstacles'
   ) => void;
   obstaclesResizeFlag: MutableRefObject<
-    | null
-    | "do-not-resize"
-    | "upper-left"
-    | "upper-right"
-    | "lower-left"
-    | "lower-right"
+    null | 'do-not-resize' | 'upper-left' | 'upper-right' | 'lower-left' | 'lower-right'
   >;
   selected: MutableRefObject<number[]>;
 }
@@ -70,8 +61,7 @@ const tempObject = new THREE.Object3D();
 const tempVec = new THREE.Vector3();
 
 const EditorObstacles: ForwardRefExoticComponent<
-  PropsWithoutRef<EditorObstaclesProps> &
-    RefAttributes<EditorObstaclesRefAttributes>
+  PropsWithoutRef<EditorObstaclesProps> & RefAttributes<EditorObstaclesRefAttributes>
 > = forwardRef((props, ref) => {
   const settings = useRecoilValue(settingsState);
   const obstacles = useRef<Obstacle[]>([]);
@@ -83,9 +73,7 @@ const EditorObstacles: ForwardRefExoticComponent<
     }
   }, []);
   const [maxObstacles, setMaxObstacles] = useState<number>(1024);
-  const isSelectedArray = useRef<Float32Array>(
-    Float32Array.from({ length: 1024 }).fill(0)
-  );
+  const isSelectedArray = useRef<Float32Array>(Float32Array.from({ length: 1024 }).fill(0));
   const snappingModulus = useRef<number>(undefined);
   const snapBuffer = useRef<number>(0);
 
@@ -94,7 +82,7 @@ const EditorObstacles: ForwardRefExoticComponent<
     if (obstacles.current.length > maxObstacles) {
       setMaxObstacles(maxObstacles + 1024);
       const newIsSelectedArray = Float32Array.from({
-        length: maxObstacles + 1024,
+        length: maxObstacles + 1024
       }).fill(0);
       newIsSelectedArray.set(isSelectedArray.current);
       isSelectedArray.current = newIsSelectedArray;
@@ -112,10 +100,7 @@ const EditorObstacles: ForwardRefExoticComponent<
       settings.editorTimeScaleFactor * obstacle.dimensions.z
     );
     tempObject.updateMatrix();
-    meshRef.current.setMatrixAt(
-      obstacles.current.length - 1,
-      tempObject.matrix
-    );
+    meshRef.current.setMatrixAt(obstacles.current.length - 1, tempObject.matrix);
     meshRef.current.instanceMatrix.needsUpdate = true;
     return true;
   };
@@ -148,7 +133,7 @@ const EditorObstacles: ForwardRefExoticComponent<
     },
     // todo: snapping should probably work differently from collectibles
     moveBy(targets: number[], distance: Vector3D): void {
-      if (typeof snappingModulus.current !== "undefined") {
+      if (typeof snappingModulus.current !== 'undefined') {
         distance.z += snapBuffer.current;
         const distanceRemainder = distance.z % snappingModulus.current;
         distance.z -= distanceRemainder;
@@ -157,11 +142,7 @@ const EditorObstacles: ForwardRefExoticComponent<
 
       if (!distance.z && !distance.x && !distance.y) return;
 
-      tempVec.set(
-        distance.x,
-        distance.y,
-        -settings.editorTimeScaleFactor * distance.z
-      );
+      tempVec.set(distance.x, distance.y, -settings.editorTimeScaleFactor * distance.z);
       for (const target of targets) {
         meshRef.current.getMatrixAt(target, tempObject.matrix);
         tempObject.position.setFromMatrixPosition(tempObject.matrix);
@@ -180,10 +161,10 @@ const EditorObstacles: ForwardRefExoticComponent<
       for (const target of targets) {
         const pos = obstacles.current[target].position;
         const newCol = {
-          type: "Obstacle",
+          type: 'Obstacle',
           position: { x: pos.x, y: pos.y, z: pos.z },
           measure: 0, // todo
-          beat: 0, // todo
+          beat: 0 // todo
         } as Obstacle;
 
         if (save) {
@@ -199,9 +180,7 @@ const EditorObstacles: ForwardRefExoticComponent<
       // Sort targets largest to smallest
       // -> array shifts don't affect unhandled indexes
       targets = targets.sort((a, b) => b - a);
-      targets = targets.map((target) =>
-        target < 0 ? meshRef.current.count + target : target
-      );
+      targets = targets.map((target) => (target < 0 ? meshRef.current.count + target : target));
       for (const target of targets) {
         for (let i = target; i < meshRef.current.count - 1; i += 1) {
           meshRef.current.getMatrixAt(i + 1, tempObject.matrix);
@@ -252,9 +231,7 @@ const EditorObstacles: ForwardRefExoticComponent<
     // Can deselect from the end with negative indexes, e.g. select(-1) deselects the last element.
     deselect(targets: number[]): void {
       props.selected.current = props.selected.current.filter((e) => {
-        const keep = !targets.includes(
-          e < 0 ? e - obstacles.current.length : e
-        );
+        const keep = !targets.includes(e < 0 ? e - obstacles.current.length : e);
         if (!keep) {
           if (e < 0) {
             isSelectedArray.current.set([0], obstacles.current.length + e);
@@ -276,7 +253,7 @@ const EditorObstacles: ForwardRefExoticComponent<
     resizeBy(
       targets: number[],
       distance: Vector3D,
-      corner: "upper-left" | "upper-right" | "lower-left" | "lower-right",
+      corner: 'upper-left' | 'upper-right' | 'lower-left' | 'lower-right',
       reverseZ: boolean
     ): void {
       targets.forEach((target) => {
@@ -291,19 +268,19 @@ const EditorObstacles: ForwardRefExoticComponent<
           obstacles.current[target].position.x += distance.x / 2;
           obstacles.current[target].position.y += distance.y / 2;
           switch (corner) {
-            case "upper-right":
+            case 'upper-right':
               obstacles.current[target].dimensions.x += distance.x;
               obstacles.current[target].dimensions.y += distance.y;
               break;
-            case "upper-left":
+            case 'upper-left':
               obstacles.current[target].dimensions.x -= distance.x;
               obstacles.current[target].dimensions.y += distance.y;
               break;
-            case "lower-left":
+            case 'lower-left':
               obstacles.current[target].dimensions.x -= distance.x;
               obstacles.current[target].dimensions.y -= distance.y;
               break;
-            case "lower-right":
+            case 'lower-right':
               obstacles.current[target].dimensions.x += distance.x;
               obstacles.current[target].dimensions.y -= distance.y;
               break;
@@ -331,49 +308,39 @@ const EditorObstacles: ForwardRefExoticComponent<
         tempObject.scale.set(
           obstacles.current[target].dimensions.x,
           obstacles.current[target].dimensions.y,
-          settings.editorTimeScaleFactor *
-            obstacles.current[target].dimensions.z
+          settings.editorTimeScaleFactor * obstacles.current[target].dimensions.z
         );
         tempObject.updateMatrix();
         meshRef.current.setMatrixAt(target, tempObject.matrix);
       });
       meshRef.current.instanceMatrix.needsUpdate = true;
-    },
+    }
   }));
 
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
     if (!props.obstaclesResizeFlag) return;
-    if (e.face.normal.z !== 1)
-      props.obstaclesResizeFlag.current = "do-not-resize";
+    if (e.face.normal.z !== 1) props.obstaclesResizeFlag.current = 'do-not-resize';
     if (
-      e.intersections[0].uv.x <
-        0.1 / obstacles.current[e.instanceId].dimensions.x &&
-      e.intersections[0].uv.y >
-        1.0 - 0.1 / obstacles.current[e.instanceId].dimensions.y
+      e.intersections[0].uv.x < 0.1 / obstacles.current[e.instanceId].dimensions.x &&
+      e.intersections[0].uv.y > 1.0 - 0.1 / obstacles.current[e.instanceId].dimensions.y
     )
-      props.obstaclesResizeFlag.current = "upper-left";
+      props.obstaclesResizeFlag.current = 'upper-left';
     else if (
-      e.intersections[0].uv.x >
-        1.0 - 0.1 / obstacles.current[e.instanceId].dimensions.x &&
-      e.intersections[0].uv.y >
-        1.0 - 0.1 / obstacles.current[e.instanceId].dimensions.y
+      e.intersections[0].uv.x > 1.0 - 0.1 / obstacles.current[e.instanceId].dimensions.x &&
+      e.intersections[0].uv.y > 1.0 - 0.1 / obstacles.current[e.instanceId].dimensions.y
     )
-      props.obstaclesResizeFlag.current = "upper-right";
+      props.obstaclesResizeFlag.current = 'upper-right';
     else if (
-      e.intersections[0].uv.x <
-        0.1 / obstacles.current[e.instanceId].dimensions.x &&
-      e.intersections[0].uv.y <
-        0.1 / obstacles.current[e.instanceId].dimensions.y
+      e.intersections[0].uv.x < 0.1 / obstacles.current[e.instanceId].dimensions.x &&
+      e.intersections[0].uv.y < 0.1 / obstacles.current[e.instanceId].dimensions.y
     )
-      props.obstaclesResizeFlag.current = "lower-left";
+      props.obstaclesResizeFlag.current = 'lower-left';
     else if (
-      e.intersections[0].uv.x >
-        1.0 - 0.1 / obstacles.current[e.instanceId].dimensions.x &&
-      e.intersections[0].uv.y <
-        0.1 / obstacles.current[e.instanceId].dimensions.y
+      e.intersections[0].uv.x > 1.0 - 0.1 / obstacles.current[e.instanceId].dimensions.x &&
+      e.intersections[0].uv.y < 0.1 / obstacles.current[e.instanceId].dimensions.y
     )
-      props.obstaclesResizeFlag.current = "lower-right";
-    else props.obstaclesResizeFlag.current = "do-not-resize";
+      props.obstaclesResizeFlag.current = 'lower-right';
+    else props.obstaclesResizeFlag.current = 'do-not-resize';
   };
 
   const shaderData = useMemo(
@@ -382,9 +349,9 @@ const EditorObstacles: ForwardRefExoticComponent<
       fragmentShader: editorObstacleFragmentShader,
       uniforms: {
         obstaclesTexture: {
-          value: new THREE.TextureLoader().load("./assets/obstacles.png"),
-        },
-      },
+          value: new THREE.TextureLoader().load('./assets/obstacles.png')
+        }
+      }
     }),
     []
   );
@@ -396,10 +363,9 @@ const EditorObstacles: ForwardRefExoticComponent<
         args={[null, null, maxObstacles]}
         onClick={(e) => {
           e.stopPropagation();
-          props.triggerSelectLevelObject(e, e.instanceId, "obstacles");
+          props.triggerSelectLevelObject(e, e.instanceId, 'obstacles');
         }}
-        onPointerDown={onPointerDown}
-      >
+        onPointerDown={onPointerDown}>
         {/**
          * cannot do size per instance using geometry,
          * but can do size per instance using scale per instance
@@ -407,7 +373,7 @@ const EditorObstacles: ForwardRefExoticComponent<
          */}
         <boxBufferGeometry args={[1, 1, 1]}>
           <instancedBufferAttribute
-            attachObject={["attributes", "isSelected"]}
+            attachObject={['attributes', 'isSelected']}
             args={[isSelectedArray.current, 1]}
           />
         </boxBufferGeometry>

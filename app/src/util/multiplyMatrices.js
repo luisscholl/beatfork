@@ -1,4 +1,4 @@
-import matrixVectorMultiplication from "./matrixVectorMultiplication";
+import matrixVectorMultiplication from './matrixVectorMultiplication';
 
 /**
  * This function returns the dot-product between two 3x3 matrices (flattened to 9x1)
@@ -27,6 +27,6 @@ export default function multiplyMatrices(matrix1, matrix2) {
     newRow1[2],
     newRow2[0],
     newRow2[1],
-    newRow2[2],
+    newRow2[2]
   ];
 }

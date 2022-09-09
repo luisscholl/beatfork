@@ -1,12 +1,12 @@
 /* eslint-disable react/no-unused-prop-types */
-import React from "react";
-import "./SettingsRow.scss";
+import React from 'react';
+import './SettingsRow.scss';
 
 const SettingsRow = (props: {
   title: string;
   value: any;
   setter: (value: any) => void;
-  type: "text" | "number";
+  type: 'text' | 'number';
 }) => {
   const handleInput = (e: any) => {
     props.setter(e.target.value);

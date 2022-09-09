@@ -6,7 +6,7 @@ import GameOver from './GameOver';
 describe('<GameOver />', () => {
   test('it should mount', () => {
     render(<GameOver />);
-    
+
     const gameOver = screen.getByTestId('GameOver');
 
     expect(gameOver).toBeInTheDocument();

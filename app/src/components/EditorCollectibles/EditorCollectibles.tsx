@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { ThreeEvent } from "@react-three/fiber";
+import { ThreeEvent } from '@react-three/fiber';
 import React, {
   forwardRef,
   ForwardRefExoticComponent,
@@ -11,17 +11,17 @@ import React, {
   useImperativeHandle,
   useMemo,
   useRef,
-  useState,
-} from "react";
-import { useRecoilValue } from "recoil";
-import * as THREE from "three";
-import { InstancedMesh } from "three";
-import editorCollectibleFragmentShader from "../../shaders/editorCollectibleFragmentShader.glsl";
-import editorCollectibleVertexShader from "../../shaders/editorCollectibleVertexShader.glsl";
-import { settingsState } from "../../atoms/settingsState";
-import Collectible from "../../models/Collectible";
-import Vector3D from "../../models/Vector3D";
-import "./EditorCollectibles.scss";
+  useState
+} from 'react';
+import { useRecoilValue } from 'recoil';
+import * as THREE from 'three';
+import { InstancedMesh } from 'three';
+import editorCollectibleFragmentShader from '../../shaders/editorCollectibleFragmentShader.glsl';
+import editorCollectibleVertexShader from '../../shaders/editorCollectibleVertexShader.glsl';
+import { settingsState } from '../../atoms/settingsState';
+import Collectible from '../../models/Collectible';
+import Vector3D from '../../models/Vector3D';
+import './EditorCollectibles.scss';
 
 export interface EditorCollectiblesRefAttributes {
   addCollectible(collectible: Collectible): void;
@@ -31,11 +31,7 @@ export interface EditorCollectiblesRefAttributes {
   copy(targets: number[], save: boolean): Collectible[];
   remove(targets: number[]): void;
   export(): Collectible[];
-  configureSnap(
-    bpm: number | false,
-    divider?: 4 | 8 | 16 | 32,
-    tripletDivider?: 1 | 1.5
-  ): void;
+  configureSnap(bpm: number | false, divider?: 4 | 8 | 16 | 32, tripletDivider?: 1 | 1.5): void;
   snap(targets: number[]): void;
   select(targets: number[]): void;
   deselect(targets: number[]): void;
@@ -45,11 +41,7 @@ export interface EditorCollectiblesRefAttributes {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface EditorCollectiblesProps {
-  onClick: (
-    e: ThreeEvent<MouseEvent>,
-    i: number,
-    type: "collectibles" | "obstacles"
-  ) => void;
+  onClick: (e: ThreeEvent<MouseEvent>, i: number, type: 'collectibles' | 'obstacles') => void;
   selected: MutableRefObject<number[]>;
   snappingModulusxy: number;
 }
@@ -58,8 +50,7 @@ const tempObject = new THREE.Object3D();
 const tempVec = new THREE.Vector3();
 
 const EditorCollectibles: ForwardRefExoticComponent<
-  PropsWithoutRef<EditorCollectiblesProps> &
-    RefAttributes<EditorCollectiblesRefAttributes>
+  PropsWithoutRef<EditorCollectiblesProps> & RefAttributes<EditorCollectiblesRefAttributes>
 > = forwardRef((props, ref) => {
   const settings = useRecoilValue(settingsState);
   const collectibles = useRef<Collectible[]>([]);
@@ -71,12 +62,8 @@ const EditorCollectibles: ForwardRefExoticComponent<
     }
   }, []);
   const [maxCollectibles, setMaxCollectibles] = useState<number>(1024);
-  const collectibleTypeArray = useRef<Float32Array>(
-    Float32Array.from({ length: 1024 })
-  );
-  const isSelectedArray = useRef<Float32Array>(
-    Float32Array.from({ length: 1024 }).fill(0)
-  );
+  const collectibleTypeArray = useRef<Float32Array>(Float32Array.from({ length: 1024 }));
+  const isSelectedArray = useRef<Float32Array>(Float32Array.from({ length: 1024 }).fill(0));
   const snappingModulus = useRef<number>(undefined);
   const snappingModulusxy = useRef<number>(0.2);
 
@@ -86,20 +73,17 @@ const EditorCollectibles: ForwardRefExoticComponent<
 
   const snapBufferxyz = useRef<Vector3D>({ x: 0, y: 0, z: 0 });
 
-  const _addCollectible = (
-    collectible: Collectible,
-    pushCollectible = true
-  ) => {
+  const _addCollectible = (collectible: Collectible, pushCollectible = true) => {
     if (pushCollectible) collectibles.current.push(collectible);
     if (collectibles.current.length > maxCollectibles) {
       setMaxCollectibles(maxCollectibles + 1024);
       const newCollectibleTypeArray = Float32Array.from({
-        length: maxCollectibles + 1024,
+        length: maxCollectibles + 1024
       });
       newCollectibleTypeArray.set(collectibleTypeArray.current);
       collectibleTypeArray.current = newCollectibleTypeArray;
       const newIsSelectedArray = Float32Array.from({
-        length: maxCollectibles + 1024,
+        length: maxCollectibles + 1024
       }).fill(0);
       newIsSelectedArray.set(isSelectedArray.current);
       isSelectedArray.current = newIsSelectedArray;
@@ -112,10 +96,7 @@ const EditorCollectibles: ForwardRefExoticComponent<
       -settings.editorTimeScaleFactor * collectible.position.z
     );
     tempObject.updateMatrix();
-    meshRef.current.setMatrixAt(
-      collectibles.current.length - 1,
-      tempObject.matrix
-    );
+    meshRef.current.setMatrixAt(collectibles.current.length - 1, tempObject.matrix);
     collectibleTypeArray.current.set(
       [collectible.collectibleType],
       collectibles.current.length - 1
@@ -167,11 +148,7 @@ const EditorCollectibles: ForwardRefExoticComponent<
 
       if (!distance.z && !distance.x && !distance.y) return;
 
-      tempVec.set(
-        distance.x,
-        distance.y,
-        -settings.editorTimeScaleFactor * distance.z
-      );
+      tempVec.set(distance.x, distance.y, -settings.editorTimeScaleFactor * distance.z);
       for (const target of targets) {
         meshRef.current.getMatrixAt(target, tempObject.matrix);
         tempObject.position.setFromMatrixPosition(tempObject.matrix);
@@ -190,11 +167,11 @@ const EditorCollectibles: ForwardRefExoticComponent<
       for (const target of targets) {
         const pos = collectibles.current[target].position;
         const newCol = {
-          type: "Collectible",
+          type: 'Collectible',
           collectibleType: collectibles.current[target].collectibleType,
           position: { x: pos.x, y: pos.y, z: pos.z },
           measure: 0, // todo
-          beat: 0, // todo
+          beat: 0 // todo
         } as Collectible;
 
         if (save) {
@@ -210,18 +187,13 @@ const EditorCollectibles: ForwardRefExoticComponent<
       // Sort targets largest to smallest
       // -> array shifts don't affect unhandled indexes
       targets = targets.sort((a, b) => b - a);
-      targets = targets.map((target) =>
-        target < 0 ? meshRef.current.count + target : target
-      );
+      targets = targets.map((target) => (target < 0 ? meshRef.current.count + target : target));
       for (const target of targets) {
         for (let i = target; i < meshRef.current.count - 1; i += 1) {
           meshRef.current.getMatrixAt(i + 1, tempObject.matrix);
           meshRef.current.setMatrixAt(i, tempObject.matrix);
         }
-        collectibleTypeArray.current.set(
-          collectibleTypeArray.current.subarray(target + 1),
-          target
-        );
+        collectibleTypeArray.current.set(collectibleTypeArray.current.subarray(target + 1), target);
         collectibles.current.splice(target, 1);
         isSelectedArray.current.set([0], target);
         meshRef.current.count -= 1;
@@ -245,21 +217,17 @@ const EditorCollectibles: ForwardRefExoticComponent<
           : 0;
     },
     snap(targets: number[]): void {
-      targets = targets.map((target) =>
-        target < 0 ? meshRef.current.count + target : target
-      );
+      targets = targets.map((target) => (target < 0 ? meshRef.current.count + target : target));
       targets.forEach((target) => {
-        if (typeof snappingModulus.current === "undefined") return;
-        const remainder =
-          collectibles.current[target].position.z % snappingModulus.current;
+        if (typeof snappingModulus.current === 'undefined') return;
+        const remainder = collectibles.current[target].position.z % snappingModulus.current;
         if (snappingModulus.current - remainder > 1e-12) {
           collectibles.current[target].position.z -= remainder;
         }
         tempObject.position.x = collectibles.current[target].position.x;
         tempObject.position.y = collectibles.current[target].position.y;
         tempObject.position.z =
-          -settings.editorTimeScaleFactor *
-          collectibles.current[target].position.z;
+          -settings.editorTimeScaleFactor * collectibles.current[target].position.z;
         tempObject.updateMatrix();
         meshRef.current.setMatrixAt(target, tempObject.matrix);
       });
@@ -274,10 +242,7 @@ const EditorCollectibles: ForwardRefExoticComponent<
         // todo: If we have isSelectedArray, do we need props.selected?
         if (target < 0) {
           props.selected.current.push(collectibles.current.length + target);
-          isSelectedArray.current.set(
-            [1],
-            collectibles.current.length + target
-          );
+          isSelectedArray.current.set([1], collectibles.current.length + target);
         } else {
           props.selected.current.push(target);
           isSelectedArray.current.set([1], target);
@@ -289,9 +254,7 @@ const EditorCollectibles: ForwardRefExoticComponent<
     // Can deselect from the end with negative indexes, e.g. select(-1) deselects the last element.
     deselect(targets: number[]): void {
       props.selected.current = props.selected.current.filter((e) => {
-        const keep = !targets.includes(
-          e < 0 ? e - collectibles.current.length : e
-        );
+        const keep = !targets.includes(e < 0 ? e - collectibles.current.length : e);
         if (!keep) {
           if (e < 0) {
             isSelectedArray.current.set([0], collectibles.current.length + e);
@@ -308,7 +271,7 @@ const EditorCollectibles: ForwardRefExoticComponent<
     },
     setSnappingxy(snapTo: 0.1 | 0.3 | 0.5): void {
       snappingModulusxy.current = snapTo;
-    },
+    }
   }));
 
   const shaderData = useMemo(
@@ -317,9 +280,9 @@ const EditorCollectibles: ForwardRefExoticComponent<
       fragmentShader: editorCollectibleFragmentShader,
       uniforms: {
         collectibleTexture: {
-          value: new THREE.TextureLoader().load("./assets/collectibles.png"),
-        },
-      },
+          value: new THREE.TextureLoader().load('/assets/collectibles.png')
+        }
+      }
     }),
     []
   );
@@ -330,16 +293,15 @@ const EditorCollectibles: ForwardRefExoticComponent<
       args={[null, null, maxCollectibles]}
       onClick={(e) => {
         e.stopPropagation();
-        props.onClick(e, e.instanceId, "collectibles");
-      }}
-    >
+        props.onClick(e, e.instanceId, 'collectibles');
+      }}>
       <boxBufferGeometry args={[0.25, 0.25, 0.25]}>
         <instancedBufferAttribute
-          attachObject={["attributes", "collectibleType"]}
+          attachObject={['attributes', 'collectibleType']}
           args={[collectibleTypeArray.current, 1]}
         />
         <instancedBufferAttribute
-          attachObject={["attributes", "isSelected"]}
+          attachObject={['attributes', 'isSelected']}
           args={[isSelectedArray.current, 1]}
         />
       </boxBufferGeometry>

@@ -1,6 +1,7 @@
 version: "3.9"
 services:
-  postgres:
+  keycloak-db:
+    container_name: Keycloak_DB
     image: postgres
     volumes:
       - ~/postgres_data:/var/lib/postgresql/data
@@ -10,20 +11,42 @@ services:
       POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
     ports:
       - 5432:5432
+  pgbackups:
+    container_name: Keycloak_DB_Backup
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    volumes:
+      - ~/backup/keycloak:/backups
+    links:
+      - keycloak-db
+    depends_on:
+      - keycloak-db
+    environment:
+      - POSTGRES_HOST=keycloak-db
+      - POSTGRES_DB=${KC_DB_USERNAME}
+      - POSTGRES_USER=${KC_DB_USERNAME}
+      - POSTGRES_PASSWORD=${KC_DB_PASSWORD}
+      - POSTGRES_EXTRA_OPTS=-Z9
+      - SCHEDULE=30 4 * * *
+      - BACKUP_KEEP_DAYS=7
+      - BACKUP_KEEP_WEEKS=4
+      - BACKUP_KEEP_MONTHS=6
+      - HEALTHCHECK_PORT=81
   keycloak:
+    container_name: Keycloak
     image: quay.io/keycloak/keycloak:19.0.1
     volumes:
       - ~/beatfork/docker/themes:/opt/keycloak/themes
     environment:
       KC_DB: postgres
-      KC_DB_URL: postgres:5432
+      KC_DB_URL: keycloak-db:5432
       KC_DB_USERNAME: ${KC_DB_USERNAME}
       KC_DB_PASSWORD: ${KC_DB_PASSWORD}
       KC_HOSTNAME: ${KC_HOSTNAME}
       KEYCLOAK_ADMIN: ${KC_USER}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_PASSWORD}
     depends_on:
-      - postgres
+      - keycloak-db
     entrypoint: "/opt/keycloak/bin/kc.sh start --proxy=edge --http-relative-path=auth --hostname-strict=false --hostname-strict-https=false"
     network_mode: "host"
 volumes:

@@ -1,8 +1,8 @@
-import React from "react";
-import * as THREE from "three";
-import { ThreeEvent } from "@react-three/fiber";
-import Vector3D from "../../models/Vector3D";
-import "./Obstacle.scss";
+import React from 'react';
+import * as THREE from 'three';
+import { ThreeEvent } from '@react-three/fiber';
+import Vector3D from '../../models/Vector3D';
+import './Obstacle.scss';
 
 const Obstacle = (props: {
   position: Vector3D;
@@ -24,7 +24,7 @@ const Obstacle = (props: {
 
 Obstacle.defaultProps = {
   onClick: null,
-  childRef: null,
+  childRef: null
 };
 
 export default Obstacle;

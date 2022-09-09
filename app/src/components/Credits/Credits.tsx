@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useSetRecoilState } from "recoil";
-import { viewState } from "../../atoms/viewState";
-import "./Credits.scss";
+import React, { useEffect, useState } from 'react';
+import { useSetRecoilState } from 'recoil';
+import { viewState } from '../../atoms/viewState';
+import './Credits.scss';
 
 const Credits = () => {
   const [creditsText, setCreditsText] = useState<{
@@ -9,14 +9,14 @@ const Credits = () => {
     licenseSongs: string;
     license3rdParty: string;
   }>({
-    license: "Loading license...",
-    licenseSongs: "Loading song notices",
-    license3rdParty: "Loading 3rd party notices...",
+    license: 'Loading license...',
+    licenseSongs: 'Loading song notices',
+    license3rdParty: 'Loading 3rd party notices...'
   });
   const setView = useSetRecoilState(viewState);
 
   useEffect(() => {
-    fetch("/LICENSE.txt")
+    fetch('/LICENSE.txt')
       .then((license) => license.text())
       .then((license) => {
         setCreditsText((creditsTextLocal) => {
@@ -25,7 +25,7 @@ const Credits = () => {
           return creditsTextCopy;
         });
       });
-    fetch("/LICENSE-SONGS.txt")
+    fetch('/LICENSE-SONGS.txt')
       .then((licenseSongs) => licenseSongs.text())
       .then((licenseSongs) => {
         setCreditsText((creditsTextLocal) => {
@@ -34,7 +34,7 @@ const Credits = () => {
           return creditsTextCopy;
         });
       });
-    fetch("/LICENSE-3RD-PARTY.txt")
+    fetch('/LICENSE-3RD-PARTY.txt')
       .then((license3rdParty) => license3rdParty.text())
       .then((license3rdParty) => {
         setCreditsText((creditsTextLocal) => {

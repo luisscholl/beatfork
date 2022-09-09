@@ -1,5 +1,5 @@
-import React from "react";
-import "./Score.scss";
+import React from 'react';
+import './Score.scss';
 
 const Score = (props: { score: number; multiplier: number }) => {
   const { round } = Math;

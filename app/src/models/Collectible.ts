@@ -1,8 +1,8 @@
-import GameObject from "./GameObject";
+import GameObject from './GameObject';
 
 export default interface Collectible extends GameObject {
   collectibleType: CollectibleType;
-  type: "Collectible";
+  type: 'Collectible';
 }
 
 export enum CollectibleType {
@@ -14,5 +14,5 @@ export enum CollectibleType {
   LeftHand = 6,
   RightHand = 7,
   LeftFoot = 8,
-  RightFoot = 9,
+  RightFoot = 9
 }

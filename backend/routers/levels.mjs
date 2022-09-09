@@ -1,23 +1,23 @@
-import { Router } from "express";
-import { ObjectId } from "mongodb";
+import { Router } from 'express';
+import { ObjectId } from 'mongodb';
 
 const router = Router();
 
 const artists = {
-  "A80F7A98-C02F-4A85-B13F-DCDF70035BDE": {
-    id: "A80F7A98-C02F-4A85-B13F-DCDF70035BDE",
-    name: "Ryan Anderson",
-    website: "https://www.ryanandersenmusic.com",
+  'A80F7A98-C02F-4A85-B13F-DCDF70035BDE': {
+    id: 'A80F7A98-C02F-4A85-B13F-DCDF70035BDE',
+    name: 'Ryan Anderson',
+    website: 'https://www.ryanandersenmusic.com'
   },
-  "B80F7A98-C02F-4A85-B13F-DCDF70035BDE": {
-    id: "B80F7A98-C02F-4A85-B13F-DCDF70035BDE",
-    name: "Andy G. Cohen",
-    website: "https://www.youtube.com/channel/UCJJBHPNXpLBcOPb5qFpy4wA",
+  'B80F7A98-C02F-4A85-B13F-DCDF70035BDE': {
+    id: 'B80F7A98-C02F-4A85-B13F-DCDF70035BDE',
+    name: 'Andy G. Cohen',
+    website: 'https://www.youtube.com/channel/UCJJBHPNXpLBcOPb5qFpy4wA'
   },
-  "C80F7A98-C02F-4A85-B13F-DCDF70035BDE": {
-    id: "C80F7A98-C02F-4A85-B13F-DCDF70035BDE",
-    name: "Fast Ballerz",
-  },
+  'C80F7A98-C02F-4A85-B13F-DCDF70035BDE': {
+    id: 'C80F7A98-C02F-4A85-B13F-DCDF70035BDE',
+    name: 'Fast Ballerz'
+  }
 };
 
 // Helpers used by multiple methods
@@ -28,8 +28,7 @@ function checkAuthenticated(error) {
       const notAuthenticated = new Error();
       notAuthenticated.status = 401;
       notAuthenticated.errors = error;
-      notAuthenticated.message =
-        "The header 'authorization' must contain a valid token";
+      notAuthenticated.message = "The header 'authorization' must contain a valid token";
       return next(notAuthenticated);
     }
     next();
@@ -44,8 +43,7 @@ function checkNoDuplicateVersionIds() {
       if (versionIds.hasOwnProperty(version.id)) {
         const duplicateVersionId = new Error();
         duplicateVersionId.status = 400;
-        duplicateVersionId.errors =
-          "Versions of a level can't share the same versionId";
+        duplicateVersionId.errors = "Versions of a level can't share the same versionId";
         duplicateVersionId.message = `Duplicate versionId ${version.id}`;
         return next(duplicateVersionId);
       }
@@ -62,9 +60,9 @@ function removeAdditionalFromGameObjects() {
     // we need to remove additional properties from collectibles and obstacles manually
     for (const version of req.body.versions) {
       for (const object of version.objects) {
-        if (object.type === "Obstacle") {
+        if (object.type === 'Obstacle') {
           delete object.collectibleType;
-        } else if (object.type === "Collectible") {
+        } else if (object.type === 'Collectible') {
           delete object.dimensions;
         }
       }
@@ -83,7 +81,7 @@ function setArtists() {
       } else {
         const artistNotFound = new Error();
         artistNotFound.status = 404;
-        artistNotFound.errors = "At least one unknown artistId given";
+        artistNotFound.errors = 'At least one unknown artistId given';
         artistNotFound.message = `No artist with artistId ${artistId} found`;
         return next(artistNotFound);
       }
@@ -98,7 +96,7 @@ function setAuthor() {
   return async (req, res, next) => {
     req.body.author = {
       id: res.locals.userId,
-      username: res.locals.username,
+      username: res.locals.username
     };
     next();
   };
@@ -108,13 +106,13 @@ function keepAuthor() {
   return async (req, res, next) => {
     req.body.author = {
       id: res.locals.authorId,
-      username: res.locals.authorName,
+      username: res.locals.authorName
     };
     next();
   };
 }
 
-function getAuthor() {
+function getAuthorFromDB() {
   return async (req, res, next) => {
     let query;
     try {
@@ -123,22 +121,28 @@ function getAuthor() {
       // An ObjectId can't be constructed from the given levelId
       const levelNotFound = new Error();
       levelNotFound.status = 404;
-      levelNotFound.errors = "Level not found";
+      levelNotFound.errors = 'Level not found';
       levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
       return next(levelNotFound);
     }
-    const oldLevel = await res.app.locals.db
-      .collection("levels")
-      .findOne(query);
+    const oldLevel = await res.app.locals.db.collection('levels').findOne(query);
     if (!oldLevel) {
       const levelNotFound = new Error();
       levelNotFound.status = 404;
-      levelNotFound.errors = "Level not found";
+      levelNotFound.errors = 'Level not found';
       levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
       return next(levelNotFound);
     }
     res.locals.authorId = oldLevel.author.id;
     res.locals.authorName = oldLevel.author.username;
+    next();
+    return null;
+  };
+}
+
+function getAuthorFromQuery() {
+  return async (req, res, next) => {
+    res.locals.authorId = req.query.authorId;
     next();
     return null;
   };
@@ -162,134 +166,231 @@ function checkAuthorized(error, message) {
   };
 }
 
-// TODO: only return unpublished levels to their autor
-
 router.post(
-  "/",
-  checkAuthenticated("Levels can only be created by authorized users"),
+  '/',
+  checkAuthenticated('Levels can only be created by authenticated users'),
   checkNoDuplicateVersionIds(),
   removeAdditionalFromGameObjects(),
   setArtists(),
   setAuthor(),
   async (req, res, next) => {
-    const result = await res.app.locals.db
-      .collection("levels")
-      .insertOne(req.body);
-    if (result.acknowledged) {
-      res.json({
-        id: result.insertedId,
-      });
-    } else {
-      return next(
-        new Error("Something went wrong inserting new level into the database")
-      );
+    const { versions } = req.body;
+    delete req.body.versions;
+    const levelResult = await res.app.locals.db.collection('levels').insertOne(req.body);
+    if (!levelResult.acknowledged) {
+      return next(new Error('Something went wrong inserting new level into the database'));
     }
+
+    const versionInserts = [];
+    for (const version of versions) {
+      version._id = {
+        levelId: new ObjectId(levelResult.insertedId),
+        versionId: version.id
+      };
+      delete version.id;
+      versionInserts.push(res.app.locals.db.collection('versions').insertOne(version));
+    }
+    const versionResults = await Promise.all(versionInserts);
+    for (const versionResult of versionResults) {
+      if (!versionResult.acknowledged) {
+        return next(
+          new Error('Something went wrong inserting version of new level into the database')
+        );
+      }
+    }
+
+    res.json({
+      id: levelResult.insertedId
+    });
     return null;
   }
 );
 
-router.get("/", async (req, res) => {
+router.get('/', async (req, res) => {
   // create the index for text search on title if it doesn't exist already
-  await res.app.locals.db.collection("levels").createIndex({ title: "text" });
+  await res.app.locals.db.collection('levels').createIndex({ title: 'text' });
 
-  const currentPage = req.query.hasOwnProperty("currentPage")
-    ? req.query.currentPage
-    : 1;
-  const pageSize = req.query.hasOwnProperty("pageSize")
-    ? req.query.pageSize
-    : 20;
+  const currentPage = req.query.hasOwnProperty('currentPage') ? req.query.currentPage : 1;
+  const pageSize = req.query.hasOwnProperty('pageSize') ? req.query.pageSize : 20;
+  const onlyLiked =
+    res.locals.authenticated && req.query.hasOwnProperty('onlyLiked') ? req.query.onlyLiked : false;
   // no rating or personalBest yet so use title as defailt in the meantime (also change in openapi.yaml)
   const orderBy =
-    req.query.hasOwnProperty("orderBy") &&
-      req.query.orderBy !== "personalBest" &&
-      req.query.orderBy !== "rating"
+    req.query.hasOwnProperty('orderBy') &&
+      req.query.orderBy !== 'personalBest' &&
+      req.query.orderBy !== 'rating'
       ? req.query.orderBy
-      : "title";
+      : 'title';
   const direction =
-    req.query.hasOwnProperty("direction") &&
-      req.query.direction === "descending"
-      ? -1
-      : 1;
-  const minDifficulty = req.query.hasOwnProperty("minDifficulty")
-    ? req.query.minDifficulty
-    : 1;
-  const maxDifficulty = req.query.hasOwnProperty("maxDifficulty")
-    ? req.query.maxDifficulty
-    : 20;
-  const minLength = req.query.hasOwnProperty("minLength")
-    ? req.query.minLength
-    : 0;
-  const maxLength = req.query.hasOwnProperty("maxLength")
-    ? req.query.maxLength
-    : 0;
-  /*
-  const minPersonalBest = req.query.hasOwnProperty("minPersonalBest")
+    req.query.hasOwnProperty('direction') && req.query.direction === 'descending' ? -1 : 1;
+  const minDifficulty = req.query.hasOwnProperty('minDifficulty') ? req.query.minDifficulty : 1;
+  const maxDifficulty = req.query.hasOwnProperty('maxDifficulty') ? req.query.maxDifficulty : 20;
+  const minLength = req.query.hasOwnProperty('minLength') ? req.query.minLength : 0;
+  const maxLength = req.query.hasOwnProperty('maxLength') ? req.query.maxLength : 0;
+  const minPersonalBest = req.query.hasOwnProperty('minPersonalBest')
     ? req.query.minPersonalBest
-    : 0; // tracking of personal bests not implemented
-  const maxPersonalBest = req.query.hasOwnProperty("maxPersonalBest")
+    : 0;
+  const maxPersonalBest = req.query.hasOwnProperty('maxPersonalBest')
     ? req.query.maxPersonalBest
-    : 100; // tracking of personal bests not implemented
-  const minRating = req.query.hasOwnProperty("minRating")
-    ? req.query.minRating
-    : 0; // tracking of ratings not implemented
-  */
-  const title = req.query.hasOwnProperty("title") ? req.query.title : "";
-  const author = req.query.hasOwnProperty("author") ? req.query.author : "";
-  const artist = req.query.hasOwnProperty("artist") ? req.query.artist : "";
+    : 100;
+  const minRating = req.query.hasOwnProperty('minRating') ? req.query.minRating : 0;
+  const title = req.query.hasOwnProperty('title') ? req.query.title : '';
+  const author = req.query.hasOwnProperty('author') ? req.query.author : '';
+  const artist = req.query.hasOwnProperty('artist') ? req.query.artist : '';
 
   const aggregationPipeline = [];
   aggregationPipeline.push({
     $match: {
-      ...(title !== "" && { $text: { $search: title } }),
+      ...(title !== '' && { $text: { $search: title } }),
       ...(!res.locals.authenticated && { published: true }),
       ...(res.locals.authenticated &&
         !res.locals.admin && {
-        $or: [{ published: true }, { "author.id": res.locals.userId }],
+        $or: [{ published: true }, { 'author.id': res.locals.userId }]
       }),
-      "author.username": {
+      'author.username': {
         $regex: author,
-        $options: "i",
+        $options: 'i'
       },
-      ...(artist !== "" && {
-        "artists.name": {
+      ...(artist !== '' && {
+        'artists.name': {
           $regex: artist,
-          $options: "i",
-        },
+          $options: 'i'
+        }
       }),
       length: {
         $gte: minLength,
-        ...(maxLength > 0 && { $lte: maxLength }),
-      },
-      "versions.difficulty": {
-        $gte: minDifficulty,
-        $lte: maxDifficulty,
-      },
-    },
+        ...(maxLength > 0 && { $lte: maxLength })
+      }
+    }
   });
-  if (orderBy === "difficulty") {
+  aggregationPipeline.push({
+    $lookup: {
+      from: 'versions',
+      localField: '_id',
+      foreignField: '_id.levelId',
+      as: 'versions'
+    }
+  });
+  let personalBestField;
+  if (res.locals.authenticated) {
+    personalBestField = `$$version.personalBests.${res.locals.userId}`;
+  }
+  let ownRatingField;
+  if (res.locals.authenticated) {
+    ownRatingField = `$ratings.${res.locals.userId}`;
+  }
+  aggregationPipeline.push({
+    $addFields: {
+      id: '$_id',
+      ...(res.locals.authenticated && {
+        ownRating: ownRatingField
+      }),
+      ratingsArray: {
+        $ifNull: [{ $objectToArray: '$ratings' }, { $literal: [{ k: 'internal', v: 0 }] }]
+      },
+      versions: {
+        $map: {
+          input: '$versions',
+          as: 'version',
+          in: {
+            id: '$$version._id.versionId',
+            difficulty: '$$version.difficulty',
+            ...(res.locals.authenticated && {
+              personalBest: {
+                $ifNull: [personalBestField, { $literal: 0 }]
+              }
+            })
+          }
+        }
+      }
+    }
+  });
+  aggregationPipeline.push({
+    $addFields: {
+      numFields: { $size: '$ratingsArray' },
+      numLikes: {
+        $reduce: {
+          input: '$ratingsArray',
+          initialValue: 0,
+          in: { $add: ['$$value', '$$this.v'] }
+        }
+      }
+    }
+  });
+  aggregationPipeline.push({
+    $addFields: {
+      averageRating: { $divide: ['$numLikes', '$numFields'] }
+    }
+  });
+  aggregationPipeline.push({
+    $match: {
+      'versions.difficulty': {
+        $gte: minDifficulty,
+        $lte: maxDifficulty
+      },
+      averageRating: {
+        $gte: minRating
+      },
+      ...(res.locals.authenticated && {
+        'versions.personalBest': {
+          $gte: minPersonalBest,
+          $lte: maxPersonalBest
+        }
+      }),
+      ...(onlyLiked && { ownRating: { $eq: 1 } })
+    }
+  });
+  if (orderBy === 'difficulty') {
     if (direction === 1) {
       aggregationPipeline.push({
         $addFields: {
           difficulty: {
             $reduce: {
-              input: "$versions",
+              input: '$versions',
               initialValue: 20,
-              in: { $min: ["$$value", "$$this.difficulty"] },
-            },
-          },
-        },
+              in: { $min: ['$$value', '$$this.difficulty'] }
+            }
+          }
+        }
       });
     } else {
       aggregationPipeline.push({
         $addFields: {
           difficulty: {
             $reduce: {
-              input: "$versions",
+              input: '$versions',
               initialValue: 1,
-              in: { $max: ["$$value", "$$this.difficulty"] },
-            },
-          },
-        },
+              in: { $max: ['$$value', '$$this.difficulty'] }
+            }
+          }
+        }
+      });
+    }
+  }
+  if (orderBy === 'personalBest') {
+    if (direction === 1) {
+      aggregationPipeline.push({
+        $addFields: {
+          personalBest: {
+            $reduce: {
+              input: '$versions',
+              initialValue: 100,
+              in: { $min: ['$$value', '$$this.personalBest'] }
+            }
+          }
+        }
+      });
+    } else {
+      aggregationPipeline.push({
+        $addFields: {
+          personalBest: {
+            $reduce: {
+              input: '$versions',
+              initialValue: 0,
+              in: { $max: ['$$value', '$$this.personalBest'] }
+            }
+          }
+        }
       });
     }
   }
@@ -297,239 +398,216 @@ router.get("/", async (req, res) => {
     $facet: {
       statistics: [
         {
-          $count: "totalLevels",
+          $count: 'totalLevels'
         },
         {
           $project: {
             totalPages: {
               $ceil: {
-                $divide: ["$totalLevels", pageSize],
-              },
+                $divide: ['$totalLevels', pageSize]
+              }
             },
             _id: false,
             currentPage: {
-              $literal: currentPage,
+              $literal: currentPage
             },
             pageSize: {
-              $literal: pageSize,
-            },
-          },
-        },
+              $literal: pageSize
+            }
+          }
+        }
       ],
       levels: [
         {
           $sort: {
             [orderBy]: direction,
-            _id: 1, // we need to sort on at least one unique field for skip and limit
-          },
+            _id: 1 // we need to sort on at least one unique field for skip and limit
+          }
         },
         {
-          $skip: (currentPage - 1) * pageSize,
+          $skip: (currentPage - 1) * pageSize
         },
         {
-          $limit: pageSize,
-        },
-        {
-          $addFields: {
-            id: "$_id",
-          },
+          $limit: pageSize
         },
         {
           $project: {
-            "versions.objects": false,
             _id: false,
-            ...(orderBy === "difficulty" && { difficulty: false }),
-          },
-        },
-      ],
-    },
+            ...(orderBy === 'difficulty' && { difficulty: false }),
+            ...(orderBy === 'personalBest' && { personalBest: false }),
+            ratings: false,
+            ratingsArray: false,
+            numFields: false,
+            numLikes: false
+          }
+        }
+      ]
+    }
   });
   aggregationPipeline.push({
     $project: {
       statistics: {
         $ifNull: [
           {
-            $first: "$statistics",
+            $first: '$statistics'
           },
           {
             totalPages: 0,
             currentPage,
-            pageSize,
-          },
-        ],
+            pageSize
+          }
+        ]
       },
-      levels: true,
-    },
+      levels: true
+    }
   });
 
   const levels = await res.app.locals.db
-    .collection("levels")
+    .collection('levels')
     .aggregate(aggregationPipeline)
     .toArray();
   res.json(levels[0]);
 });
 
-router.get("/:levelId", async (req, res, next) => {
-  let query;
-  try {
-    query = { _id: new ObjectId(req.params.levelId) };
-  } catch (err) {
-    // An ObjectId can't be constructed from the given levelId
-    const levelNotFound = new Error();
-    levelNotFound.status = 404;
-    levelNotFound.errors = "Level not found";
-    levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
-    return next(levelNotFound);
-  }
-  const level = await res.app.locals.db.collection("levels").findOne(query);
-  if (!level) {
-    const levelNotFound = new Error();
-    levelNotFound.status = 404;
-    levelNotFound.errors = "Level not found";
-    levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
-    return next(levelNotFound);
-  }
-  if (
-    !(
-      level.published ||
-      res.locals.admin(
-        res.locals.authenticated && res.locals.userId === level.author.id
-      )
-    )
-  ) {
-    const userNotAuthorized = new Error();
-    userNotAuthorized.status = 403;
-    userNotAuthorized.errors =
-      "Levels, that aren't published, can only be viewed by authorized users";
-    userNotAuthorized.message =
-      "The given user isn't authorized to view this level";
-    return next(userNotAuthorized);
-  }
-  level.id = level._id;
-  delete level._id;
-  res.json(level);
-  return null;
-});
-
-router.put(
-  "/:levelId",
-  checkAuthenticated("Levels can only be updated by authenticated users"),
-  checkNoDuplicateVersionIds(),
-  removeAdditionalFromGameObjects(),
-  setArtists(),
-  getAuthor(),
-  checkAuthorized(
-    "Levels can only be updated by authorized users",
-    "The given user isn't authorized to update this level"
-  ),
-  keepAuthor(),
-  async (req, res, next) => {
-    let query;
-    try {
-      query = { _id: new ObjectId(req.params.levelId) };
-    } catch (err) {
-      // An ObjectId can't be constructed from the given levelId
-      const levelNotFound = new Error();
-      levelNotFound.status = 404;
-      levelNotFound.errors = "Level not found";
-      levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
-      return next(levelNotFound);
-    }
-    const result = await res.app.locals.db
-      .collection("levels")
-      .replaceOne(query, req.body);
-    if (!result.acknowledged || !result.matchedCount === 1) {
-      const unknownServerError = new Error();
-      unknownServerError.status = 500;
-      unknownServerError.errors = "Something went wrong";
-      unknownServerError.message = "Something went wrong";
-      return next(unknownServerError);
-    }
-    res.sendStatus(200);
-    return null;
-  }
-);
-
 router.delete(
-  "/:levelId",
-  getAuthor(),
-  checkAuthenticated("Levels can only be deleted by authenticated users"),
+  '/',
+  checkAuthenticated('Levels can only be deleted by authenticated users'),
+  getAuthorFromQuery(),
   checkAuthorized(
-    "Levels can only be deleted by authorized users",
+    'Levels can only be deleted by authorized users',
     "The given user isn't authorized to delete this level"
   ),
   async (req, res, next) => {
-    let query;
-    try {
-      query = { _id: new ObjectId(req.params.levelId) };
-    } catch (err) {
-      // An ObjectId can't be constructed from the given levelId
-      const levelNotFound = new Error();
-      levelNotFound.status = 404;
-      levelNotFound.errors = "Level not found";
-      levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
-      return next(levelNotFound);
-    }
-    const result = await res.app.locals.db
-      .collection("levels")
-      .deleteOne(query);
-    if (!result.acknowledged || !result.matchedCount === 1) {
+    const levelsQuery = { 'author.id': res.locals.authorId };
+
+    const levels = await res.app.locals.db.collection('levels').find(levelsQuery).toArray();
+
+    const deleteLevelsResult = await res.app.locals.db.collection('levels').deleteMany(levelsQuery);
+    if (!deleteLevelsResult.acknowledged) {
       const unknownServerError = new Error();
       unknownServerError.status = 500;
-      unknownServerError.errors = "Something went wrong";
-      unknownServerError.message = "Something went wrong";
+      unknownServerError.errors = 'Something went wrong';
+      unknownServerError.message = 'Something went wrong';
       return next(unknownServerError);
     }
+
+    const levelsIds = [];
+    for (const level of levels) {
+      levelsIds.push(new ObjectId(level._id));
+    }
+
+    const versionsQuery = { '_id.levelId': { $in: levelsIds } };
+
+    const deleteVersionsResult = await res.app.locals.db
+      .collection('versions')
+      .deleteMany(versionsQuery);
+
+    if (!deleteVersionsResult.acknowledged) {
+      const unknownServerError = new Error();
+      unknownServerError.status = 500;
+      unknownServerError.errors = 'Something went wrong';
+      unknownServerError.message = 'Something went wrong';
+      return next(unknownServerError);
+    }
+
     res.sendStatus(200);
     return null;
   }
 );
 
-router.get("/:levelId/:versionId", async (req, res, next) => {
-  const aggregationPipeline = [];
+router.get('/:levelId', async (req, res, next) => {
+  let levelId;
   try {
-    aggregationPipeline.push({
-      $match: {
-        _id: ObjectId(req.params.levelId),
-        "versions.id": {
-          $eq: Number(req.params.versionId),
-        },
-      },
-    });
+    levelId = new ObjectId(req.params.levelId);
   } catch (err) {
     // An ObjectId can't be constructed from the given levelId
     const levelNotFound = new Error();
     levelNotFound.status = 404;
-    levelNotFound.errors = "Level not found";
+    levelNotFound.errors = 'Level not found';
     levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
     return next(levelNotFound);
   }
-  aggregationPipeline.push({
-    $project: {
-      version: {
-        $first: {
-          $filter: {
-            input: "$versions",
-            as: "version",
-            cond: {
-              $eq: ["$$version.id", Number(req.params.versionId)],
-            },
-          },
-        },
-      },
-      published: true,
-      "author.id": true,
+  let personalBestField;
+  if (res.locals.authenticated) {
+    personalBestField = `$$version.personalBests.${res.locals.userId}`;
+  }
+  let ownRatingField;
+  if (res.locals.authenticated) {
+    ownRatingField = `$ratings.${res.locals.userId}`;
+  }
+  const aggregationPipeline = [
+    {
+      $match: { _id: levelId }
     },
-  });
+    {
+      $lookup: {
+        from: 'versions',
+        localField: '_id',
+        foreignField: '_id.levelId',
+        as: 'versions'
+      }
+    },
+    {
+      $addFields: {
+        id: '$_id',
+        ...(res.locals.authenticated && {
+          ownRating: ownRatingField
+        }),
+        ratingsArray: {
+          $ifNull: [{ $objectToArray: '$ratings' }, { $literal: [{ k: 'internal', v: 0 }] }]
+        },
+        versions: {
+          $map: {
+            input: '$versions',
+            as: 'version',
+            in: {
+              id: '$$version._id.versionId',
+              difficulty: '$$version.difficulty',
+              ...(res.locals.authenticated && {
+                personalBest: personalBestField
+              }),
+              objects: '$$version.objects'
+            }
+          }
+        }
+      }
+    },
+    {
+      $addFields: {
+        numFields: { $size: '$ratingsArray' },
+        numLikes: {
+          $reduce: {
+            input: '$ratingsArray',
+            initialValue: 0,
+            in: { $add: ['$$value', '$$this.v'] }
+          }
+        }
+      }
+    },
+    {
+      $addFields: {
+        averageRating: { $divide: ['$numLikes', '$numFields'] }
+      }
+    },
+    {
+      $project: {
+        ratings: false,
+        _id: false,
+        ratingsArray: false,
+        numFields: false,
+        numLikes: false
+      }
+    }
+  ];
   const levels = await res.app.locals.db
-    .collection("levels")
+    .collection('levels')
     .aggregate(aggregationPipeline)
     .toArray();
   if (levels.length === 0) {
     const levelNotFound = new Error();
     levelNotFound.status = 404;
-    levelNotFound.errors = "Version of level not found";
-    levelNotFound.message = `Either no level with levelId ${req.params.levelId} found or no version with versionId ${req.params.versionId} of level found`;
+    levelNotFound.errors = 'Level not found';
+    levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
     return next(levelNotFound);
   }
   const level = levels[0];
@@ -544,12 +622,327 @@ router.get("/:levelId/:versionId", async (req, res, next) => {
     userNotAuthorized.status = 403;
     userNotAuthorized.errors =
       "Levels, that aren't published, can only be viewed by authorized users";
-    userNotAuthorized.message =
-      "The given user isn't authorized to view this level";
+    userNotAuthorized.message = "The given user isn't authorized to view this level";
     return next(userNotAuthorized);
   }
-  res.json(level.version);
+  res.json(level);
   return null;
 });
+
+router.put(
+  '/:levelId',
+  checkAuthenticated('Levels can only be updated by authenticated users'),
+  checkNoDuplicateVersionIds(),
+  removeAdditionalFromGameObjects(),
+  setArtists(),
+  getAuthorFromDB(),
+  checkAuthorized(
+    'Levels can only be updated by authorized users',
+    "The given user isn't authorized to update this level"
+  ),
+  keepAuthor(),
+  async (req, res, next) => {
+    const newVersions = req.body.versions;
+    delete req.body.versions;
+
+    let levelId;
+    try {
+      levelId = new ObjectId(req.params.levelId);
+    } catch (err) {
+      // An ObjectId can't be constructed from the given levelId
+      const levelNotFound = new Error();
+      levelNotFound.status = 404;
+      levelNotFound.errors = 'Level not found';
+      levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
+      return next(levelNotFound);
+    }
+    const levelQuery = { _id: levelId };
+    const levelUpdateResult = await res.app.locals.db
+      .collection('levels')
+      .replaceOne(levelQuery, req.body);
+    if (!levelUpdateResult.acknowledged || !levelUpdateResult.matchedCount === 1) {
+      const unknownServerError = new Error();
+      unknownServerError.status = 500;
+      unknownServerError.errors = 'Something went wrong';
+      unknownServerError.message = 'Something went wrong';
+      return next(unknownServerError);
+    }
+
+    const versionsQuery = { '_id.levelId': levelId };
+    let oldVersionIds = await res.app.locals.db
+      .collection('versions')
+      .find(versionsQuery)
+      .project({ _id: 1 })
+      .toArray();
+    const versionUpserts = [];
+    for (const newVersion of newVersions) {
+      oldVersionIds = oldVersionIds.filter(
+        (oldVersionId) => oldVersionId._id.versionId !== newVersion.id
+      );
+      const versionQuery = { _id: { levelId, versionId: newVersion.id } };
+      const update = {
+        $set: {
+          difficulty: newVersion.difficulty,
+          objects: newVersion.objects,
+          _id: versionQuery._id
+        }
+      };
+      versionUpserts.push(
+        res.app.locals.db.collection('versions').updateOne(versionQuery, update, { upsert: true })
+      );
+    }
+    const versionUpsertResults = await Promise.all(versionUpserts);
+    for (const versionUpsertResult of versionUpsertResults) {
+      if (!versionUpsertResult.acknowledged) {
+        return next(
+          new Error(
+            'Something went wrong updating or inserting version of new level into the database'
+          )
+        );
+      }
+    }
+    if (oldVersionIds.length > 0) {
+      oldVersionIds = oldVersionIds.map((id) => id._id);
+      const versionDeleteResult = await res.app.locals.db
+        .collection('versions')
+        .deleteMany({ _id: { $in: oldVersionIds } });
+      if (!versionDeleteResult.acknowledged) {
+        return next(
+          new Error(
+            'Something went wrong updating or inserting version of new level into the database'
+          )
+        );
+      }
+    }
+
+    res.sendStatus(200);
+    return null;
+  }
+);
+
+router.delete(
+  '/:levelId',
+  getAuthorFromDB(),
+  checkAuthenticated('Levels can only be deleted by authenticated users'),
+  checkAuthorized(
+    'Levels can only be deleted by authorized users',
+    "The given user isn't authorized to delete this level"
+  ),
+  async (req, res, next) => {
+    let levelId;
+    try {
+      levelId = new ObjectId(req.params.levelId);
+    } catch (err) {
+      // An ObjectId can't be constructed from the given levelId
+      const levelNotFound = new Error();
+      levelNotFound.status = 404;
+      levelNotFound.errors = 'Level not found';
+      levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
+      return next(levelNotFound);
+    }
+    const levelQuery = { _id: levelId };
+    const levelResult = await res.app.locals.db.collection('levels').deleteOne(levelQuery);
+    if (!levelResult.acknowledged || !levelResult.matchedCount === 1) {
+      const unknownServerError = new Error();
+      unknownServerError.status = 500;
+      unknownServerError.errors = 'Something went wrong';
+      unknownServerError.message = 'Something went wrong';
+      return next(unknownServerError);
+    }
+    const versionsQuery = { '_id.levelId': levelId };
+    const versionsResult = await res.app.locals.db.collection('versions').deleteMany(versionsQuery);
+    if (!versionsResult.acknowledged) {
+      return next(
+        new Error('Something went wrong deleting a version of the level from the database')
+      );
+    }
+    res.sendStatus(200);
+    return null;
+  }
+);
+
+router.put(
+  '/:levelId/rating',
+  checkAuthenticated('Only authenticated users can set ratings'),
+  async (req, res, next) => {
+    let levelId;
+    try {
+      levelId = ObjectId(req.params.levelId);
+    } catch (err) {
+      // An ObjectId can't be constructed from the given levelId
+      const levelNotFound = new Error();
+      levelNotFound.status = 404;
+      levelNotFound.errors = 'Level not found';
+      levelNotFound.message = `No level with levelId found`;
+      return next(levelNotFound);
+    }
+    if (
+      !res.locals.admin &&
+      req.body.hasOwnProperty('userId') &&
+      req.body.userId !== res.locals.userId
+    ) {
+      const userNotAuthorized = new Error();
+      userNotAuthorized.status = 403;
+      userNotAuthorized.errors = 'A non admin user can only set his own rating';
+      userNotAuthorized.message = "The given user isn't authorized to set a rating for this user";
+      return next(userNotAuthorized);
+    }
+    const query = { _id: levelId };
+    const field = `ratings.${req.body.userId || res.locals.userId}`;
+    const update = { $set: {} };
+    update.$set[field] = req.body.rating;
+    const result = await res.app.locals.db.collection('levels').updateOne(query, update);
+    if (!result.acknowledged) {
+      const unknownServerError = new Error();
+      unknownServerError.status = 500;
+      unknownServerError.errors = 'Something went wrong';
+      unknownServerError.message = 'Something went wrong';
+      return next(unknownServerError);
+    }
+    if (result.matchedCount === 0) {
+      const levelNotFound = new Error();
+      levelNotFound.status = 404;
+      levelNotFound.errors = 'Version not found';
+      levelNotFound.message = `No level with levelId ${req.params.levelId} found`;
+      return next(levelNotFound);
+    }
+    res.sendStatus(200);
+    return null;
+  }
+);
+
+router.get('/:levelId/:versionId', async (req, res, next) => {
+  let levelId;
+  let versionId;
+  try {
+    levelId = ObjectId(req.params.levelId);
+    versionId = Number(req.params.versionId);
+  } catch (err) {
+    // An ObjectId can't be constructed from the given levelId
+    const levelNotFound = new Error();
+    levelNotFound.status = 404;
+    levelNotFound.errors = 'Version not found';
+    levelNotFound.message = `No version with levelId ${req.params.levelId} and versionId ${req.params.versionId} found`;
+    return next(levelNotFound);
+  }
+  const aggregationPipeline = [];
+  aggregationPipeline.push({
+    $match: {
+      '_id.levelId': levelId,
+      '_id.versionId': versionId
+    }
+  });
+  aggregationPipeline.push({
+    $lookup: {
+      from: 'levels',
+      localField: '_id.levelId',
+      foreignField: '_id',
+      as: 'level'
+    }
+  });
+  let personalBestField;
+  if (res.locals.authenticated) {
+    personalBestField = `$personalBests.${res.locals.userId}`;
+  }
+  aggregationPipeline.push({
+    $project: {
+      level: {
+        $first: '$level'
+      },
+      ...(res.locals.authenticated && { personalBest: personalBestField }),
+      id: '$_id.versionId',
+      objects: 1,
+      difficulty: 1,
+      _id: 0
+    }
+  });
+  aggregationPipeline.push({
+    $project: {
+      personalBests: 0
+    }
+  });
+  const versions = await req.app.locals.db
+    .collection('versions')
+    .aggregate(aggregationPipeline)
+    .toArray();
+  if (versions.length === 0 || versions[0].level === null) {
+    const levelNotFound = new Error();
+    levelNotFound.status = 404;
+    levelNotFound.errors = 'Version not found';
+    levelNotFound.message = `No version with levelId ${req.params.levelId} and versionId ${req.params.versionId} found`;
+    return next(levelNotFound);
+  }
+  const version = versions[0];
+  if (
+    !(
+      version.level.published ||
+      res.locals.admin ||
+      (res.locals.authenticated && res.locals.userId === version.level.author.id)
+    )
+  ) {
+    const userNotAuthorized = new Error();
+    userNotAuthorized.status = 403;
+    userNotAuthorized.errors =
+      "Levels, that aren't published, can only be viewed by authorized users";
+    userNotAuthorized.message = "The given user isn't authorized to view this level";
+    return next(userNotAuthorized);
+  }
+  delete version.level;
+  res.json(version);
+  return null;
+});
+
+router.put(
+  '/:levelId/:versionId/personalBest',
+  checkAuthenticated('Only authenticated users can set personal bests'),
+  async (req, res, next) => {
+    let levelId;
+    let versionId;
+    try {
+      levelId = ObjectId(req.params.levelId);
+      versionId = Number(req.params.versionId);
+    } catch (err) {
+      // An ObjectId can't be constructed from the given levelId
+      const levelNotFound = new Error();
+      levelNotFound.status = 404;
+      levelNotFound.errors = 'Version not found';
+      levelNotFound.message = `No version with levelId ${req.params.levelId} and versionId ${req.params.versionId} found`;
+      return next(levelNotFound);
+    }
+    if (
+      !res.locals.admin &&
+      req.body.hasOwnProperty('userId') &&
+      req.body.userId !== res.locals.userId
+    ) {
+      const userNotAuthorized = new Error();
+      userNotAuthorized.status = 403;
+      userNotAuthorized.errors = 'A non admin user can only set his own personal best';
+      userNotAuthorized.message =
+        "The given user isn't authorized to set a personal best for this user";
+      return next(userNotAuthorized);
+    }
+    const query = { _id: { levelId, versionId } };
+    const field = `personalBests.${req.body.userId || res.locals.userId}`;
+    const update = { $set: {} };
+    update.$set[field] = req.body.personalBest;
+    const result = await res.app.locals.db.collection('versions').updateOne(query, update);
+    if (!result.acknowledged) {
+      const unknownServerError = new Error();
+      unknownServerError.status = 500;
+      unknownServerError.errors = 'Something went wrong';
+      unknownServerError.message = 'Something went wrong';
+      return next(unknownServerError);
+    }
+    if (result.matchedCount === 0) {
+      const levelNotFound = new Error();
+      levelNotFound.status = 404;
+      levelNotFound.errors = 'Version not found';
+      levelNotFound.message = `No version with levelId ${req.params.levelId} and versionId ${req.params.versionId} found`;
+      return next(levelNotFound);
+    }
+    res.sendStatus(200);
+    return null;
+  }
+);
 
 export default router;

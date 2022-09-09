@@ -1,32 +1,29 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.scss";
-import { RecoilRoot } from "recoil";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import { AuthProvider } from "react-oidc-context";
-import ReactMarkdown from "react-markdown";
-import App from "./components/App/App";
-import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
-import reportWebVitals from "./reportWebVitals";
-import Credits from "./components/Credits/Credits";
-import CalibrationScene from "./components/CalibrationScene/CalibrationScene";
-import "@fontsource/ubuntu";
-import oidcConfig from "./config/config.json";
-import CloseAccount from "./components/CloseAccount/CloseAccount";
-import About from "./components/About/About";
-import Browse from "./components/Browse/Browse";
-import Profile from "./components/Profile/Profile";
-import Gameplay from "./components/Gameplay/Gameplay";
-import Legal from "./components/Legal/Legal";
-import LazyMarkdown from "./components/LazyMarkdown/LazyMarkdown";
-import Editor from "./components/Editor/Editor";
-import GameOver from "./components/GameOver/GameOver";
-import LevelCompleted from "./components/LevelCompleted/LevelCompleted";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.scss';
+import { RecoilRoot } from 'recoil';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from 'react-oidc-context';
+import ReactMarkdown from 'react-markdown';
+import App from './components/App/App';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import reportWebVitals from './reportWebVitals';
+import Credits from './components/Credits/Credits';
+import CalibrationScene from './components/CalibrationScene/CalibrationScene';
+import '@fontsource/ubuntu';
+import oidcConfig from './config/config.json';
+import CloseAccount from './components/CloseAccount/CloseAccount';
+import About from './components/About/About';
+import Browse from './components/Browse/Browse';
+import Profile from './components/Profile/Profile';
+import Gameplay from './components/Gameplay/Gameplay';
+import Legal from './components/Legal/Legal';
+import LazyMarkdown from './components/LazyMarkdown/LazyMarkdown';
+import Editor from './components/Editor/Editor';
+import GameOver from './components/GameOver/GameOver';
+import LevelCompleted from './components/LevelCompleted/LevelCompleted';
+import MyLevels from './components/MyLevels/MyLevels';
+import Home from './components/Home/Home';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -37,14 +34,11 @@ ReactDOM.render(
           <Routes>
             <Route path="/" element={<App />}>
               <Route path="/close-account" element={<CloseAccount />} />
-              <Route
-                index
-                element={<Navigate to={`/about${window.location.search}`} />}
-              />
+              <Route index element={<Navigate to={`/about${window.location.search}`} />} />
               <Route path="/about" element={<About />} />
-              <Route path="/home" element={<Browse />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/browse" element={<Browse />} />
-              <Route path="/my-levels" element={<Browse />} />
+              <Route path="/my-levels" element={<MyLevels />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/legal" element={<Legal />}>
                 <Route index element={<Navigate to="/legal/credits" />} />
@@ -71,30 +65,26 @@ ReactDOM.render(
                 />
                 <Route
                   path="/legal/dmca"
-                  element={
-                    <LazyMarkdown url="/legal/DMCA Takedown Notice.md" />
-                  }
+                  element={<LazyMarkdown url="/legal/DMCA Takedown Notice.md" />}
                 />
-                <Route
-                  path="/legal/treat"
-                  element={<LazyMarkdown url="/legal/treat.md" />}
-                />
+                <Route path="/legal/treat" element={<LazyMarkdown url="/legal/treat.md" />} />
               </Route>
-              <Route path="/game-over" element={<GameOver />} />
-              <Route path="/level-completed" element={<LevelCompleted />} />
+              <Route path="/game-over/:levelId/:versionId" element={<GameOver />} />
+              <Route path="/level-completed/:levelId/:versionId" element={<LevelCompleted />} />
             </Route>
             <Route
               path="/gameplay/:levelId/:versionId"
               element={<Gameplay debug={!!process.env.REACT_APP_DEBUG} />}
             />
             <Route path="/edit" element={<Editor />} />
+            <Route path="/edit/:levelId/:versionId" element={<Editor />} />
             <Route path="/calibration" element={<CalibrationScene />} />
           </Routes>
         </Router>
       </RecoilRoot>
     </AuthProvider>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root')
 );
 
 // If you want your app to work offline and load faster, you can change
