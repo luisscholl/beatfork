@@ -25,7 +25,6 @@ import './EditorCollectibles.scss';
 
 export interface EditorCollectiblesRefAttributes {
   addCollectible(collectible: Collectible): void;
-  addCollectible(collectible: Collectible): void;
   moveTo(targets: number[], position: Vector3D): void;
   moveBy(targets: number[], distance: Vector3D): void;
   copy(targets: number[], save: boolean): Collectible[];
@@ -36,14 +35,14 @@ export interface EditorCollectiblesRefAttributes {
   select(targets: number[]): void;
   deselect(targets: number[]): void;
   getLastIndex(): number;
-  setSnappingxy(snapTo: 0.1 | 0.3 | 0.5): void;
+  setSnappingXY(snapTo: 0.140625 | 0.28125 | 0.5625): void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface EditorCollectiblesProps {
   onClick: (e: ThreeEvent<MouseEvent>, i: number, type: 'collectibles' | 'obstacles') => void;
   selected: MutableRefObject<number[]>;
-  snappingModulusxy: number;
+  snappingModulusXY: number;
 }
 
 const tempObject = new THREE.Object3D();
@@ -64,14 +63,12 @@ const EditorCollectibles: ForwardRefExoticComponent<
   const [maxCollectibles, setMaxCollectibles] = useState<number>(1024);
   const collectibleTypeArray = useRef<Float32Array>(Float32Array.from({ length: 1024 }));
   const isSelectedArray = useRef<Float32Array>(Float32Array.from({ length: 1024 }).fill(0));
-  const snappingModulus = useRef<number>(undefined);
-  const snappingModulusxy = useRef<number>(0.2);
+  const snappingModulusZ = useRef<number>(undefined);
+  const snappingModulusXY = useRef<number>(0.28125);
 
-  const snapBufferx = useRef<number>(0);
-  const snapBuffery = useRef<number>(0);
-  const snapBufferz = useRef<number>(0);
-
-  const snapBufferxyz = useRef<Vector3D>({ x: 0, y: 0, z: 0 });
+  const snapBufferX = useRef<number>(0);
+  const snapBufferY = useRef<number>(0);
+  const snapBufferZ = useRef<number>(0);
 
   const _addCollectible = (collectible: Collectible, pushCollectible = true) => {
     if (pushCollectible) collectibles.current.push(collectible);
@@ -133,18 +130,20 @@ const EditorCollectibles: ForwardRefExoticComponent<
       meshRef.current.instanceMatrix.needsUpdate = true;
     },
     moveBy(targets: number[], distance: Vector3D): void {
-      distance.x += snapBufferx.current;
-      distance.y += snapBuffery.current;
-      distance.z += snapBufferz.current;
-      const distanceRemainderx = distance.x % snappingModulusxy.current;
-      const distanceRemaindery = distance.y % snappingModulusxy.current;
-      const distanceRemainderz = distance.z % snappingModulusxy.current;
-      distance.x -= distanceRemainderx;
-      distance.y -= distanceRemaindery;
-      distance.z -= distanceRemainderz;
-      snapBufferx.current = distanceRemainderx;
-      snapBuffery.current = distanceRemaindery;
-      snapBufferz.current = distanceRemainderz;
+      distance.x += snapBufferX.current;
+      distance.y += snapBufferY.current;
+      const distanceRemainderX = distance.x % snappingModulusXY.current;
+      const distanceRemainderY = distance.y % snappingModulusXY.current;
+      distance.x -= distanceRemainderX;
+      distance.y -= distanceRemainderY;
+      snapBufferX.current = distanceRemainderX;
+      snapBufferY.current = distanceRemainderY;
+      if (typeof snappingModulusZ.current !== 'undefined') {
+        distance.z += snapBufferZ.current;
+        const distanceRemainderZ = distance.z % snappingModulusZ.current;
+        distance.z -= distanceRemainderZ;
+        snapBufferZ.current = distanceRemainderZ;
+      }
 
       if (!distance.z && !distance.x && !distance.y) return;
 
@@ -210,19 +209,30 @@ const EditorCollectibles: ForwardRefExoticComponent<
       divider: 4 | 8 | 16 | 32 = 4,
       tripletDivider: 1 | 1.5 = 1
     ): void {
-      if (bpm === false) snappingModulus.current = undefined;
+      if (bpm === false) snappingModulusZ.current = undefined;
       else
-        snappingModulus.current = divider
+        snappingModulusZ.current = divider
           ? ((60 / (bpm as number)) * 4) / divider / tripletDivider
           : 0;
     },
     snap(targets: number[]): void {
       targets = targets.map((target) => (target < 0 ? meshRef.current.count + target : target));
       targets.forEach((target) => {
-        if (typeof snappingModulus.current === 'undefined') return;
-        const remainder = collectibles.current[target].position.z % snappingModulus.current;
-        if (snappingModulus.current - remainder > 1e-12) {
-          collectibles.current[target].position.z -= remainder;
+        if (typeof snappingModulusXY.current !== 'undefined') {
+          const remainderX = collectibles.current[target].position.x % snappingModulusXY.current;
+          if (snappingModulusXY.current - remainderX > 1e-12) {
+            collectibles.current[target].position.x -= remainderX;
+          }
+          const remainderY = collectibles.current[target].position.y % snappingModulusXY.current;
+          if (snappingModulusXY.current - remainderY > 1e-12) {
+            collectibles.current[target].position.y -= remainderY;
+          }
+        }
+        if (typeof snappingModulusZ.current !== 'undefined') {
+          const remainderZ = collectibles.current[target].position.z % snappingModulusZ.current;
+          if (snappingModulusZ.current - remainderZ > 1e-12) {
+            collectibles.current[target].position.z -= remainderZ;
+          }
         }
         tempObject.position.x = collectibles.current[target].position.x;
         tempObject.position.y = collectibles.current[target].position.y;
@@ -269,8 +279,8 @@ const EditorCollectibles: ForwardRefExoticComponent<
     getLastIndex(): number {
       return collectibles.current.length - 1;
     },
-    setSnappingxy(snapTo: 0.1 | 0.3 | 0.5): void {
-      snappingModulusxy.current = snapTo;
+    setSnappingXY(snapTo: 0.140625 | 0.28125 | 0.5625): void {
+      snappingModulusXY.current = snapTo;
     }
   }));
 

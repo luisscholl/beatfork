@@ -53,7 +53,7 @@ import Artist from '../../models/Artist';
 import User from '../../models/User';
 import { viewState } from '../../atoms/viewState';
 
-const snappingModuliXY = [0.1, 0.3, 0.5];
+const snappingModuliXY = [0.140625, 0.28125, 0.5625];
 
 const Editor = () => {
   const auth = useAuth();
@@ -113,7 +113,7 @@ const Editor = () => {
   const sideBarRef = useRef<HTMLDivElement>(null);
   const ground = useRef<{ animate: (t: number) => void }>(null);
 
-  const [snappingModulusXY, setSnappingModulusXY] = useState<0.1 | 0.3 | 0.5>(0.3);
+  const [snappingModulusXY, setSnappingModulusXY] = useState<0.140625 | 0.28125 | 0.5625>(0.28125);
   const snapBufferX = useRef<number>(0);
   const snapBufferY = useRef<number>(0);
 
@@ -340,9 +340,7 @@ const Editor = () => {
     collectibles.current.deselect(selected.collectibles.current);
     obstacles.current.deselect(selected.obstacles.current);
     collectibles.current.select([-1]);
-    if (snappingDivider) {
-      collectibles.current.snap([-1]);
-    }
+    collectibles.current.snap([-1]);
   };
 
   const onSidebarTemplateMouseDown = (
@@ -464,9 +462,10 @@ const Editor = () => {
     }
   };
 
-  const setSnappingXY = (snapTo: 0.1 | 0.3 | 0.5) => {
+  const setSnappingXY = (snapTo: 0.140625 | 0.28125 | 0.5625) => {
     setSnappingModulusXY(snapTo);
-    collectibles.current.setSnappingxy(snapTo);
+    collectibles.current.setSnappingXY(snapTo);
+    collectibles.current.snap(selected.collectibles.current);
   };
 
   const copy = () => {
@@ -758,7 +757,7 @@ const Editor = () => {
             ref={collectiblesCb}
             onClick={selectLevelObject}
             selected={selected.collectibles}
-            snappingModulusxy={snappingModulusXY}
+            snappingModulusXY={snappingModulusXY}
           />
           <EditorObstacles
             ref={obstaclesCb}
