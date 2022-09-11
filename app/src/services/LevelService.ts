@@ -115,7 +115,7 @@ function search(options: SearchOptions, page: number): Promise<LevelPartial[]> {
     });
 }
 
-function addVersion(levelId: string) {
+function addVersion(levelId: string, title: string, bpm: number, audioPath: string) {
   return get(levelId).then((level) => {
     const uploadLevel = JSON.parse(JSON.stringify(level));
     let versionId = 1;
@@ -127,13 +127,19 @@ function addVersion(levelId: string) {
       difficulty: 1,
       objects: [] as Array<Collectible | Obstacle>
     };
-    return updateVersion(levelId, version).then(() => {
+    return updateVersion(levelId, version, title, bpm, audioPath).then(() => {
       return `${versionId}`;
     });
   });
 }
 
-async function updateVersion(levelId: string, version: LevelVersion) {
+async function updateVersion(
+  levelId: string,
+  version: LevelVersion,
+  title: string,
+  bpm: number,
+  audioPath: string
+) {
   return get(levelId).then(async (level) => {
     const uploadLevel = JSON.parse(JSON.stringify(level));
     uploadLevel.versions[version.id] = version;
@@ -145,6 +151,9 @@ async function updateVersion(levelId: string, version: LevelVersion) {
     });
     uploadLevel.artistIds = level.artists.map((artist) => artist.id);
     delete uploadLevel.artists;
+    uploadLevel.title = title;
+    uploadLevel.bpm = bpm;
+    uploadLevel.audioLinks = [audioPath];
 
     const levelInLevels = await levels.get(levelId);
     const levelPartialInLevelPartials = await levelPartials.get(levelId);

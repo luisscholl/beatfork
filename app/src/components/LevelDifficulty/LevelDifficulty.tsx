@@ -17,7 +17,12 @@ const LevelDifficulty = () => {
   const [view, setView] = useRecoilState(viewState);
 
   const addVersion = () => {
-    LevelService.addVersion(view.level.id).then((versionId) => {
+    LevelService.addVersion(
+      view.level.id,
+      view.level.title,
+      view.level.bpm,
+      view.level.audioLinks[0]
+    ).then((versionId) => {
       navigate(`/edit/${view.level.id}/${versionId}`);
     });
   };

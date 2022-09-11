@@ -518,11 +518,17 @@ const Editor = () => {
     }
     const isAuthor = levelId && (await LevelService.isAuthor(levelId));
     if (levelId && isAuthor && versionId) {
-      LevelService.updateVersion(levelId, {
-        id: versionId,
-        difficulty,
-        objects
-      });
+      LevelService.updateVersion(
+        levelId,
+        {
+          id: versionId,
+          difficulty,
+          objects
+        },
+        title,
+        bpm,
+        audioPath
+      );
     } else {
       const level = {
         title,
@@ -926,7 +932,12 @@ const Editor = () => {
           <div className="settings-wrapper" onClick={toggleSettings}>
             <div className="settings" onClick={(e) => e.stopPropagation()}>
               <SettingsRow title="Title" value={title} setter={setTitle} type="text" />
-              <SettingsRow title="BPM" value={bpm} setter={setBpm} type="number" />
+              <SettingsRow
+                title="BPM"
+                value={bpm}
+                setter={(e) => setBpm(parseFloat(e))}
+                type="number"
+              />
               <SettingsRow title="Audio Path" value={audioPath} setter={setAudioPath} type="text" />
               <SettingsRow
                 title="Difficulty"
