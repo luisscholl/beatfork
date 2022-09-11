@@ -53,7 +53,7 @@ import Artist from '../../models/Artist';
 import User from '../../models/User';
 import { viewState } from '../../atoms/viewState';
 
-const snappingModuliXY = [0.140625, 0.28125, 0.5625];
+const snappingModuliXY = [0.0109375, 0.21875, 0.4375];
 
 const Editor = () => {
   const auth = useAuth();
@@ -113,7 +113,7 @@ const Editor = () => {
   const sideBarRef = useRef<HTMLDivElement>(null);
   const ground = useRef<{ animate: (t: number) => void }>(null);
 
-  const [snappingModulusXY, setSnappingModulusXY] = useState<0.140625 | 0.28125 | 0.5625>(0.28125);
+  const [snappingModulusXY, setSnappingModulusXY] = useState<0.0109375 | 0.21875 | 0.4375>(0.21875);
   const snapBufferX = useRef<number>(0);
   const snapBufferY = useRef<number>(0);
 
@@ -462,7 +462,7 @@ const Editor = () => {
     }
   };
 
-  const setSnappingXY = (snapTo: 0.140625 | 0.28125 | 0.5625) => {
+  const setSnappingXY = (snapTo: 0.0109375 | 0.21875 | 0.4375) => {
     setSnappingModulusXY(snapTo);
     collectibles.current.setSnappingXY(snapTo);
     collectibles.current.snap(selected.collectibles.current);
@@ -682,7 +682,7 @@ const Editor = () => {
   const renderAtTime = (t: number) => {
     tSince0.current = t;
     ground.current?.animate(t);
-    camera.current?.position.setZ(-settings.editorTimeScaleFactor * t + 2);
+    camera.current?.position.setZ(-settings.editorTimeScaleFactor * t + 2.6);
     placementPlane.current?.position.setZ(-settings.editorTimeScaleFactor * t);
   };
 
@@ -746,7 +746,7 @@ const Editor = () => {
       <Canvas>
         <RecoilBridge>
           <color attach="background" args={['#158ed4']} />
-          <PerspectiveCamera makeDefault position={[0, 0, 2]} rotation={[0, 0, 0]} ref={camera} />
+          <PerspectiveCamera makeDefault position={[0, 0, 3]} rotation={[0, 0, 0]} ref={camera} />
           <directionalLight position={[5, 20, 35]} />
           <mesh position={[0, 0, 0]} rotation={[0, 0, 0]} scale={[10, 10, 1]} ref={placementPlane}>
             <planeBufferGeometry />

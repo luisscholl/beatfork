@@ -35,7 +35,7 @@ export interface EditorCollectiblesRefAttributes {
   select(targets: number[]): void;
   deselect(targets: number[]): void;
   getLastIndex(): number;
-  setSnappingXY(snapTo: 0.140625 | 0.28125 | 0.5625): void;
+  setSnappingXY(snapTo: 0.0109375 | 0.21875 | 0.4375): void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -64,7 +64,7 @@ const EditorCollectibles: ForwardRefExoticComponent<
   const collectibleTypeArray = useRef<Float32Array>(Float32Array.from({ length: 1024 }));
   const isSelectedArray = useRef<Float32Array>(Float32Array.from({ length: 1024 }).fill(0));
   const snappingModulusZ = useRef<number>(undefined);
-  const snappingModulusXY = useRef<number>(0.28125);
+  const snappingModulusXY = useRef<number>(0.21875);
 
   const snapBufferX = useRef<number>(0);
   const snapBufferY = useRef<number>(0);
@@ -279,7 +279,7 @@ const EditorCollectibles: ForwardRefExoticComponent<
     getLastIndex(): number {
       return collectibles.current.length - 1;
     },
-    setSnappingXY(snapTo: 0.140625 | 0.28125 | 0.5625): void {
+    setSnappingXY(snapTo: 0.0109375 | 0.21875 | 0.4375): void {
       snappingModulusXY.current = snapTo;
     }
   }));
