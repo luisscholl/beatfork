@@ -248,40 +248,40 @@ const Gameplay = (props: { debug: boolean }) => {
     }
     const matrix15 = multiplyMatrices(
       [[results.results.poseLandmarks[15].x], [results.poseLandmarks[15].y], [1]],
-      getMatrix
+      getMatrix()
     );
     const matrix16 = multiplyMatrices(
       [[results.results.poseLandmarks[16].x], [results.poseLandmarks[16].y], [1]],
-      getMatrix
+      getMatrix()
     );
     const matrix27 = multiplyMatrices(
       [[results.results.poseLandmarks[27].x], [results.poseLandmarks[27].y], [1]],
-      getMatrix
+      getMatrix()
     );
     const matrix28 = multiplyMatrices(
       [[results.results.poseLandmarks[28].x], [results.poseLandmarks[28].y], [1]],
-      getMatrix
+      getMatrix()
     );
     // Calculate and set position and rotation of holograms
     leftHand.current = {
-      x: (-results.poseLandmarks[15].x + 0.5) * 2 * settings.hologramScale, // Rescaling @ calculateHologramTransform
-      y: (-results.poseLandmarks[15].y + 0.5) * 2 * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      x: matrix15[0] * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      y: matrix15[1] * settings.hologramScale, // Rescaling @ calculateHologramTransform
       z: 1,
       rotation: calculateAngleBetweenTwoPoints(results.poseLandmarks[13], results.poseLandmarks[15])
     };
     leftHandHologramRef.current.position.set(leftHand.current.x, leftHand.current.y, -1);
     // leftHandHologramRef.current.rotation.set(0, 0, leftHand.current.rotation);
     rightHand.current = {
-      x: (-results.poseLandmarks[16].x + 0.5) * 2 * settings.hologramScale, // Rescaling @ calculateHologramTransform
-      y: (-results.poseLandmarks[16].y + 0.5) * 2 * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      x: matrix16[0] * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      y: matrix16[0] * settings.hologramScale, // Rescaling @ calculateHologramTransform
       z: 1,
       rotation: calculateAngleBetweenTwoPoints(results.poseLandmarks[14], results.poseLandmarks[16])
     };
     rightHandHologramRef.current.position.set(rightHand.current.x, rightHand.current.y, -1);
     // rightHandHologramRef.current.rotation.set(0, 0, rightHand.current.rotation);
     leftFoot.current = {
-      x: (-results.poseLandmarks[27].x + 0.5) * 2 * settings.hologramScale, // Rescaling @ calculateHologramTransform
-      y: (-results.poseLandmarks[27].y + 0.5) * 2 * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      x: matrix27[0] * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      y: matrix27[1] * settings.hologramScale, // Rescaling @ calculateHologramTransform
       z: 1,
       rotation:
         calculateAngleBetweenTwoPoints(results.poseLandmarks[25], results.poseLandmarks[27]) +
@@ -290,8 +290,8 @@ const Gameplay = (props: { debug: boolean }) => {
     leftFootHologramRef.current.position.set(leftFoot.current.x, leftFoot.current.y, -1);
     // leftFootHologramRef.current.rotation.set(0, 0, leftFoot.current.rotation);
     rightFoot.current = {
-      x: (-results.poseLandmarks[28].x + 0.5) * 2 * settings.hologramScale, // Rescaling @ calculateHologramTransform
-      y: (-results.poseLandmarks[28].y + 0.5) * 2 * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      x: matrix28[0] * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      y: matrix28[1] * settings.hologramScale, // Rescaling @ calculateHologramTransform
       z: 1,
       rotation:
         calculateAngleBetweenTwoPoints(results.poseLandmarks[26], results.poseLandmarks[28]) +
