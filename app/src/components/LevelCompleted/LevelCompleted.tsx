@@ -12,8 +12,10 @@ const LevelCompleted: FC<LevelCompletedProps> = () => {
 
   return (
     <div className="LevelCompleted" data-testid="LevelCompleted">
-      <div className="level-completed">LEVEL COMPLETED!</div>
-      <div className="end-score">{(view as any).score} Points</div>
+      <div>
+        <p className="level-completed">LEVEL COMPLETED!</p>
+        <p className="end-score">{(view as any).score} Points</p>
+      </div>
       <Link to={`/gameplay/${levelId}/${versionId}`}>Play again!</Link>
       <Link to={view.returnView}>Return</Link>
     </div>
