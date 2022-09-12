@@ -107,6 +107,7 @@
     "rimraf": "^3.0.2",
     "sass-loader": "^10.1.1",
     "shx": "^0.3.4",
+    "storybook-addon-react-router-v6": "^0.2.1",
     "style-loader": "^2.0.0",
     "stylelint": "^14.0.0",
     "stylelint-config-standard-scss": "^2.0.0",
