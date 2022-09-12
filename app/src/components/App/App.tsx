@@ -18,7 +18,6 @@ const App = () => {
   const [view, setView] = useRecoilState(viewState);
   const [levels, setLevels] = useState<Array<Level>>([]);
   const [gameRunning, setGameRunning] = useState(true);
-
   const appWrapper = useRef<HTMLDivElement>();
   //
   //  useEffect(() => {

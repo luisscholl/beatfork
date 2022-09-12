@@ -262,6 +262,7 @@ const CalibrationScene = () => {
     minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5
   });
+  // Results from Media Pipe
   pose.onResults(detectedPose);
 
   useEffect(() => {
