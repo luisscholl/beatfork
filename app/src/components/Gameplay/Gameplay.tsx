@@ -71,11 +71,11 @@ const Gameplay = (props: { debug: boolean }) => {
   const [mediaPipeReady, setMediaPipeReady] = useState<boolean>(false);
   const mediaPipeCamera = useRef<Camera>();
   // MatrixCalibration Variables:
-  let leftBorder = Number.MAX_SAFE_INTEGER;
-  let rightBorder = 0;
-  let topBorder = Number.MAX_SAFE_INTEGER;
-  let bottomBorder = 0;
-  const recordedAngle: number[] = [];
+  const leftBorder = useRef<number>(1);
+  const rightBorder = useRef<number>(0);
+  const topBorder = useRef<number>(1);
+  const bottomBorder = useRef<number>(0);
+  const recordedAngle = useRef<number[]>([]);
   const leftHand = useRef<{
     x: number;
     y: number;
@@ -158,9 +158,9 @@ const Gameplay = (props: { debug: boolean }) => {
       const p15x = p15X * 1;
       const p15y = p15Y * 1;
       const leftWristPoint: [number, number, any] = [p15x, p15y, p15Z];
-      if (leftWristPoint[0] > rightBorder) {
+      if (leftWristPoint[0] > rightBorder.current) {
         // eslint-disable-next-line prefer-destructuring
-        rightBorder = leftWristPoint[0];
+        rightBorder.current = leftWristPoint[0];
       }
       // Right Wrist
       const p16X = results.poseLandmarks[16].x;
@@ -169,61 +169,79 @@ const Gameplay = (props: { debug: boolean }) => {
       const p16x = p16X * 1;
       const p16y = p16Y * 1;
       const rightWristPoint: [number, number, any] = [p16x, p16y, p16Z];
-      if (rightWristPoint[0] < leftBorder) {
+      if (rightWristPoint[0] < leftBorder.current) {
         // eslint-disable-next-line prefer-destructuring
-        leftBorder = rightWristPoint[0];
+        leftBorder.current = rightWristPoint[0];
       }
       const top = (rightWristPoint[1] + leftWristPoint[1]) / 2;
-      if (top < topBorder) {
-        topBorder = top;
+      if (top < topBorder.current) {
+        topBorder.current = top;
       }
       const armsVector: [number, number, any] = [
         leftWristPoint[0] - rightWristPoint[0],
         leftWristPoint[1] - rightWristPoint[1],
         leftWristPoint[2] - rightWristPoint[2]
       ];
-      const ArmsAngle = Math.round(Math.atan2(armsVector[1], armsVector[0]));
-      recordedAngle.push(ArmsAngle);
+      const ArmsAngle = -Math.atan2(armsVector[1], armsVector[0]);
+      recordedAngle.current.push(ArmsAngle);
       const ankleY = results.poseLandmarks[28].y * 1;
-      if (ankleY > bottomBorder) {
-        bottomBorder = ankleY;
+      if (ankleY > bottomBorder.current) {
+        bottomBorder.current = ankleY;
       }
       // Calculate n and f for perspective transformation
-      const n = (1 * 0.5 * (topBorder + bottomBorder)) / Math.tan(Math.max(...recordedAngle));
-      const f = n + (rightBorder - leftBorder);
+      let n =
+        (1 * 0.5 * (topBorder.current + bottomBorder.current)) /
+        Math.tan(Math.max(...recordedAngle.current));
+      n = Math.min(n, Number.MAX_SAFE_INTEGER);
+      n = Math.max(n, -Number.MAX_SAFE_INTEGER);
+      console.log('n :>> ', n);
+      console.log('leftBorder :>> ', leftBorder.current);
+      console.log('rightBorder :>> ', rightBorder.current);
+      console.log('Math.max(...recordedAngle) :>> ', Math.max(...recordedAngle.current));
+      console.log('topBorder :>> ', topBorder.current);
+      console.log('leftWristPoint[1] :>> ', leftWristPoint[1]);
+      console.log('rightWristPoint[1] :>> ', rightWristPoint[1]);
+      console.log('bottomBorder :>> ', bottomBorder.current);
+      const f = n + (rightBorder.current - leftBorder.current);
       // Now we can calculate the perspective Transformation matrix
       const matrixTransl: number[][] = [
-        [1, 0, n - leftBorder], // -1 or - leftBorder
-        [0, 1, -0.5 * (topBorder + bottomBorder)],
+        [1, 0, n - 1], // -1 or - leftBorder
+        [0, 1, -0.5 * (topBorder.current + bottomBorder.current)],
         [0, 0, 1]
       ];
+      console.log('matrixTransl :>> ', matrixTransl);
       const matrixRot: number[][] = [
         [0, 1, 0],
         [-1, 0, 0],
         [0, 0, 1]
       ];
+      console.log('matrixRot :>> ', matrixRot);
       const matrixPersp: number[][] = [
         [1, 0, 0],
         [0, 1 + f / n, f],
         [0, 1 / -n, 0]
       ];
+      console.log('matrixPersp :>> ', matrixPersp);
       const matrixRotInv: number[][] = [
         [0, -1, 0],
         [1, 0, 0],
         [0, 0, 1]
       ];
+      console.log('matrixRotInv :>> ', matrixRotInv);
       const matrixTranslInv: number[][] = [
-        [1, 0, -(n - leftBorder)],
-        [0, 1, 0.5 * (topBorder + bottomBorder)],
+        [1, 0, -(n - leftBorder.current)],
+        [0, 1, 0.5 * (topBorder.current + bottomBorder.current)],
         [0, 0, 1]
       ];
+      console.log('matrixTranslInv :>> ', matrixTranslInv);
       const matrix: number[][] = multiplyMatrices(
         matrixTranslInv,
         multiplyMatrices(
           matrixRotInv,
-          multiplyMatrices(matrixPersp, multiplyMatrices(matrixTransl, matrixRot))
+          multiplyMatrices(matrixPersp, multiplyMatrices(matrixRot, matrixTransl))
         )
       );
+      console.log('matrix :>> ', matrix);
       return matrix;
     }
     function multiplyMatrices(a: number[][], b: number[][]) {
@@ -246,58 +264,75 @@ const Gameplay = (props: { debug: boolean }) => {
       }
       return m;
     }
-    const matrix15 = multiplyMatrices(
-      [[results.results.poseLandmarks[15].x], [results.poseLandmarks[15].y], [1]],
-      getMatrix()
-    );
-    const matrix16 = multiplyMatrices(
-      [[results.results.poseLandmarks[16].x], [results.poseLandmarks[16].y], [1]],
-      getMatrix()
-    );
-    const matrix27 = multiplyMatrices(
-      [[results.results.poseLandmarks[27].x], [results.poseLandmarks[27].y], [1]],
-      getMatrix()
-    );
-    const matrix28 = multiplyMatrices(
-      [[results.results.poseLandmarks[28].x], [results.poseLandmarks[28].y], [1]],
-      getMatrix()
-    );
+    const matrix15 = multiplyMatrices(getMatrix(), [
+      [results.poseLandmarks[15].x],
+      [results.poseLandmarks[15].y],
+      [1]
+    ]);
+    matrix15[0][0] /= matrix15[2][0];
+    matrix15[1][0] /= matrix15[2][0];
+    console.log('-----------');
+    console.log('matrix15 :>> ', matrix15);
+    console.log('getMatrix() :>> ', getMatrix());
+    const matrix16 = multiplyMatrices(getMatrix(), [
+      [results.poseLandmarks[16].x],
+      [results.poseLandmarks[16].y],
+      [1]
+    ]);
+    matrix16[0][0] /= matrix16[2][0];
+    matrix16[1][0] /= matrix16[2][0];
+    const matrix27 = multiplyMatrices(getMatrix(), [
+      [results.poseLandmarks[27].x],
+      [results.poseLandmarks[27].y],
+      [1]
+    ]);
+    matrix27[0][0] /= matrix27[2][0];
+    matrix27[1][0] /= matrix27[2][0];
+    const matrix28 = multiplyMatrices(getMatrix(), [
+      [results.poseLandmarks[28].x],
+      [results.poseLandmarks[28].y],
+      [1]
+    ]);
+    matrix28[0][0] /= matrix28[2][0];
+    matrix28[1][0] /= matrix28[2][0];
     // Calculate and set position and rotation of holograms
     leftHand.current = {
-      x: matrix15[0] * settings.hologramScale, // Rescaling @ calculateHologramTransform
-      y: matrix15[1] * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      x: -(-matrix15[0][0] + 0.5) * 2, // Rescaling @ calculateHologramTransform
+      y: (-matrix15[1][0] + 0.5) * 2, // Rescaling @ calculateHologramTransform
       z: 1,
       rotation: calculateAngleBetweenTwoPoints(results.poseLandmarks[13], results.poseLandmarks[15])
     };
-    leftHandHologramRef.current.position.set(leftHand.current.x, leftHand.current.y, -1);
+    console.log('matrix15 :>> ', matrix15);
+    console.log('leftHand.current :>> ', leftHand.current);
+    leftHandHologramRef.current.position.set(leftHand.current.x, leftHand.current.y, 0);
     // leftHandHologramRef.current.rotation.set(0, 0, leftHand.current.rotation);
     rightHand.current = {
-      x: matrix16[0] * settings.hologramScale, // Rescaling @ calculateHologramTransform
-      y: matrix16[0] * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      x: -(-matrix16[0][0] + 0.5) * 2, // Rescaling @ calculateHologramTransform
+      y: (-matrix16[1][0] + 0.5) * 2, // Rescaling @ calculateHologramTransform
       z: 1,
       rotation: calculateAngleBetweenTwoPoints(results.poseLandmarks[14], results.poseLandmarks[16])
     };
-    rightHandHologramRef.current.position.set(rightHand.current.x, rightHand.current.y, -1);
+    rightHandHologramRef.current.position.set(rightHand.current.x, rightHand.current.y, 0);
     // rightHandHologramRef.current.rotation.set(0, 0, rightHand.current.rotation);
     leftFoot.current = {
-      x: matrix27[0] * settings.hologramScale, // Rescaling @ calculateHologramTransform
-      y: matrix27[1] * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      x: -(-matrix27[0][0] + 0.5) * 2, // Rescaling @ calculateHologramTransform
+      y: (-matrix27[1][0] + 0.5) * 2, // Rescaling @ calculateHologramTransform
       z: 1,
       rotation:
         calculateAngleBetweenTwoPoints(results.poseLandmarks[25], results.poseLandmarks[27]) +
         Math.PI
     };
-    leftFootHologramRef.current.position.set(leftFoot.current.x, leftFoot.current.y, -1);
+    leftFootHologramRef.current.position.set(leftFoot.current.x, leftFoot.current.y, 0);
     // leftFootHologramRef.current.rotation.set(0, 0, leftFoot.current.rotation);
     rightFoot.current = {
-      x: matrix28[0] * settings.hologramScale, // Rescaling @ calculateHologramTransform
-      y: matrix28[1] * settings.hologramScale, // Rescaling @ calculateHologramTransform
+      x: -(-matrix28[0][0] + 0.5) * 2, // Rescaling @ calculateHologramTransform
+      y: (-matrix28[1][0] + 0.5) * 2, // Rescaling @ calculateHologramTransform
       z: 1,
       rotation:
         calculateAngleBetweenTwoPoints(results.poseLandmarks[26], results.poseLandmarks[28]) +
         Math.PI
     };
-    rightFootHologramRef.current.position.set(rightFoot.current.x, rightFoot.current.y, -1);
+    rightFootHologramRef.current.position.set(rightFoot.current.x, rightFoot.current.y, 0);
     // rightFootHologramRef.current.rotation.set(0, 0, rightFoot.current.rotation);
 
     if (landmarkDebugCanvas.current) landmarkDebugCanvas.current.draw(results);
@@ -733,7 +768,7 @@ const Gameplay = (props: { debug: boolean }) => {
         <Suspense fallback={null}>
           <PerspectiveCamera
             makeDefault
-            position={[0, 0, 0.75]}
+            position={[0, 0, 2]}
             rotation={[0, 0, 0]} // x_rot, y_rot, z_rot
           />
           <directionalLight position={[5, 20, 35]} />
