@@ -13,7 +13,7 @@ const PlayerHologram = (props: { threeRef: Ref<Mesh>; icon: string }) => {
   texture.minFilter = THREE.NearestFilter;
 
   return (
-    <mesh ref={props.threeRef}>
+    <mesh ref={props.threeRef} rotation={[0, 0, 0]}>
       <planeBufferGeometry attach="geometry" args={[0.25, 0.25]} />
       <meshStandardMaterial
         attach="material"

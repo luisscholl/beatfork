@@ -131,7 +131,7 @@ const Gameplay = (props: { debug: boolean }) => {
   const [level, setLevel] = useState<Level>();
 
   function detectedPose(results: any) {
-    if (!results.poseLandmarks || !leftHand.current) return;
+    if (!results.poseLandmarks || !leftHand.current || !leftHandHologramRef.current) return;
     setMediaPipeReady(true);
     /**
      * Calculates the angles between two landmarks which are represented as position vectors.
@@ -304,6 +304,7 @@ const Gameplay = (props: { debug: boolean }) => {
     };
     console.log('matrix15 :>> ', matrix15);
     console.log('leftHand.current :>> ', leftHand.current);
+    // leftHandHologramRef.current.position.set(-1, 1, 0);
     leftHandHologramRef.current.position.set(leftHand.current.x, leftHand.current.y, 0);
     // leftHandHologramRef.current.rotation.set(0, 0, leftHand.current.rotation);
     rightHand.current = {
@@ -312,6 +313,7 @@ const Gameplay = (props: { debug: boolean }) => {
       z: 1,
       rotation: calculateAngleBetweenTwoPoints(results.poseLandmarks[14], results.poseLandmarks[16])
     };
+    // rightHandHologramRef.current.position.set(1, 1, 0);
     rightHandHologramRef.current.position.set(rightHand.current.x, rightHand.current.y, 0);
     // rightHandHologramRef.current.rotation.set(0, 0, rightHand.current.rotation);
     leftFoot.current = {
@@ -322,6 +324,7 @@ const Gameplay = (props: { debug: boolean }) => {
         calculateAngleBetweenTwoPoints(results.poseLandmarks[25], results.poseLandmarks[27]) +
         Math.PI
     };
+    // leftFootHologramRef.current.position.set(-1, -1, 0);
     leftFootHologramRef.current.position.set(leftFoot.current.x, leftFoot.current.y, 0);
     // leftFootHologramRef.current.rotation.set(0, 0, leftFoot.current.rotation);
     rightFoot.current = {
@@ -332,6 +335,7 @@ const Gameplay = (props: { debug: boolean }) => {
         calculateAngleBetweenTwoPoints(results.poseLandmarks[26], results.poseLandmarks[28]) +
         Math.PI
     };
+    // rightFootHologramRef.current.position.set(1, -1, 0);
     rightFootHologramRef.current.position.set(rightFoot.current.x, rightFoot.current.y, 0);
     // rightFootHologramRef.current.rotation.set(0, 0, rightFoot.current.rotation);
 
@@ -388,6 +392,7 @@ const Gameplay = (props: { debug: boolean }) => {
       let animationFrameId: number;
       const debugAnimate = async () => {
         if (
+          captureVideo.current &&
           captureVideo.current.currentTime > 0 &&
           !captureVideo.current.paused &&
           !captureVideo.current.ended
@@ -758,8 +763,8 @@ const Gameplay = (props: { debug: boolean }) => {
         <Suspense fallback={null}>
           <PerspectiveCamera
             makeDefault
-            position={[0, 0, 2]}
-            rotation={[0, 0, 0]} // x_rot, y_rot, z_rot
+            position={[0, 0, -2.6]}
+            rotation={[0, Math.PI, 0]} // x_rot, y_rot, z_rot
           />
           <directionalLight position={[5, 20, 35]} />
           <PlayerHologram threeRef={leftHandHologramRef} icon={leftHandThreeURL} />
