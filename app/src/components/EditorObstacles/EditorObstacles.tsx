@@ -94,6 +94,14 @@ const EditorObstacles: ForwardRefExoticComponent<
       obstacle.position.y,
       -settings.editorTimeScaleFactor * obstacle.position.z
     );
+
+    console.log('tempObject');
+    console.log(tempObject);
+    console.log('tempObject.scale');
+    console.log(tempObject.scale);
+    console.log('Obstacle');
+    console.log(obstacle);
+    console.log(obstacle.dimensions);
     tempObject.scale.set(
       obstacle.dimensions.x,
       obstacle.dimensions.y,
@@ -160,9 +168,11 @@ const EditorObstacles: ForwardRefExoticComponent<
       const selected = [];
       for (const target of targets) {
         const pos = obstacles.current[target].position;
+        const dim = obstacles.current[target].dimensions;
         const newCol = {
           type: 'Obstacle',
           position: { x: pos.x, y: pos.y, z: pos.z },
+          dimensions: dim,
           measure: 0, // todo
           beat: 0 // todo
         } as Obstacle;
