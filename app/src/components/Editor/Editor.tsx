@@ -1,27 +1,31 @@
 import { PerspectiveCamera } from '@react-three/drei';
 import { Canvas, ThreeEvent } from '@react-three/fiber';
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCogs,
   faStop,
+  faFolderOpen,
+  faAngry,
   faSave,
   faPlay,
   faPause,
   faTrash,
   faCaretUp,
   faCaretDown,
+  faCoffee,
+  faTable,
   faBorderAll,
+  faMagnet,
   faCopy,
   faToggleOn,
   faToggleOff,
   faThLarge,
+  faTimes,
   faHome,
-  faRunning,
-  faCircle,
-  faPaste,
-  faArchive
+  faRunning
 } from '@fortawesome/free-solid-svg-icons';
+import * as hash from 'object-hash';
 import * as THREE from 'three';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { DoubleSide, Mesh, Raycaster, Vector2 } from 'three';
@@ -45,6 +49,10 @@ import { settingsState } from '../../atoms/settingsState';
 import EditorCollectibles, {
   EditorCollectiblesRefAttributes
 } from '../EditorCollectibles/EditorCollectibles';
+import editorObstacleFragmentShader from '../../shaders/editorObstacleFragmentShader.glsl';
+import editorCollectibleFragmentShader from '../../shaders/editorCollectibleFragmentShader.glsl';
+import editorObstacleVertexShader from '../../shaders/editorObstacleVertexShader.glsl';
+import editorCollectibleVertexShader from '../../shaders/editorCollectibleVertexShader.glsl';
 import EditorSideBarObstacle from '../EditorSideBarObstacle/EditorSideBarObstacle';
 import EditorObstacles, { EditorObstaclesRefAttributes } from '../EditorObstacles/EditorObstacles';
 import SettingsRow from '../SettingsRow/SettingsRow';
@@ -56,6 +64,32 @@ import { viewState } from '../../atoms/viewState';
 const snappingModuliXY = [0.0109375, 0.21875, 0.4375];
 
 const Editor = () => {
+  const shaderData = useMemo(
+    () => ({
+      fragmentShader: editorObstacleFragmentShader,
+      vertexShader: editorObstacleVertexShader,
+      uniforms: {
+        obstacleTexture: {
+          value: new THREE.TextureLoader().load('./assets/obstacles.png')
+        }
+      }
+    }),
+    []
+  );
+
+  const shaderData2 = useMemo(
+    () => ({
+      fragmentShader: editorCollectibleFragmentShader,
+      vertexShader: editorCollectibleVertexShader,
+      uniforms: {
+        collectibleTexture: {
+          value: new THREE.TextureLoader().load('./assets/collectibles.png')
+        }
+      }
+    }),
+    []
+  );
+
   const auth = useAuth();
   const navigate = useNavigate();
   const setView = useSetRecoilState(viewState);
@@ -155,6 +189,26 @@ const Editor = () => {
   const templateIndex = useRef<number>(0);
 
   const [isOpen, setOpen] = useState(JSON.parse(localStorage.getItem('templates')) || false);
+  const itemRenders = useRef(JSON.parse(localStorage.getItem('itemRenders')) || []);
+
+  const sideBarCanvasRef = useRef(Array(10).fill(0));
+
+  const dummyTemplateRef = useRef<HTMLCanvasElement>();
+  const [dummyTemplate, setDummyTemplate] = useState<Array<Collectible | Obstacle>>([]);
+
+  const [renderMap, setRenderMap] = useState(
+    new Map<string, string>(JSON.parse(localStorage.getItem('renderMap')))
+  );
+
+  useEffect(() => {
+    if (dummyTemplate.length !== 0) {
+      console.log(dummyTemplate);
+      for (let v = 0; v < dummyTemplate.length; v += 1) {
+        console.log(dummyTemplate[v]);
+      }
+      saveTemplateRender(dummyTemplate);
+    }
+  }, [dummyTemplate]);
 
   const loadLevel = () => {
     if (
@@ -259,7 +313,7 @@ const Editor = () => {
       // Only left button
       case 1:
         if (selected.collectibles.current.length > 0 || selected.obstacles.current.length > 0) {
-          if (!event.shiftKey) {
+          if (!event.nativeEvent.shiftKey) {
             const movementX = current3DMousePosition.current.x - last3DMousePosition.current.x;
             const movementY = current3DMousePosition.current.y - last3DMousePosition.current.y;
             if (obstaclesResizeFlag.current && obstaclesResizeFlag.current !== 'do-not-resize') {
@@ -275,7 +329,7 @@ const Editor = () => {
         if (selected.collectibles.current.length > 0 || selected.obstacles.current.length > 0) {
           const distance = -(event.movementY / window.innerHeight) * 20;
           if (obstaclesResizeFlag.current && obstaclesResizeFlag.current !== 'do-not-resize') {
-            if (event.shiftKey) {
+            if (event.nativeEvent.shiftKey) {
               resizeSelectedObstacles({ z: distance }, obstaclesResizeFlag.current, true);
             } else {
               resizeSelectedObstacles({ z: distance }, obstaclesResizeFlag.current);
@@ -617,66 +671,288 @@ const Editor = () => {
   };
 
   const templateToggleSwitch = () => {
+    saveSidebarRender();
+
     setTemplateToggle(!templateToggle);
 
     setSideBarItems(!templateToggle ? templateTypes : itemTypes);
   };
 
-  const mapSidebarItem = (type: number | Array<Collectible | Obstacle>) => {
-    if (typeof type === 'number') {
+  const deleteTemplate = (type: Array<Collectible | Obstacle>) => {
+    for (let f = 0; f < templateTypes.length; f += 1) {
+      if (templateTypes[f] === type) {
+        const templateHash = hash.sha1(type);
+        const tempTypes = templateTypes;
+
+        tempTypes.splice(f, 1);
+
+        setRenderMap(new Map(renderMap.set(templateHash, '')));
+        renderMap.delete(templateHash);
+
+        localStorage.setItem('renderMap', JSON.stringify(Array.from(renderMap.entries())));
+
+        setTemplateType(tempTypes);
+        setSideBarItems(tempTypes);
+
+        localStorage.setItem('templates', JSON.stringify(tempTypes));
+      }
+    }
+    return 1;
+  };
+
+  const mapSidebarItem = (type: number | Array<Collectible | Obstacle>, index: number) => {
+    if (typeof type === 'number' && itemRenders.current[type]) {
       if (type === 0) {
         return (
-          <button type="button" onMouseDown={(event) => onSidebarObstacleMouseDown(event)}>
-            <EditorSideBarObstacle />
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+              <button
+                style={{ marginRight: '0px', marginBottom: '0px' }}
+                type="button"
+                onMouseDown={(event) => onSidebarObstacleMouseDown(event)}>
+                <img src={itemRenders.current[type]} alt="object" />
+              </button>
+            </div>
+            <p style={{ textAlign: 'center' }}>Obstacle</p>
+          </div>
+        );
+      }
+
+      return (
+        <div>
+          <button
+            type="button"
+            onMouseDown={(event) => onSidebarCollectibleMouseDown(event, type as CollectibleType)}>
+            <img src={itemRenders.current[type]} alt="object" />
           </button>
+          {type === CollectibleType.All && <p style={{ textAlign: 'center' }}>Basic Collectible</p>}
+          {type === CollectibleType.Hands && (
+            <p style={{ textAlign: 'center' }}>Hands Collectible</p>
+          )}
+          {type === CollectibleType.Feet && <p style={{ textAlign: 'center' }}>Feet Collectible</p>}
+          {type === CollectibleType.Left && (
+            <p style={{ textAlign: 'center' }}>Left Side Collectible</p>
+          )}
+          {type === CollectibleType.Right && (
+            <p style={{ textAlign: 'center' }}>Right Side Collectible</p>
+          )}
+          {type === CollectibleType.LeftHand && (
+            <p style={{ textAlign: 'center' }}>Left Hand Collectible</p>
+          )}
+          {type === CollectibleType.RightHand && (
+            <p style={{ textAlign: 'center' }}>Right Hand Collectible</p>
+          )}
+          {type === CollectibleType.LeftFoot && (
+            <p style={{ textAlign: 'center' }}>Left Foot Collectible</p>
+          )}
+          {type === CollectibleType.RightFoot && (
+            <p style={{ textAlign: 'center' }}>Right Foot Collectible</p>
+          )}
+        </div>
+      );
+    }
+    if (typeof type === 'number') {
+      const a = renderSidebarItem(type);
+      return a;
+    }
+
+    if (Array.isArray(type)) {
+      console.log('Rendering Template');
+      const templateHash = hash.sha1(type);
+      return (
+        <div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+            <button type="button" onMouseDown={(event) => onSidebarTemplateMouseDown(event, type)}>
+              <img src={renderMap.get(templateHash)} alt="object" />
+            </button>
+            <button
+              style={{ marginRight: '40px' }}
+              type="button"
+              onClick={() => deleteTemplate(type)}>
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+          </div>
+          <hr
+            style={{
+              height: '3px'
+            }}
+          />
+        </div>
+      );
+    }
+
+    return 1;
+  };
+
+  const mapTemplatePart = (template: Collectible | Obstacle) => {
+    // const x = template.position.x;
+    // const y = template.position.y;
+    // const z = template.position.z;
+
+    const { x, y, z } = template.position;
+    const xScaled = x / 10;
+    const yScaled = y / 10;
+    const zScaled = z / 10;
+    const boxSize = 0.05;
+
+    if (template.type === 'Obstacle') {
+      return [
+        <mesh position={[xScaled, yScaled, zScaled]}>
+          <boxBufferGeometry args={[boxSize, boxSize, boxSize]} attach="geometry" />
+          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+          <shaderMaterial attach="material" {...shaderData} />
+        </mesh>,
+        <PerspectiveCamera makeDefault position={[0, 0, 0.55]} rotation={[0, 0, 0]} />
+      ];
+    }
+
+    return [
+      <mesh position={[xScaled, yScaled, zScaled]}>
+        <boxBufferGeometry args={[boxSize, boxSize, boxSize]} attach="geometry">
+          <instancedBufferAttribute
+            attachObject={['attributes', 'collectibleType']}
+            args={[Float32Array.from([template.collectibleType]), 1]}
+          />
+        </boxBufferGeometry>
+        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+        <shaderMaterial attach="material" {...shaderData2} />
+      </mesh>,
+      <PerspectiveCamera makeDefault position={[0, 0, 0.55]} rotation={[0, 0, 0]} />
+    ];
+  };
+
+  const renderSidebarItem = (template: number) => {
+    if (typeof template === 'number') {
+      if (template === 0) {
+        return (
+          <div className="EditorSideBarObstacle" data-testid="EditorSideBarObstacle">
+            <button type="button" onMouseDown={(event) => onSidebarObstacleMouseDown(event)}>
+              <Canvas
+                gl={{ preserveDrawingBuffer: true }}
+                ref={(element) => {
+                  sideBarCanvasRef.current[template] = element;
+                }}>
+                <mesh position={[0.0, 0, 0]}>
+                  <boxBufferGeometry args={[0.25, 0.25, 0.25]} attach="geometry" />
+                  {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                  <shaderMaterial attach="material" {...shaderData} />
+                </mesh>
+                <PerspectiveCamera makeDefault position={[0, 0, 0.55]} rotation={[0, 0, 0]} />
+                <directionalLight position={[-5, 20, -35]} />
+              </Canvas>
+            </button>
+            <p style={{ textAlign: 'center' }}>Obstacle</p>
+          </div>
         );
       }
       return (
-        <button
-          key={type}
-          type="button"
-          onMouseDown={(event) => onSidebarCollectibleMouseDown(event, type as CollectibleType)}>
-          <EditorSideBarCollectible type={type as CollectibleType} />
-        </button>
+        <div className="EditorSideBarCollectible" data-testid="EditorSideBarCollectible">
+          <button
+            key={template}
+            type="button"
+            onMouseDown={(event) =>
+              onSidebarCollectibleMouseDown(event, template as CollectibleType)
+            }>
+            <Canvas
+              gl={{ preserveDrawingBuffer: true }}
+              ref={(element) => {
+                sideBarCanvasRef.current[template] = element;
+              }}>
+              <mesh position={[0, 0, 0]}>
+                <boxBufferGeometry args={[0.25, 0.25, 0.25]} attach="geometry">
+                  <instancedBufferAttribute
+                    attachObject={['attributes', 'collectibleType']}
+                    args={[Float32Array.from([template]), 1]}
+                  />
+                </boxBufferGeometry>
+                {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                <shaderMaterial attach="material" {...shaderData2} />
+              </mesh>
+              <PerspectiveCamera makeDefault position={[0, 0, 0.55]} rotation={[0, 0, 0]} />
+              <directionalLight position={[-5, 20, -35]} />
+            </Canvas>
+          </button>
+          {template === CollectibleType.All && (
+            <p style={{ textAlign: 'center' }}>Basic Collectible</p>
+          )}
+          {template === CollectibleType.Hands && (
+            <p style={{ textAlign: 'center' }}>Hands Collectible</p>
+          )}
+          {template === CollectibleType.Feet && (
+            <p style={{ textAlign: 'center' }}>Feet Collectible</p>
+          )}
+          {template === CollectibleType.Left && (
+            <p style={{ textAlign: 'center' }}>Left Side Collectible</p>
+          )}
+          {template === CollectibleType.Right && (
+            <p style={{ textAlign: 'center' }}>Right Side Collectible</p>
+          )}
+          {template === CollectibleType.LeftHand && (
+            <p style={{ textAlign: 'center' }}>Left Hand Collectible</p>
+          )}
+          {template === CollectibleType.RightHand && (
+            <p style={{ textAlign: 'center' }}>Right Hand Collectible</p>
+          )}
+          {template === CollectibleType.LeftFoot && (
+            <p style={{ textAlign: 'center' }}>Left Foot Collectible</p>
+          )}
+          {template === CollectibleType.RightFoot && (
+            <p style={{ textAlign: 'center' }}>Right Foot Collectible</p>
+          )}
+        </div>
       );
     }
-    return mapSidebarTemplate(type);
+    return 1;
   };
 
-  const mapSidebarTemplate = (type: Array<Collectible | Obstacle>) => {
-    templateIndex.current += 1;
+  const saveSidebarRender = () => {
+    sideBarCanvasRef.current = sideBarCanvasRef.current.filter((n) => n && n !== 0);
+    const itemDataURLs = sideBarCanvasRef.current.map((x) => x.toDataURL());
 
-    return (
-      <button
-        key={1}
-        type="button"
-        style={{ fontSize: '150%' }}
-        onMouseDown={(event) => onSidebarTemplateMouseDown(event, type)}>
-        {templateIndex.current}
-      </button>
-    );
+    if (itemDataURLs.length !== 0) {
+      localStorage.setItem('itemRenders', JSON.stringify(itemDataURLs));
+      itemRenders.current = itemDataURLs;
+    }
+
+    return 1;
   };
 
   const saveTemplate = () => {
+    const obstTemplate = levelObjectRefs.obstacles.current.copy(selected.obstacles.current, false);
+
     const collTemplate = levelObjectRefs.collectibles.current.copy(
       selected.collectibles.current,
       false
     );
-    const obstTemplate = levelObjectRefs.obstacles.current.copy(selected.obstacles.current, false);
 
     const template = [...collTemplate, ...obstTemplate];
 
     templateTypes.push(template);
-    const templates = JSON.parse(localStorage.getItem('templates'));
-    if (templates === null) {
-      localStorage.setItem('templates', JSON.stringify([template]));
-      setTemplateType([template]);
-    } else {
-      localStorage.setItem('templates', JSON.stringify([...templates, template]));
-      setTemplateType([...templates, template]);
-    }
 
-    // localStorage.setItem("templates", JSON.stringify());
+    const templates = JSON.parse(localStorage.getItem('templates')) || [];
+    localStorage.setItem('templates', JSON.stringify([...templates, template]));
+
+    setDummyTemplate(template);
+  };
+
+  const saveTemplateRender = (template: Array<Obstacle | Collectible>) => {
+    const newTemplateURL = dummyTemplateRef.current.toDataURL();
+
+    const templateHash = hash.sha1(template);
+
+    setRenderMap(new Map(renderMap.set(templateHash, newTemplateURL)));
+
+    localStorage.setItem('renderMap', JSON.stringify(Array.from(renderMap.entries())));
   };
 
   const renderAtTime = (t: number) => {
@@ -889,8 +1165,9 @@ const Editor = () => {
             {/* <button type="button" onClick={() => console.log('todo: implement pasting')}>
               <FontAwesomeIcon icon={faPaste} />
             </button> */}
-            <button className="" type="button" onClick={saveTemplate}>
-              <FontAwesomeIcon icon={faArchive} />
+            <button className="" type="button" onClick={saveTemplate} style={{ fontSize: '150%' }}>
+              <FontAwesomeIcon style={{ width: '50%' }} icon={faSave} />
+              <FontAwesomeIcon style={{ width: '20%' }} icon={faThLarge} />
             </button>
           </div>
           <div className="others">
@@ -948,6 +1225,15 @@ const Editor = () => {
           </div>
         )}
       </div>
+      <button
+        key={1}
+        type="button"
+        style={{ fontSize: '150%' }}
+        onMouseDown={(event) => onSidebarTemplateMouseDown(event, dummyTemplate)}>
+        <Canvas gl={{ preserveDrawingBuffer: true }} ref={dummyTemplateRef}>
+          {dummyTemplate.map(mapTemplatePart)}
+        </Canvas>
+      </button>
     </div>
   );
 };
