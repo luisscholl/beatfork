@@ -2,9 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
 import { RecoilRoot } from 'recoil';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from 'react-oidc-context';
-import ReactMarkdown from 'react-markdown';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import App from './components/App/App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
@@ -22,6 +21,8 @@ import LazyMarkdown from './components/LazyMarkdown/LazyMarkdown';
 import Editor from './components/Editor/Editor';
 import GameOver from './components/GameOver/GameOver';
 import LevelCompleted from './components/LevelCompleted/LevelCompleted';
+import MyLevels from './components/MyLevels/MyLevels';
+import Home from './components/Home/Home';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -34,9 +35,9 @@ ReactDOM.render(
               <Route path="/close-account" element={<CloseAccount />} />
               <Route index element={<Navigate to={`/about${window.location.search}`} />} />
               <Route path="/about" element={<About />} />
-              <Route path="/home" element={<Browse />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/browse" element={<Browse />} />
-              <Route path="/my-levels" element={<Browse />} />
+              <Route path="/my-levels" element={<MyLevels />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/legal" element={<Legal />}>
                 <Route index element={<Navigate to="/legal/credits" />} />
@@ -67,14 +68,15 @@ ReactDOM.render(
                 />
                 <Route path="/legal/treat" element={<LazyMarkdown url="/legal/treat.md" />} />
               </Route>
-              <Route path="/game-over" element={<GameOver />} />
-              <Route path="/level-completed" element={<LevelCompleted />} />
+              <Route path="/game-over/:levelId/:versionId" element={<GameOver />} />
+              <Route path="/level-completed/:levelId/:versionId" element={<LevelCompleted />} />
             </Route>
             <Route
               path="/gameplay/:levelId/:versionId"
               element={<Gameplay debug={!!process.env.REACT_APP_DEBUG} />}
             />
             <Route path="/edit" element={<Editor />} />
+            <Route path="/edit/:levelId/:versionId" element={<Editor />} />
             <Route path="/calibration" element={<CalibrationScene />} />
           </Routes>
         </Router>

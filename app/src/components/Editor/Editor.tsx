@@ -5,31 +5,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCogs,
   faStop,
-  faFolderOpen,
-  faAngry,
   faSave,
   faPlay,
   faPause,
   faTrash,
   faCaretUp,
   faCaretDown,
-  faCoffee,
-  faTable,
   faBorderAll,
-  faMagnet,
   faCopy,
   faToggleOn,
   faToggleOff,
-  faThLarge
+  faThLarge,
+  faHome,
+  faRunning,
+  faCircle,
+  faPaste,
+  faArchive
 } from '@fortawesome/free-solid-svg-icons';
 import * as THREE from 'three';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { DoubleSide, Mesh, Raycaster, Vector2 } from 'three';
 import { generateUUID } from 'three/src/math/MathUtils';
-import { saveAs } from 'file-saver';
+import { useAuth } from 'react-oidc-context';
 import {
   // eslint-disable-next-line camelcase
   useRecoilBridgeAcrossReactRoots_UNSTABLE,
-  useRecoilValue
+  useRecoilValue,
+  useSetRecoilState
 } from 'recoil';
 import { Howl } from 'howler';
 import Collectible, { CollectibleType } from '../../models/Collectible';
@@ -46,8 +48,20 @@ import EditorCollectibles, {
 import EditorSideBarObstacle from '../EditorSideBarObstacle/EditorSideBarObstacle';
 import EditorObstacles, { EditorObstaclesRefAttributes } from '../EditorObstacles/EditorObstacles';
 import SettingsRow from '../SettingsRow/SettingsRow';
+import { LevelService } from '../../services/LevelService';
+import Artist from '../../models/Artist';
+import User from '../../models/User';
+import { viewState } from '../../atoms/viewState';
+
+const snappingModuliXY = [0.0109375, 0.21875, 0.4375];
 
 const Editor = () => {
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const setView = useSetRecoilState(viewState);
+  const { levelId, versionId } = useParams();
+  const lastLevelIdAndVersionId = useRef<string>('null');
+
   const settings = useRecoilValue(settingsState);
   const RecoilBridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
 
@@ -57,6 +71,7 @@ const Editor = () => {
   const [id, setId] = useState<string>(generateUUID());
   const [title, setTitle] = useState<string>('My Level');
   const [bpm, setBpm] = useState<number>(120);
+  const [difficulty, setDifficulty] = useState<number>(1);
   const audio = useRef<Howl>(null);
   const [audioPath, setAudioPath] = useState<string>('/levels/Für Elise/silence.mp3');
   // Holds indexes of selected collectibles and obstacles
@@ -71,14 +86,26 @@ const Editor = () => {
   >(undefined);
   const scrollSideBarTop = useRef<number>(0);
   // When snapping is activated, level objects will only be moved once a certain threshold of movement was crossed. Especially when this threshold is not crossed in a single event, the distance needs to be buffered for subsequent events regarding the same set of events. Otherwise the level objects would never move.
-  const [snapBuffer, setSnapBuffer] = useState<number>();
   // todo: Reset snapBuffers, when user changes the selection?
-  const [importedFile, setFile] = useState<File>();
+  // const [importedFile, setFile] = useState<File>();
   const [snappingDivider, setSnappingDivider] = useState<4 | 8 | 16 | 32>();
   const [tripletSnappingDivider, setTripletSnappingDivider] = useState<1 | 1.5>(1);
+  const [snapMenuActive, setSnapMenuActive] = useState<boolean>(false);
 
   const collectibles = useRef<EditorCollectiblesRefAttributes>(null);
+  const collectiblesCb = useCallback((node) => {
+    if (node) {
+      collectibles.current = node;
+      loadLevel();
+    }
+  }, []);
   const obstacles = useRef<EditorObstaclesRefAttributes>(null);
+  const obstaclesCb = useCallback((node) => {
+    if (node) {
+      obstacles.current = node;
+      loadLevel();
+    }
+  }, []);
   const levelObjectRefs = {
     collectibles,
     obstacles
@@ -86,10 +113,9 @@ const Editor = () => {
   const sideBarRef = useRef<HTMLDivElement>(null);
   const ground = useRef<{ animate: (t: number) => void }>(null);
 
-  const [snappingModulusxy, setSnappingModulusxy] = useState<0.1 | 0.3 | 0.5>(0.3);
-  // const snappingModulusxy = useState<number>(0.2);
-  const snapBufferx = useRef<number>(0);
-  const snapBuffery = useRef<number>(0);
+  const [snappingModulusXY, setSnappingModulusXY] = useState<0.0109375 | 0.21875 | 0.4375>(0.21875);
+  const snapBufferX = useRef<number>(0);
+  const snapBufferY = useRef<number>(0);
 
   // Using just useRef would result in ground.current being undefined on the first frame.
   // Note that we don't need to useCallback for the other things rendered in animate as they are either non-existent on the first frame or already at their correct position.
@@ -116,9 +142,6 @@ const Editor = () => {
   const fileInput = useRef<HTMLInputElement>();
   const animationFrameRequest = useRef<number>(null);
 
-  const renderer = new THREE.WebGLRenderer({
-    preserveDrawingBuffer: true
-  });
   const itemTypes = Array.from({ length: 10 }, (e, i) => i);
 
   const [templateTypes, setTemplateType] = useState<Array<Array<Collectible | Obstacle>>>(
@@ -133,31 +156,66 @@ const Editor = () => {
 
   const [isOpen, setOpen] = useState(JSON.parse(localStorage.getItem('templates')) || false);
 
-  // load level from file
-  useEffect(() => {
-    if (importedFile) {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        // todo: More rigorous checks?
-        const levelData = JSON.parse(e.target.result as string);
+  const loadLevel = () => {
+    if (
+      `${levelId}:${versionId}` === lastLevelIdAndVersionId.current ||
+      !collectibles.current ||
+      !obstacles.current
+    )
+      return;
+    const temporaryLevel = LevelService.getTemporaryLevel();
+    if (!levelId || !versionId) {
+      if (temporaryLevel) {
+        // no level in db, but temporary level
+        setTitle(temporaryLevel.title);
+        setBpm(temporaryLevel.bpm);
+        collectibles.current.remove(
+          Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
+        );
+        obstacles.current.remove(
+          Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
+        );
+        temporaryLevel.versions['1'].objects.forEach((f: Collectible | Obstacle) => {
+          if (f.type === 'Collectible') {
+            collectibles.current.addCollectible(f);
+          } else if (f.type === 'Obstacle') {
+            obstacles.current.addObstacle(f);
+          }
+        });
+        if (temporaryLevel.audioLinks.length > 0) setAudioPath(temporaryLevel.audioLinks[0]);
+        renderAtTime(0);
+      }
+    } else {
+      lastLevelIdAndVersionId.current = `${levelId}:${versionId}`;
+      LevelService.get(levelId, versionId).then((levelData) => {
         if (levelData.id) setId(levelData.id);
-        if (levelData.title) setTitle(levelData.title);
-        if (levelData.bpm) setBpm(levelData.bpm);
-        if (levelData.objects && Array.isArray(levelData.objects)) {
-          levelData.objects.forEach((f: Collectible | Obstacle) => {
+        if (levelData.title) setTitle((temporaryLevel || levelData).title);
+        if (levelData.bpm) setBpm((temporaryLevel || levelData).bpm);
+        collectibles.current.remove(
+          Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
+        );
+        obstacles.current.remove(
+          Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
+        );
+        (temporaryLevel || levelData).versions[temporaryLevel ? '1' : versionId].objects.forEach(
+          (f: Collectible | Obstacle) => {
             if (f.type === 'Collectible') {
               collectibles.current.addCollectible(f);
             } else if (f.type === 'Obstacle') {
               obstacles.current.addObstacle(f);
             }
-          });
-        }
-        if (levelData.audio) setAudioPath(levelData.audio);
+          }
+        );
+        if ((temporaryLevel || levelData).audioLinks.length > 0)
+          setAudioPath((temporaryLevel || levelData).audioLinks[0]);
         renderAtTime(0);
-      };
-      reader.readAsText(importedFile);
+      });
     }
-  }, [importedFile]);
+    LevelService.setTemporaryLevel(null);
+  };
+
+  // Load level
+  useEffect(loadLevel, [levelId, versionId]);
 
   // Load audio file
   useEffect(() => {
@@ -282,9 +340,7 @@ const Editor = () => {
     collectibles.current.deselect(selected.collectibles.current);
     obstacles.current.deselect(selected.obstacles.current);
     collectibles.current.select([-1]);
-    if (snappingDivider) {
-      collectibles.current.snap([-1]);
-    }
+    collectibles.current.snap([-1]);
   };
 
   const onSidebarTemplateMouseDown = (
@@ -296,13 +352,11 @@ const Editor = () => {
     // localStorage.clear();
 
     for (const elem of template) {
-      // console.log(elem.position);
       const pos = {
         x: elem.position.x,
         y: elem.position.y,
         z: elem.position.z
       };
-      console.log(pos);
       pos.z /= -settings.editorTimeScaleFactor;
       if (elem.type === 'Collectible') {
         collectibles.current.addCollectible({
@@ -382,14 +436,14 @@ const Editor = () => {
     corner: 'upper-left' | 'upper-right' | 'lower-left' | 'lower-right',
     reverseZ = false
   ) => {
-    distance.x += snapBufferx.current;
-    distance.y += snapBuffery.current;
-    const distanceRemainderx = distance.x % snappingModulusxy;
-    const distanceRemaindery = distance.y % snappingModulusxy;
+    distance.x += snapBufferX.current;
+    distance.y += snapBufferY.current;
+    const distanceRemainderx = distance.x % snappingModulusXY;
+    const distanceRemaindery = distance.y % snappingModulusXY;
     distance.x -= distanceRemainderx;
     distance.y -= distanceRemaindery;
-    snapBufferx.current = distanceRemainderx;
-    snapBuffery.current = distanceRemaindery;
+    snapBufferX.current = distanceRemainderx;
+    snapBufferY.current = distanceRemaindery;
     const d: Vector3D = { x: 0, y: 0, z: 0, ...distance };
     levelObjectRefs.obstacles.current.resizeBy(selected.obstacles.current, d, corner, reverseZ);
   };
@@ -408,9 +462,10 @@ const Editor = () => {
     }
   };
 
-  const setSnappingxy = (snapTo: 0.1 | 0.3 | 0.5) => {
-    setSnappingModulusxy(snapTo);
-    collectibles.current.setSnappingxy(snapTo);
+  const setSnappingXY = (snapTo: 0.0109375 | 0.21875 | 0.4375) => {
+    setSnappingModulusXY(snapTo);
+    collectibles.current.setSnappingXY(snapTo);
+    collectibles.current.snap(selected.collectibles.current);
   };
 
   const copy = () => {
@@ -452,26 +507,85 @@ const Editor = () => {
     setPlaying(false);
   };
 
-  const openLoadDialog = () => {
-    fileInput.current.click();
+  const save = async () => {
+    const objects = [collectibles.current.export(), obstacles.current.export()]
+      .flat()
+      .sort((a, b) => a.position.z - b.position.z);
+    if (!auth.isAuthenticated) {
+      // todo: Warn user that level upload is only possible while logged in.
+      return;
+    }
+    const isAuthor = levelId && (await LevelService.isAuthor(levelId));
+    if (levelId && isAuthor && versionId) {
+      LevelService.updateVersion(
+        levelId,
+        {
+          id: versionId,
+          difficulty,
+          objects
+        },
+        title,
+        bpm,
+        audioPath
+      );
+    } else {
+      const level = {
+        title,
+        bpm,
+        published: false,
+        artistIds: [] as string[],
+        versions: [
+          {
+            id: 1,
+            difficulty,
+            objects
+          }
+        ],
+        audioLinks: [audioPath],
+        length: audio.current.duration()
+      };
+      LevelService.upload(level).then((result) => {
+        if (result.ok) {
+          result.json().then((levelInfo) => {
+            window.history.pushState('', '', `/edit/${levelInfo.id}/1`);
+            window.history.forward();
+            window.location.reload();
+          });
+        }
+      });
+    }
   };
 
-  const save = () => {
+  const switchToGameplay = () => {
     const objects = [collectibles.current.export(), obstacles.current.export()]
       .flat()
       .sort((a, b) => a.position.z - b.position.z);
     const level = {
-      id,
+      id: 'preview',
       title,
       bpm,
-      objects,
-      audio: audioPath
+      published: false,
+      averageRating: 0,
+      artists: [] as Artist[],
+      author: null as User,
+      versions: {
+        '1': {
+          id: '1',
+          difficulty,
+          objects
+        }
+      },
+      audioLinks: [audioPath],
+      length: audio.current.duration()
     };
-    const fileForExport = new Blob([JSON.stringify(level, null, 2)], {
-      type: 'application/json'
+    LevelService.setTemporaryLevel(level);
+    setView((old) => {
+      return {
+        ...old,
+        returnView: levelId && versionId ? `/edit/${levelId}/${versionId}` : '/edit'
+      };
     });
-    const fileTitle = `${title}.json`;
-    saveAs(fileForExport, fileTitle);
+    navigate('/gameplay/preview/1');
   };
 
   const animate = () => {
@@ -510,7 +624,6 @@ const Editor = () => {
 
   const mapSidebarItem = (type: number | Array<Collectible | Obstacle>) => {
     if (typeof type === 'number') {
-      console.log(type);
       if (type === 0) {
         return (
           <button type="button" onMouseDown={(event) => onSidebarObstacleMouseDown(event)}>
@@ -531,7 +644,6 @@ const Editor = () => {
   };
 
   const mapSidebarTemplate = (type: Array<Collectible | Obstacle>) => {
-    console.log(type);
     templateIndex.current += 1;
 
     return (
@@ -570,7 +682,7 @@ const Editor = () => {
   const renderAtTime = (t: number) => {
     tSince0.current = t;
     ground.current?.animate(t);
-    camera.current?.position.setZ(-settings.editorTimeScaleFactor * t + 2);
+    camera.current?.position.setZ(-settings.editorTimeScaleFactor * t + 2.6);
     placementPlane.current?.position.setZ(-settings.editorTimeScaleFactor * t);
   };
 
@@ -596,6 +708,33 @@ const Editor = () => {
     }
   };
 
+  const snapMenuOnWheel = (event: React.WheelEvent) => {
+    event.stopPropagation();
+    if (event.deltaY < 0) {
+      switch (snappingModulusXY) {
+        case snappingModuliXY[1]:
+          setSnappingXY(snappingModuliXY[0] as any);
+          break;
+        case snappingModuliXY[2]:
+          setSnappingXY(snappingModuliXY[1] as any);
+          break;
+        default:
+          break;
+      }
+    } else {
+      switch (snappingModulusXY) {
+        case snappingModuliXY[0]:
+          setSnappingXY(snappingModuliXY[1] as any);
+          break;
+        case snappingModuliXY[1]:
+          setSnappingXY(snappingModuliXY[2] as any);
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
   return (
     <div
       className="Editor"
@@ -607,7 +746,7 @@ const Editor = () => {
       <Canvas>
         <RecoilBridge>
           <color attach="background" args={['#158ed4']} />
-          <PerspectiveCamera makeDefault position={[0, 0, 2]} rotation={[0, 0, 0]} ref={camera} />
+          <PerspectiveCamera makeDefault position={[0, 0, 3]} rotation={[0, 0, 0]} ref={camera} />
           <directionalLight position={[5, 20, 35]} />
           <mesh position={[0, 0, 0]} rotation={[0, 0, 0]} scale={[10, 10, 1]} ref={placementPlane}>
             <planeBufferGeometry />
@@ -615,13 +754,13 @@ const Editor = () => {
           </mesh>
           <Ground ref={groundCallback} bpm={bpm} timeScaleFactor={settings.editorTimeScaleFactor} />
           <EditorCollectibles
-            ref={collectibles}
+            ref={collectiblesCb}
             onClick={selectLevelObject}
             selected={selected.collectibles}
-            snappingModulusxy={snappingModulusxy}
+            snappingModulusXY={snappingModulusXY}
           />
           <EditorObstacles
-            ref={obstacles}
+            ref={obstaclesCb}
             triggerSelectLevelObject={selectLevelObject}
             obstaclesResizeFlag={obstaclesResizeFlag}
             selected={selected.obstacles}
@@ -699,54 +838,76 @@ const Editor = () => {
               onClick={() => toggleTripletSnapping()}>
               <MusicIcon type="triplet" />
             </button>
-            <button
-              className={snappingModulusxy === 0.1 ? 'active' : ''}
-              type="button"
-              style={{ fontSize: '150%' }}
-              onClick={() => setSnappingxy(0.1)}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />1
+            <div
+              className={`xy-snap-menu ${snapMenuActive ? 'active' : ''}`}
+              onClick={(e) => setSnapMenuActive((old) => !old)}
+              onWheel={(e) => snapMenuOnWheel(e)}>
+              <button type="button">
+                {snappingModulusXY === snappingModuliXY[0] && (
+                  <img src="/assets/grid-icon-1.svg" alt="grid size 1" />
+                )}
+                {snappingModulusXY === snappingModuliXY[1] && (
+                  <img src="/assets/grid-icon-2.svg" alt="grid size 1" />
+                )}
+                {snappingModulusXY === snappingModuliXY[2] && (
+                  <img src="/assets/grid-icon-3.svg" alt="grid size 1" />
+                )}
+              </button>
+              <div className="dropdown">
+                <button
+                  className={snappingModulusXY === snappingModuliXY[0] ? 'active' : ''}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSnappingXY(snappingModuliXY[0] as any);
+                  }}>
+                  <img src="/assets/grid-icon-1.svg" alt="grid size 1" />
+                </button>
+                <button
+                  className={snappingModulusXY === snappingModuliXY[1] ? 'active' : ''}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSnappingXY(snappingModuliXY[1] as any);
+                  }}>
+                  <img src="/assets/grid-icon-2.svg" alt="grid size 2" />
+                </button>
+                <button
+                  className={snappingModulusXY === snappingModuliXY[2] ? 'active' : ''}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSnappingXY(snappingModuliXY[2] as any);
+                  }}>
+                  <img src="/assets/grid-icon-3.svg" alt="grid size 3" />
+                </button>
+              </div>
+            </div>
+            <button type="button" onClick={() => copy()}>
+              <FontAwesomeIcon icon={faCopy} />
             </button>
-            <button
-              className={snappingModulusxy === 0.3 ? 'active' : ''}
-              type="button"
-              style={{ fontSize: '150%' }}
-              onClick={() => setSnappingxy(0.3)}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />2
-            </button>
-            <button
-              className={snappingModulusxy === 0.5 ? 'active' : ''}
-              type="button"
-              style={{ fontSize: '150%' }}
-              onClick={() => setSnappingxy(0.5)}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faBorderAll} />3
-            </button>
-            <button className="" type="button" style={{ fontSize: '150%' }} onClick={() => copy()}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faCopy} />
-            </button>
-            <button className="" type="button" onClick={saveTemplate} style={{ fontSize: '150%' }}>
-              <FontAwesomeIcon style={{ width: '50%' }} icon={faSave} />
-              <FontAwesomeIcon style={{ width: '20%' }} icon={faThLarge} />
+            {/* <button type="button" onClick={() => console.log('todo: implement pasting')}>
+              <FontAwesomeIcon icon={faPaste} />
+            </button> */}
+            <button className="" type="button" onClick={saveTemplate}>
+              <FontAwesomeIcon icon={faArchive} />
             </button>
           </div>
           <div className="others">
+            <Link to="/browse">
+              <FontAwesomeIcon icon={faHome} />
+            </Link>
             <button type="button" onClick={() => toggleSettings()}>
               <FontAwesomeIcon icon={faCogs} />
             </button>
-            <button type="button" onClick={() => stop()}>
-              <FontAwesomeIcon icon={faStop} />
-            </button>
-            <input
-              type="file"
-              accept="application/json"
-              className="file-input"
-              onChange={(e) => setFile(e.target.files[0])}
-              ref={fileInput}
-            />
-            <button type="button" onClick={() => openLoadDialog()}>
-              <FontAwesomeIcon icon={faFolderOpen} />
-            </button>
             <button type="button" onClick={() => save()}>
               <FontAwesomeIcon icon={faSave} />
+            </button>
+            <button type="button" onClick={() => switchToGameplay()}>
+              <FontAwesomeIcon icon={faRunning} />
+            </button>
+            <button type="button" onClick={() => stop()}>
+              <FontAwesomeIcon icon={faStop} />
             </button>
             {playing ? (
               <button type="button" onClick={() => pause()}>
@@ -770,8 +931,19 @@ const Editor = () => {
           <div className="settings-wrapper" onClick={toggleSettings}>
             <div className="settings" onClick={(e) => e.stopPropagation()}>
               <SettingsRow title="Title" value={title} setter={setTitle} type="text" />
-              <SettingsRow title="BPM" value={bpm} setter={setBpm} type="number" />
+              <SettingsRow
+                title="BPM"
+                value={bpm}
+                setter={(e) => setBpm(parseFloat(e))}
+                type="number"
+              />
               <SettingsRow title="Audio Path" value={audioPath} setter={setAudioPath} type="text" />
+              <SettingsRow
+                title="Difficulty"
+                value={difficulty}
+                setter={(n) => setDifficulty(Math.max(1, Math.min(Math.round(n), 20)))}
+                type="number"
+              />
             </div>
           </div>
         )}

@@ -18,12 +18,12 @@ const Browse: FC<BrowseProps> = () => (
   <div className="Browse" data-testid="Browse">
     <SearchCriteria />
     <div>
-      <NavLink to="/editor" className="to-editor">
+      <NavLink to="/edit" className="to-editor">
         <FontAwesomeIcon icon={faPlus} />
         New Level
       </NavLink>
       <SearchBar />
-      <LevelList />
+      <LevelList type="browse" />
       <Preview />
     </div>
     <div>

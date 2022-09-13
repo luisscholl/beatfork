@@ -6,3 +6,9 @@ export default interface LevelVersion {
   difficulty: number;
   objects: Array<Collectible | Obstacle>;
 }
+
+export interface UploadLevelVersion {
+  id: number;
+  difficulty: number;
+  objects: Array<Collectible | Obstacle>;
+}

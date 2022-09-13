@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { generateUUID } from 'three/src/math/MathUtils';
 import { FixedSizeList as List } from 'react-window';
@@ -13,7 +13,11 @@ import LevelPartial from '../../models/LevelPartial';
 import { searchCriteriaState } from '../../atoms/searchCriteriaState';
 import { LevelService } from '../../services/LevelService';
 
-const LevelList = () => {
+interface LevelListProps {
+  type: 'home' | 'browse' | 'my-levels';
+}
+
+const LevelList: FC<LevelListProps> = (props) => {
   const auth = useAuth();
   const [view, setView] = useRecoilState(viewState);
   const [levels, setLevels] = useState<LevelPartial[]>([]);
@@ -33,7 +37,10 @@ const LevelList = () => {
     const options = JSON.parse(JSON.stringify(searchCriteria));
     if (options.maxLength === 300) options.maxLength = Infinity;
     delete options.showPlaylists;
-    LevelService.searchLevel(options, lastPage.current).then((results) => {
+    if (props.type === 'my-levels') {
+      options.author = auth.user?.profile.preferred_username;
+    }
+    LevelService.search(options, lastPage.current).then((results) => {
       setIsNextPageLoading(false);
       if (results.length > 0) {
         setLevels((old) => [...old, ...results]);
@@ -93,6 +100,8 @@ const LevelList = () => {
       loadMoreRows();
     }, 200) as any as number;
   }, [searchCriteria]);
+
+  if (props.type === 'my-levels' && !auth.user) return <div />;
 
   return (
     <div
