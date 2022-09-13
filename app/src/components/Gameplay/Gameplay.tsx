@@ -313,7 +313,7 @@ const Gameplay = (props: { debug: boolean }) => {
       z: 1,
       rotation: calculateAngleBetweenTwoPoints(results.poseLandmarks[14], results.poseLandmarks[16])
     };
-    // rightHandHologramRef.current.position.set(1, 1, 0);
+    // rightHandHologramRef.current.position.set(0.5, 0.75, 0);
     rightHandHologramRef.current.position.set(rightHand.current.x, rightHand.current.y, 0);
     // rightHandHologramRef.current.rotation.set(0, 0, rightHand.current.rotation);
     leftFoot.current = {
@@ -763,8 +763,8 @@ const Gameplay = (props: { debug: boolean }) => {
         <Suspense fallback={null}>
           <PerspectiveCamera
             makeDefault
-            position={[0, 0, -2.6]}
-            rotation={[0, Math.PI, 0]} // x_rot, y_rot, z_rot
+            position={[0, 0, 2.6]}
+            rotation={[0, 0, 0]} // x_rot, y_rot, z_rot
           />
           <directionalLight position={[5, 20, 35]} />
           <PlayerHologram threeRef={leftHandHologramRef} icon={leftHandThreeURL} />
