@@ -217,8 +217,8 @@ router.get('/', async (req, res) => {
   // no rating or personalBest yet so use title as defailt in the meantime (also change in openapi.yaml)
   const orderBy =
     req.query.hasOwnProperty('orderBy') &&
-      req.query.orderBy !== 'personalBest' &&
-      req.query.orderBy !== 'rating'
+    req.query.orderBy !== 'personalBest' &&
+    req.query.orderBy !== 'rating'
       ? req.query.orderBy
       : 'title';
   const direction =
@@ -245,8 +245,8 @@ router.get('/', async (req, res) => {
       ...(!res.locals.authenticated && { published: true }),
       ...(res.locals.authenticated &&
         !res.locals.admin && {
-        $or: [{ published: true }, { 'author.id': res.locals.userId }]
-      }),
+          $or: [{ published: true }, { 'author.id': res.locals.userId }]
+        }),
       'author.username': {
         $regex: author,
         $options: 'i'
