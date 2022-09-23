@@ -259,4 +259,26 @@
       fill: var(--level-difficulty-icon-color);
     }
   }
+
+  .add-version {
+    grid-column: 2;
+    display: block;
+    background-color: var(--level-difficulty-add-version-bg-color);
+    color: var(--level-difficulty-add-version-text-color);
+    padding: 0.7rem 3rem 0.85rem;
+    margin: 0.5rem;
+    margin-bottom: 0;
+    transition: 0.3s background-color ease, 0.3s color ease;
+    border: none;
+    font-size: 1rem;
+
+    &:hover {
+      background-color: var(--level-difficulty-add-version-hover-bg-color);
+      color: var(--level-difficulty-add-version-hover-text-color);
+    }
+
+    svg {
+      margin-right: 0.5rem;
+    }
+  }
 }

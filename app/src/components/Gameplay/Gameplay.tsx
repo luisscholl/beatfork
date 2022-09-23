@@ -402,7 +402,7 @@ const Gameplay = (props: { debug: boolean }) => {
     const tSince0 = tCurrent - (t0.current as number);
     ground.current?.animate(tSince0);
     progressIndicator.current?.animate(tSince0);
-    camera.current?.position.setZ(-settings.gamePlaytimeScaleFactor * tSince0 + 2);
+    camera.current?.position.setZ(-settings.gamePlaytimeScaleFactor * tSince0 + 2.6);
   };
 
   // Checks if there is an intersection between a circle and a rectangle and returns true or false

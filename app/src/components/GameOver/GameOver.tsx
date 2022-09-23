@@ -12,7 +12,7 @@ const GameOver: FC<GameOverProps> = () => {
 
   return (
     <div className="GameOver" data-testid="GameOver">
-      <div className="game-over">GAME OVER</div>
+      <p>GAME OVER</p>
       <Link to={`/gameplay/${levelId}/${versionId}`}>Try again!</Link>
       <Link to={view.returnView}>Return</Link>
     </div>
