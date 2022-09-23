@@ -23,6 +23,7 @@ import GameOver from './components/GameOver/GameOver';
 import LevelCompleted from './components/LevelCompleted/LevelCompleted';
 import MyLevels from './components/MyLevels/MyLevels';
 import Home from './components/Home/Home';
+import DifficultyAnnotator from './components/DifficultyAnnotator/DifficultyAnnotator';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -77,6 +78,11 @@ ReactDOM.render(
             />
             <Route path="/edit" element={<Editor />} />
             <Route path="/edit/:levelId/:versionId" element={<Editor />} />
+            <Route
+              path="/annotate-difficulty/:levelId/:versionId"
+              element={<DifficultyAnnotator />}
+            />
+            <Route path="/d/:levelId/:versionId" element={<DifficultyAnnotator />} />
             <Route path="/calibration" element={<CalibrationScene />} />
           </Routes>
         </Router>
