@@ -34,6 +34,7 @@
       height: 100%;
       width: 10rem;
       background-color: white;
+      color: black;
       display: flex;
       flex-direction: column;
 
@@ -55,6 +56,12 @@
 
           &:hover {
             transform: scale(1.1);
+          }
+
+          p {
+            margin-top: -1rem;
+            caret-color: transparent;
+            text-align: center;
           }
         }
       }

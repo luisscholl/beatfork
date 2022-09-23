@@ -70,7 +70,7 @@ const Editor = () => {
       vertexShader: editorObstacleVertexShader,
       uniforms: {
         obstacleTexture: {
-          value: new THREE.TextureLoader().load('./assets/obstacles.png')
+          value: new THREE.TextureLoader().load('/assets/obstacles.png')
         }
       }
     }),
@@ -83,7 +83,7 @@ const Editor = () => {
       vertexShader: editorCollectibleVertexShader,
       uniforms: {
         collectibleTexture: {
-          value: new THREE.TextureLoader().load('./assets/collectibles.png')
+          value: new THREE.TextureLoader().load('/assets/collectibles.png')
         }
       }
     }),
@@ -716,9 +716,9 @@ const Editor = () => {
                 type="button"
                 onMouseDown={(event) => onSidebarObstacleMouseDown(event)}>
                 <img src={itemRenders.current[type]} alt="object" />
+                <p>Obstacle</p>
               </button>
             </div>
-            <p style={{ textAlign: 'center' }}>Obstacle</p>
           </div>
         );
       }
@@ -729,30 +729,16 @@ const Editor = () => {
             type="button"
             onMouseDown={(event) => onSidebarCollectibleMouseDown(event, type as CollectibleType)}>
             <img src={itemRenders.current[type]} alt="object" />
+            {type === CollectibleType.All && <p>Basic Collectible</p>}
+            {type === CollectibleType.Hands && <p>Hands Collectible</p>}
+            {type === CollectibleType.Feet && <p>Feet Collectible</p>}
+            {type === CollectibleType.Left && <p>Left Side Collectible</p>}
+            {type === CollectibleType.Right && <p>Right Side Collectible</p>}
+            {type === CollectibleType.LeftHand && <p>Left Hand Collectible</p>}
+            {type === CollectibleType.RightHand && <p>Right Hand Collectible</p>}
+            {type === CollectibleType.LeftFoot && <p>Left Foot Collectible</p>}
+            {type === CollectibleType.RightFoot && <p>Right Foot Collectible</p>}
           </button>
-          {type === CollectibleType.All && <p style={{ textAlign: 'center' }}>Basic Collectible</p>}
-          {type === CollectibleType.Hands && (
-            <p style={{ textAlign: 'center' }}>Hands Collectible</p>
-          )}
-          {type === CollectibleType.Feet && <p style={{ textAlign: 'center' }}>Feet Collectible</p>}
-          {type === CollectibleType.Left && (
-            <p style={{ textAlign: 'center' }}>Left Side Collectible</p>
-          )}
-          {type === CollectibleType.Right && (
-            <p style={{ textAlign: 'center' }}>Right Side Collectible</p>
-          )}
-          {type === CollectibleType.LeftHand && (
-            <p style={{ textAlign: 'center' }}>Left Hand Collectible</p>
-          )}
-          {type === CollectibleType.RightHand && (
-            <p style={{ textAlign: 'center' }}>Right Hand Collectible</p>
-          )}
-          {type === CollectibleType.LeftFoot && (
-            <p style={{ textAlign: 'center' }}>Left Foot Collectible</p>
-          )}
-          {type === CollectibleType.RightFoot && (
-            <p style={{ textAlign: 'center' }}>Right Foot Collectible</p>
-          )}
         </div>
       );
     }
@@ -842,7 +828,7 @@ const Editor = () => {
                 ref={(element) => {
                   sideBarCanvasRef.current[template] = element;
                 }}>
-                <mesh position={[0.0, 0, 0]}>
+                <mesh position={[0, 0, 0]}>
                   <boxBufferGeometry args={[0.25, 0.25, 0.25]} attach="geometry" />
                   {/* eslint-disable-next-line react/jsx-props-no-spreading */}
                   <shaderMaterial attach="material" {...shaderData} />
@@ -850,8 +836,8 @@ const Editor = () => {
                 <PerspectiveCamera makeDefault position={[0, 0, 0.55]} rotation={[0, 0, 0]} />
                 <directionalLight position={[-5, 20, -35]} />
               </Canvas>
+              <p>Obstacle</p>
             </button>
-            <p style={{ textAlign: 'center' }}>Obstacle</p>
           </div>
         );
       }
@@ -881,34 +867,16 @@ const Editor = () => {
               <PerspectiveCamera makeDefault position={[0, 0, 0.55]} rotation={[0, 0, 0]} />
               <directionalLight position={[-5, 20, -35]} />
             </Canvas>
+            {template === CollectibleType.All && <p>Basic Collectible</p>}
+            {template === CollectibleType.Hands && <p>Hands Collectible</p>}
+            {template === CollectibleType.Feet && <p>Feet Collectible</p>}
+            {template === CollectibleType.Left && <p>Left Side Collectible</p>}
+            {template === CollectibleType.Right && <p>Right Side Collectible</p>}
+            {template === CollectibleType.LeftHand && <p>Left Hand Collectible</p>}
+            {template === CollectibleType.RightHand && <p>Right Hand Collectible</p>}
+            {template === CollectibleType.LeftFoot && <p>Left Foot Collectible</p>}
+            {template === CollectibleType.RightFoot && <p>Right Foot Collectible</p>}
           </button>
-          {template === CollectibleType.All && (
-            <p style={{ textAlign: 'center' }}>Basic Collectible</p>
-          )}
-          {template === CollectibleType.Hands && (
-            <p style={{ textAlign: 'center' }}>Hands Collectible</p>
-          )}
-          {template === CollectibleType.Feet && (
-            <p style={{ textAlign: 'center' }}>Feet Collectible</p>
-          )}
-          {template === CollectibleType.Left && (
-            <p style={{ textAlign: 'center' }}>Left Side Collectible</p>
-          )}
-          {template === CollectibleType.Right && (
-            <p style={{ textAlign: 'center' }}>Right Side Collectible</p>
-          )}
-          {template === CollectibleType.LeftHand && (
-            <p style={{ textAlign: 'center' }}>Left Hand Collectible</p>
-          )}
-          {template === CollectibleType.RightHand && (
-            <p style={{ textAlign: 'center' }}>Right Hand Collectible</p>
-          )}
-          {template === CollectibleType.LeftFoot && (
-            <p style={{ textAlign: 'center' }}>Left Foot Collectible</p>
-          )}
-          {template === CollectibleType.RightFoot && (
-            <p style={{ textAlign: 'center' }}>Right Foot Collectible</p>
-          )}
         </div>
       );
     }
