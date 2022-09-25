@@ -1,0 +1,35 @@
+.Browse {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 1fr 1fr 2fr;
+
+  & > * {
+    flex-grow: 1;
+  }
+
+  & > :nth-child(2),
+  & > :nth-child(3) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .to-editor {
+    display: block;
+    background-color: var(--to-editor-bg-color);
+    color: var(--to-editor-text-color);
+    padding: 0.7rem 3rem 0.85rem;
+    margin: 0.5rem;
+    margin-bottom: 0;
+    text-decoration: none;
+    transition: 0.3s background-color ease, 0.3s color ease;
+
+    &:hover {
+      background-color: var(--to-editor-hover-bg-color);
+      color: var(--to-editor-hover-text-color);
+    }
+
+    svg {
+      margin-right: 0.5rem;
+    }
+  }
+}

@@ -7,23 +7,23 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import App from './components/App/App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
-import Credits from './components/Credits/Credits';
-import CalibrationScene from './components/CalibrationScene/CalibrationScene';
+import Credits from './components/Others/Credits/Credits';
+import CalibrationScene from './components/Others/CalibrationScene/CalibrationScene';
 import '@fontsource/ubuntu';
 import oidcConfig from './config/config.json';
-import CloseAccount from './components/CloseAccount/CloseAccount';
-import About from './components/About/About';
-import Browse from './components/Browse/Browse';
-import Profile from './components/Profile/Profile';
-import Gameplay from './components/Gameplay/Gameplay';
-import Legal from './components/Legal/Legal';
-import LazyMarkdown from './components/LazyMarkdown/LazyMarkdown';
-import Editor from './components/Editor/Editor';
-import GameOver from './components/GameOver/GameOver';
-import LevelCompleted from './components/LevelCompleted/LevelCompleted';
-import MyLevels from './components/MyLevels/MyLevels';
-import Home from './components/Home/Home';
-import DifficultyAnnotator from './components/DifficultyAnnotator/DifficultyAnnotator';
+import CloseAccount from './components/Others/CloseAccount/CloseAccount';
+import About from './components/Others/About/About';
+import Browse from './components/LevelDiscovery/Browse/Browse';
+import Profile from './components/Others/Profile/Profile';
+import Gameplay from './components/Gameplay/Gameplay/Gameplay';
+import Legal from './components/Others/Legal/Legal';
+import LazyMarkdown from './components/Others/LazyMarkdown/LazyMarkdown';
+import Editor from './components/Editor/Editor/Editor';
+import GameOver from './components/Others/GameOver/GameOver';
+import LevelCompleted from './components/Others/LevelCompleted/LevelCompleted';
+import MyLevels from './components/LevelDiscovery/MyLevels/MyLevels';
+import Home from './components/LevelDiscovery/Home/Home';
+import DifficultyAnnotator from './components/DifficultyAnnotator/DifficultyAnnotator/DifficultyAnnotator';
 
 ReactDOM.render(
   <React.StrictMode>

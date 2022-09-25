@@ -1,0 +1,25 @@
+.LevelMeta {
+  background-color: var(--level-meta-bg-color);
+  color: var(--level-meta-text-color);
+  padding: 0.2rem 0.75rem 0.5rem;
+  caret-color: transparent;
+  margin: 0.5rem;
+
+  h2 {
+    font-size: 1.8rem;
+    margin: 0;
+  }
+
+  .table {
+    display: grid;
+    grid-template-columns: max-content auto max-content auto;
+    font-size: 1rem;
+
+    :nth-child(2n + 1) {
+      color: var(--level-meta-secondary-text-color);
+      text-transform: uppercase;
+      margin-right: 0.5rem;
+      text-align: right;
+    }
+  }
+}

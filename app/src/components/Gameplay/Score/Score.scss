@@ -1,0 +1,22 @@
+.Score {
+  width: fit-content;
+  display: inline-flex;
+  font-family: "Press Start 2P", sans-serif;
+  color: white;
+  text-shadow: 3px 3px 2px black, -3px 3px 2px black, 3px -3px 2px black, -3px -3px 2px black;
+
+  p {
+    margin: 0.3em;
+  }
+
+  .multiplier {
+    font-size: 60px;
+    font-weight: bold;
+    line-height: 1.75;
+  }
+
+  .score {
+    font-size: 90px;
+    line-height: 1;
+  }
+}
