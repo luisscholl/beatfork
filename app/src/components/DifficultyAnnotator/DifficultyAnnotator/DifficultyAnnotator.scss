@@ -21,6 +21,7 @@
     height: 100%;
     position: absolute;
     display: flex;
+    flex-direction: column;
 
     // Otherwise, the Three.js canvas cannot received clicks. Need to reenable pointer-events for buttons with another rule.
     pointer-events: none;

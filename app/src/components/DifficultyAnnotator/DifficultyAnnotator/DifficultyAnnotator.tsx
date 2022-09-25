@@ -23,7 +23,9 @@ import {
   faThLarge,
   faTimes,
   faHome,
-  faRunning
+  faRunning,
+  faMinus,
+  faPlus
 } from '@fortawesome/free-solid-svg-icons';
 import * as hash from 'object-hash';
 import * as THREE from 'three';
@@ -86,6 +88,7 @@ const Editor = () => {
     obstacles: selectedObstacles
   };
   const level = useRef<Level>(null);
+  const [chunkDifficulties, setChunkDifficulties] = useState<number[]>([]);
 
   const collectibles = useRef<DifficultyAnnotatorCollectiblesRefAttributes>(null);
   const collectiblesCb = useCallback((node) => {
@@ -148,6 +151,14 @@ const Editor = () => {
           }
         });
         if (level.current.audioLinks.length > 0) setAudioPath(level.current.audioLinks[0]);
+        setChunkDifficulties(
+          Array.from(
+            {
+              length: Math.ceil(level.current.versions[versionId].objects.length / chunkSize)
+            },
+            () => 1
+          )
+        );
         renderAtTime(0);
       }
     } else {
@@ -174,6 +185,14 @@ const Editor = () => {
         );
         if ((level.current || levelData).audioLinks.length > 0)
           setAudioPath((level.current || levelData).audioLinks[0]);
+        setChunkDifficulties(
+          Array.from(
+            {
+              length: Math.ceil(level.current.versions[versionId].objects.length / chunkSize)
+            },
+            () => 1
+          )
+        );
         renderAtTime(0);
       });
     }
@@ -296,13 +315,54 @@ const Editor = () => {
   };
 
   const renderAtTime = (t: number) => {
-    if (!level.current) return;
     tSince0.current = t;
+    ground.current?.animate(t);
+    camera.current?.position.setZ(-settings.editorTimeScaleFactor * t + 2.6);
+  };
+
+  const incrementChunkDifficulty = (e: React.MouseEvent, i: number) => {
+    e.stopPropagation();
+    setChunkDifficulties((old) => {
+      const newVal = [...old];
+      newVal[i] = Math.min(Math.max(1, newVal[i] + 1), 20);
+      return newVal;
+    });
+  };
+
+  const decrementChunkDifficulty = (e: React.MouseEvent, i: number) => {
+    e.stopPropagation();
+    setChunkDifficulties((old) => {
+      const newVal = [...old];
+      newVal[i] = Math.min(Math.max(1, newVal[i] - 1), 20);
+      return newVal;
+    });
+  };
+
+  const selectChunk = (n: number) => {
+    activeChunk.current = n;
     const { objects } = level.current.versions[versionId];
     let collectibleI = 0;
     let obstacleI = 0;
-    for (let i = 0; i < objects.length; i += 1) {
-      if (i % chunkSize === 0 && objects[i].position.z >= tSince0.current) {
+    for (let i = 0; i < activeChunk.current + chunkSize; i += 1) {
+      if (objects[i].type === 'Collectible') {
+        collectibleI += 1;
+      } else {
+        obstacleI += 1;
+      }
+    }
+    for (let i = 0; i < chunkSize && activeChunk.current * chunkSize + i < objects.length; i += 1) {
+      if (objects[activeChunk.current + i].type === 'Collectible') {
+        collectibles.current.select([collectibleI]);
+        collectibleI += 1;
+      } else {
+        collectibles.current.select([collectibleI]);
+        obstacleI += 1;
+      }
+    }
+    // todo
+
+    for (let i = 0; i < objects.length && (activeChunk.current + 1) * 8; i += 1) {
+      if (i % chunkSize === 0) {
         collectibles.current.deselect(selectedCollectibles.current);
         obstacles.current.deselect(selectedObstacles.current);
         for (let j = 0; j < chunkSize; j += 1) {
@@ -317,16 +377,7 @@ const Editor = () => {
         activeChunk.current = i / chunkSize;
         break;
       }
-      if (objects[i].type === 'Collectible') {
-        collectibleI += 1;
-      } else {
-        obstacleI += 1;
-      }
     }
-    console.log(JSON.stringify(selected, null, 2));
-    console.log(`activeChunk is :${activeChunk.current}`);
-    ground.current?.animate(t);
-    camera.current?.position.setZ(-settings.editorTimeScaleFactor * t + 2.6);
   };
 
   return (
@@ -380,6 +431,24 @@ const Editor = () => {
               </button>
             )}
           </div>
+        </div>
+        <div className="sidebar">
+          {level.current &&
+            Array.from(
+              { length: Math.ceil(level.current.versions[versionId].objects.length / chunkSize) },
+              (e, i) => (
+                <button type="button" className="chunk" onClick={() => selectChunk(i)}>
+                  <p>Chunk #{i}</p>
+                  <button type="button" onClick={(f) => decrementChunkDifficulty(f, i)}>
+                    <FontAwesomeIcon icon={faMinus} />
+                  </button>
+                  <input type="number" value={chunkDifficulties[i]} min="1" max="20" />
+                  <button type="button" onClick={(f) => incrementChunkDifficulty(f, i)}>
+                    <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                </button>
+              )
+            )}
         </div>
         <div className="top-view" />
         <div className="timeline" />
