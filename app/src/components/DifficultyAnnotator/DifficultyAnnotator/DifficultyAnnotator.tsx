@@ -39,34 +39,27 @@ import {
 } from 'recoil';
 import { Howl } from 'howler';
 import Collectible, { CollectibleType } from '../../../models/Collectible';
-import EditorSideBarCollectible from '../../Editor/EditorSideBarCollectible/EditorSideBarCollectible';
-import MusicIcon from '../../Editor/MusicIcon/MusicIcon';
 import './DifficultyAnnotator.scss';
 import Vector3D from '../../../models/Vector3D';
 import Ground from '../../Others/Ground/Ground';
 import Obstacle from '../../../models/Obstacle';
 import { settingsState } from '../../../atoms/settingsState';
-import EditorCollectibles, {
-  EditorCollectiblesRefAttributes
-} from '../../Editor/EditorCollectibles/EditorCollectibles';
-import editorObstacleFragmentShader from '../../../shaders/editorObstacleFragmentShader.glsl';
-import editorCollectibleFragmentShader from '../../../shaders/editorCollectibleFragmentShader.glsl';
-import editorObstacleVertexShader from '../../../shaders/editorObstacleVertexShader.glsl';
-import editorCollectibleVertexShader from '../../../shaders/editorCollectibleVertexShader.glsl';
-import EditorSideBarObstacle from '../../Editor/EditorSideBarObstacle/EditorSideBarObstacle';
-import EditorObstacles, {
-  EditorObstaclesRefAttributes
-} from '../../Editor/EditorObstacles/EditorObstacles';
+import DifficultyAnnotatorCollectibles, {
+  DifficultyAnnotatorCollectiblesRefAttributes
+} from '../DifficultyAnnotatorCollectibles/DifficultyAnnotatorCollectibles';
+import DifficultyAnnotatorObstacles, {
+  DifficultyAnnotatorObstaclesRefAttributes
+} from '../DifficultyAnnotatorObstacles/DifficultyAnnotatorObstacles';
 import SettingsRow from '../../Editor/SettingsRow/SettingsRow';
 import { LevelService } from '../../../services/LevelService';
 import Artist from '../../../models/Artist';
 import User from '../../../models/User';
 import { viewState } from '../../../atoms/viewState';
+import Level from '../../../models/Level';
 
-const snappingModuliXY = [0.0109375, 0.21875, 0.4375];
+const chunkSize = 8;
 
 const Editor = () => {
-  const auth = useAuth();
   const navigate = useNavigate();
   const setView = useSetRecoilState(viewState);
   const { levelId, versionId } = useParams();
@@ -78,6 +71,7 @@ const Editor = () => {
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(false);
   const tSince0 = useRef<number>(0);
+  const activeChunk = useRef<number>(0);
   const [id, setId] = useState<string>(generateUUID());
   const [title, setTitle] = useState<string>('My Level');
   const [bpm, setBpm] = useState<number>(120);
@@ -91,19 +85,16 @@ const Editor = () => {
     collectibles: selectedCollectibles,
     obstacles: selectedObstacles
   };
-  const scrollSideBarTop = useRef<number>(0);
-  // When snapping is activated, level objects will only be moved once a certain threshold of movement was crossed. Especially when this threshold is not crossed in a single event, the distance needs to be buffered for subsequent events regarding the same set of events. Otherwise the level objects would never move.
-  // todo: Reset snapBuffers, when user changes the selection?
-  // const [importedFile, setFile] = useState<File>();
+  const level = useRef<Level>(null);
 
-  const collectibles = useRef<EditorCollectiblesRefAttributes>(null);
+  const collectibles = useRef<DifficultyAnnotatorCollectiblesRefAttributes>(null);
   const collectiblesCb = useCallback((node) => {
     if (node) {
       collectibles.current = node;
       loadLevel();
     }
   }, []);
-  const obstacles = useRef<EditorObstaclesRefAttributes>(null);
+  const obstacles = useRef<DifficultyAnnotatorObstaclesRefAttributes>(null);
   const obstaclesCb = useCallback((node) => {
     if (node) {
       obstacles.current = node;
@@ -137,41 +128,42 @@ const Editor = () => {
       !obstacles.current
     )
       return;
-    const temporaryLevel = LevelService.getTemporaryLevel();
+    level.current = LevelService.getTemporaryLevel();
     if (!levelId || !versionId) {
-      if (temporaryLevel) {
+      if (level.current) {
         // no level in db, but temporary level
-        setTitle(temporaryLevel.title);
-        setBpm(temporaryLevel.bpm);
+        setTitle(level.current.title);
+        setBpm(level.current.bpm);
         collectibles.current.remove(
           Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
         );
         obstacles.current.remove(
           Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
         );
-        temporaryLevel.versions['1'].objects.forEach((f: Collectible | Obstacle) => {
+        level.current.versions['1'].objects.forEach((f: Collectible | Obstacle) => {
           if (f.type === 'Collectible') {
             collectibles.current.addCollectible(f);
           } else if (f.type === 'Obstacle') {
             obstacles.current.addObstacle(f);
           }
         });
-        if (temporaryLevel.audioLinks.length > 0) setAudioPath(temporaryLevel.audioLinks[0]);
+        if (level.current.audioLinks.length > 0) setAudioPath(level.current.audioLinks[0]);
         renderAtTime(0);
       }
     } else {
       lastLevelIdAndVersionId.current = `${levelId}:${versionId}`;
       LevelService.get(levelId, versionId).then((levelData) => {
+        level.current = levelData;
         if (levelData.id) setId(levelData.id);
-        if (levelData.title) setTitle((temporaryLevel || levelData).title);
-        if (levelData.bpm) setBpm((temporaryLevel || levelData).bpm);
+        if (levelData.title) setTitle((level.current || levelData).title);
+        if (levelData.bpm) setBpm((level.current || levelData).bpm);
         collectibles.current.remove(
           Array.from({ length: collectibles.current.getLastIndex() }, (e, i) => i)
         );
         obstacles.current.remove(
           Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
         );
-        (temporaryLevel || levelData).versions[temporaryLevel ? '1' : versionId].objects.forEach(
+        (level.current || levelData).versions[level.current ? '1' : versionId].objects.forEach(
           (f: Collectible | Obstacle) => {
             if (f.type === 'Collectible') {
               collectibles.current.addCollectible(f);
@@ -180,8 +172,8 @@ const Editor = () => {
             }
           }
         );
-        if ((temporaryLevel || levelData).audioLinks.length > 0)
-          setAudioPath((temporaryLevel || levelData).audioLinks[0]);
+        if ((level.current || levelData).audioLinks.length > 0)
+          setAudioPath((level.current || levelData).audioLinks[0]);
         renderAtTime(0);
       });
     }
@@ -250,7 +242,7 @@ const Editor = () => {
     const objects = [collectibles.current.export(), obstacles.current.export()]
       .flat()
       .sort((a, b) => a.position.z - b.position.z);
-    const level = {
+    const localLevel = {
       id: 'preview',
       title,
       bpm,
@@ -268,7 +260,7 @@ const Editor = () => {
       audioLinks: [audioPath],
       length: audio.current.duration()
     };
-    LevelService.setTemporaryLevel(level);
+    LevelService.setTemporaryLevel(localLevel);
     setView((old) => {
       return {
         ...old,
@@ -276,6 +268,10 @@ const Editor = () => {
       };
     });
     navigate('/gameplay/preview/1');
+  };
+
+  const onWheel = (event: React.WheelEvent) => {
+    renderAtTime(tSince0.current + -event.deltaY / 100);
   };
 
   const animate = () => {
@@ -300,28 +296,54 @@ const Editor = () => {
   };
 
   const renderAtTime = (t: number) => {
+    if (!level.current) return;
     tSince0.current = t;
+    const { objects } = level.current.versions[versionId];
+    let collectibleI = 0;
+    let obstacleI = 0;
+    for (let i = 0; i < objects.length; i += 1) {
+      if (i % chunkSize === 0 && objects[i].position.z >= tSince0.current) {
+        collectibles.current.deselect(selectedCollectibles.current);
+        obstacles.current.deselect(selectedObstacles.current);
+        for (let j = 0; j < chunkSize; j += 1) {
+          if (objects[i + j].type === 'Collectible') {
+            collectibles.current.select([collectibleI]);
+            collectibleI += 1;
+          } else {
+            obstacles.current.select([obstacleI]);
+            obstacleI += 1;
+          }
+        }
+        activeChunk.current = i / chunkSize;
+        break;
+      }
+      if (objects[i].type === 'Collectible') {
+        collectibleI += 1;
+      } else {
+        obstacleI += 1;
+      }
+    }
+    console.log(JSON.stringify(selected, null, 2));
+    console.log(`activeChunk is :${activeChunk.current}`);
     ground.current?.animate(t);
     camera.current?.position.setZ(-settings.editorTimeScaleFactor * t + 2.6);
   };
 
   return (
-    <div className="DifficultyAnnotator" data-testid="DifficultyAnnotator">
+    <div className="DifficultyAnnotator" data-testid="DifficultyAnnotator" onWheel={onWheel}>
       <Canvas>
         <RecoilBridge>
           <color attach="background" args={['#158ed4']} />
           <PerspectiveCamera makeDefault position={[0, 0, 3]} rotation={[0, 0, 0]} ref={camera} />
           <directionalLight position={[5, 20, 35]} />
           <Ground ref={groundCallback} bpm={bpm} timeScaleFactor={settings.editorTimeScaleFactor} />
-          {/* todo */}
-          <EditorCollectibles
+          <DifficultyAnnotatorCollectibles
             ref={collectiblesCb}
             onClick={selectLevelObject}
             selected={selected.collectibles}
             snappingModulusXY={1}
           />
-          {/* todo */}
-          <EditorObstacles
+          <DifficultyAnnotatorObstacles
             ref={obstaclesCb}
             triggerSelectLevelObject={selectLevelObject}
             obstaclesResizeFlag={null}
@@ -331,6 +353,7 @@ const Editor = () => {
       </Canvas>
       <div className="UI">
         <div className="top-bar">
+          <div />
           <div className="others">
             <Link to="/browse">
               <FontAwesomeIcon icon={faHome} />
