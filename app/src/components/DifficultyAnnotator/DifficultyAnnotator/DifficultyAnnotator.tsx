@@ -35,7 +35,6 @@ import * as THREE from 'three';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { DoubleSide, Mesh, Raycaster, Vector2 } from 'three';
 import { generateUUID } from 'three/src/math/MathUtils';
-import { useAuth } from 'react-oidc-context';
 import {
   // eslint-disable-next-line camelcase
   useRecoilBridgeAcrossReactRoots_UNSTABLE,
@@ -65,7 +64,6 @@ import Level from '../../../models/Level';
 const chunkSize = 8;
 
 const Editor = () => {
-  const auth = useAuth();
   const navigate = useNavigate();
   const setView = useSetRecoilState(viewState);
   const { levelId, versionId } = useParams();
@@ -272,12 +270,7 @@ const Editor = () => {
         2
       )
     ]);
-    FileSaver.saveAs(
-      blob,
-      `chunk_difficulties_${levelId}_${versionId}_${
-        auth.user?.profile.preferred_username || 'guest'
-      }.json`
-    );
+    FileSaver.saveAs(blob, `chunk_difficulties_${levelId}_${versionId}.json`);
   };
 
   const switchToGameplay = () => {
