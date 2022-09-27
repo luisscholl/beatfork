@@ -32,10 +32,14 @@ const LevelActions = () => {
   return (
     <div className="LevelActions" data-testid="LevelActions">
       <div className="columns">
-        <button type="button">
+        {/* <button type="button"> */}
+        {/* <FontAwesomeIcon icon={faList} /> */}
+        {/* Add to playlist */}
+        {/* </button> */}
+        <Link to={`/annotate-difficulty/${view.level.id}/${view.version}`}>
           <FontAwesomeIcon icon={faList} />
-          Add to playlist
-        </button>
+          Rate Difficulty
+        </Link>
         {view.level.author.id === auth.user?.profile.sub ? (
           <Link to={`/edit/${view.level.id}/${view.version}`}>
             <FontAwesomeIcon icon={faEdit} />
