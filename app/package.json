@@ -25,6 +25,7 @@
     "@xstate/fsm": "^1.6.5",
     "@xstate/react": "^2.0.1",
     "csstype": "^3.0.10",
+    "file-saver": "^2.0.5",
     "howler": "^2.2.3",
     "multi-range-slider-react": "^1.0.7",
     "object-hash": "^3.0.0",

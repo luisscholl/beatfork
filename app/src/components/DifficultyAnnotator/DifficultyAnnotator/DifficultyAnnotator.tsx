@@ -29,6 +29,7 @@ import {
   faCaretLeft,
   faCaretRight
 } from '@fortawesome/free-solid-svg-icons';
+import FileSaver from 'file-saver';
 import * as hash from 'object-hash';
 import * as THREE from 'three';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -64,6 +65,7 @@ import Level from '../../../models/Level';
 const chunkSize = 8;
 
 const Editor = () => {
+  const auth = useAuth();
   const navigate = useNavigate();
   const setView = useSetRecoilState(viewState);
   const { levelId, versionId } = useParams();
@@ -256,7 +258,26 @@ const Editor = () => {
 
   // todo
   const save = async () => {
-    console.log('todo');
+    const blob = new Blob([
+      JSON.stringify(
+        {
+          _id: {
+            levelId,
+            versionId
+          },
+          chunkSize,
+          chunkDifficulties
+        },
+        null,
+        2
+      )
+    ]);
+    FileSaver.saveAs(
+      blob,
+      `chunk_difficulties_${levelId}_${versionId}_${
+        auth.user?.profile.preferred_username || 'guest'
+      }.json`
+    );
   };
 
   const switchToGameplay = () => {
