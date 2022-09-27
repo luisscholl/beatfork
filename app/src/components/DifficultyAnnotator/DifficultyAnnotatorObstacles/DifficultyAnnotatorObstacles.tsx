@@ -16,8 +16,8 @@ import React, {
 import { useRecoilValue } from 'recoil';
 import * as THREE from 'three';
 import { InstancedMesh } from 'three';
-import editorObstacleFragmentShader from '../../../shaders/editorObstacleFragmentShader.glsl';
-import editorObstacleVertexShader from '../../../shaders/editorObstacleVertexShader.glsl';
+import difficultyAnnotatorObstacleFragmentShader from '../../../shaders/difficultyAnnotatorObstacleFragmentShader.glsl';
+import difficultyAnnotatorObstacleVertexShader from '../../../shaders/editorObstacleVertexShader.glsl';
 import { settingsState } from '../../../atoms/settingsState';
 import Vector3D from '../../../models/Vector3D';
 import './DifficultyAnnotatorObstacles.scss';
@@ -349,16 +349,19 @@ const EditorObstacles: ForwardRefExoticComponent<
 
   const shaderData = useMemo(
     () => ({
-      vertexShader: editorObstacleVertexShader,
-      fragmentShader: editorObstacleFragmentShader,
+      vertexShader: difficultyAnnotatorObstacleVertexShader,
+      fragmentShader: difficultyAnnotatorObstacleFragmentShader,
       uniforms: {
         obstaclesTexture: {
           value: new THREE.TextureLoader().load('./assets/obstacles.png')
         }
-      }
+      },
+      transparent: true
     }),
     []
   );
+
+  console.log('isSelectedArray.current :>> ', isSelectedArray.current);
 
   return (
     <group>

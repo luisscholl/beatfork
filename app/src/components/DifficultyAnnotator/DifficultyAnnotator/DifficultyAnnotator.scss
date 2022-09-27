@@ -23,7 +23,8 @@
     display: flex;
     flex-direction: column;
 
-    // Otherwise, the Three.js canvas cannot received clicks. Need to reenable pointer-events for buttons with another rule.
+    // Otherwise, the Three.js canvas cannot received clicks.
+    // Need to reenable pointer-events for buttons with another rule.
     pointer-events: none;
 
     button,
@@ -38,24 +39,8 @@
       background-color: #ffffff80;
       height: 5rem;
 
-      .snapping {
-        display: flex;
-
-        button {
-          @include button;
-
-          width: 5rem;
-          height: 5rem;
-          font-size: 3rem;
-          overflow: hidden;
-
-          .MusicIcon {
-            margin-top: -5.3rem;
-          }
-        }
-      }
-
-      .others {
+      .others,
+      .chunk-selection {
         button,
         a {
           @include button;
@@ -64,10 +49,83 @@
           width: 5rem;
           height: 5rem;
           color: var(--editor-button-text-color);
+
+          &.deactivated {
+            opacity: 50%;
+
+            &:hover > * {
+              transform: none;
+            }
+          }
+        }
+      }
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: max-content;
+      overflow-y: scroll;
+      height: 100%;
+
+      .chunk {
+        border: none;
+        border-top: 1px solid #77777780;
+        background-color: #ffffff80;
+        font-size: 1rem;
+        padding: 1rem;
+        cursor: pointer;
+
+        &.active {
+          background-color: #ffffffe0;
+          font-weight: bold;
+
+          .controls {
+            button,
+            input {
+              background-color: #fff;
+            }
+          }
         }
 
-        .file-input {
-          display: none;
+        &:hover {
+          background-color: #ffffffe0;
+        }
+
+        p {
+          margin: 0;
+          margin-bottom: 1rem;
+          text-align: left;
+        }
+
+        .controls {
+          display: flex;
+
+          button {
+            border-radius: 0;
+            border: 1px solid #777;
+            background-color: #eee;
+            width: 2rem;
+
+            &:first-child {
+              border-radius: 0.3rem 0 0 0.3rem;
+            }
+
+            &:last-child {
+              border-radius: 0 0.3rem 0.3rem 0;
+            }
+          }
+
+          input {
+            background-color: #eee;
+            border: 1px solid #777;
+            border-left: none;
+            border-right: none;
+            font-size: 1.4rem;
+            width: calc(3ch + 2rem);
+            padding: 0.25rem 1rem;
+            text-align: right;
+          }
         }
       }
     }

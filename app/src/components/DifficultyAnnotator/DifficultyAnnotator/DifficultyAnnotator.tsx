@@ -1,6 +1,6 @@
 import { PerspectiveCamera } from '@react-three/drei';
 import { Canvas, ThreeEvent } from '@react-three/fiber';
-import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
+import React, { useMemo, useEffect, useRef, useState, useCallback, FormEvent } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCogs,
@@ -25,7 +25,9 @@ import {
   faHome,
   faRunning,
   faMinus,
-  faPlus
+  faPlus,
+  faCaretLeft,
+  faCaretRight
 } from '@fortawesome/free-solid-svg-icons';
 import * as hash from 'object-hash';
 import * as THREE from 'three';
@@ -73,7 +75,7 @@ const Editor = () => {
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
   const [playing, setPlaying] = useState<boolean>(false);
   const tSince0 = useRef<number>(0);
-  const activeChunk = useRef<number>(0);
+  const [activeChunk, setActiveChunk] = useState<number>(0);
   const [id, setId] = useState<string>(generateUUID());
   const [title, setTitle] = useState<string>('My Level');
   const [bpm, setBpm] = useState<number>(120);
@@ -159,7 +161,7 @@ const Editor = () => {
             () => 1
           )
         );
-        renderAtTime(0);
+        selectChunk(0);
       }
     } else {
       lastLevelIdAndVersionId.current = `${levelId}:${versionId}`;
@@ -193,7 +195,7 @@ const Editor = () => {
             () => 1
           )
         );
-        renderAtTime(0);
+        selectChunk(0);
       });
     }
     LevelService.setTemporaryLevel(null);
@@ -338,46 +340,55 @@ const Editor = () => {
     });
   };
 
+  const handleChunkDifficultyInput = (e: FormEvent<HTMLInputElement>, i: number) => {
+    const n = parseInt(e.currentTarget.value, 10);
+    if (Number.isNaN(n)) return;
+    setChunkDifficulties((old) => {
+      const newVal = [...old];
+      newVal[i] = Math.min(Math.max(1, n), 20);
+      return newVal;
+    });
+  };
+
   const selectChunk = (n: number) => {
-    activeChunk.current = n;
+    // Highlight 3D objects
+    collectibles.current.deselect(selectedCollectibles.current);
+    obstacles.current.deselect(selectedObstacles.current);
     const { objects } = level.current.versions[versionId];
+    n = Math.min(Math.max(0, n), Math.floor(objects.length / chunkSize));
+    setActiveChunk(n);
     let collectibleI = 0;
     let obstacleI = 0;
-    for (let i = 0; i < activeChunk.current + chunkSize; i += 1) {
+    for (let i = 0; i < n * chunkSize; i += 1) {
       if (objects[i].type === 'Collectible') {
         collectibleI += 1;
       } else {
         obstacleI += 1;
       }
     }
-    for (let i = 0; i < chunkSize && activeChunk.current * chunkSize + i < objects.length; i += 1) {
-      if (objects[activeChunk.current + i].type === 'Collectible') {
+    for (let i = 0; i < chunkSize && n * chunkSize + i < objects.length; i += 1) {
+      if (objects[n * chunkSize + i].type === 'Collectible') {
         collectibles.current.select([collectibleI]);
         collectibleI += 1;
       } else {
-        collectibles.current.select([collectibleI]);
+        obstacles.current.select([obstacleI]);
         obstacleI += 1;
       }
     }
-    // todo
-
-    for (let i = 0; i < objects.length && (activeChunk.current + 1) * 8; i += 1) {
-      if (i % chunkSize === 0) {
-        collectibles.current.deselect(selectedCollectibles.current);
-        obstacles.current.deselect(selectedObstacles.current);
-        for (let j = 0; j < chunkSize; j += 1) {
-          if (objects[i + j].type === 'Collectible') {
-            collectibles.current.select([collectibleI]);
-            collectibleI += 1;
-          } else {
-            obstacles.current.select([obstacleI]);
-            obstacleI += 1;
-          }
-        }
-        activeChunk.current = i / chunkSize;
-        break;
-      }
+    // Go to chunk in 3D
+    const firstOjbectInChunk = level.current.versions[versionId].objects[n * chunkSize];
+    if (firstOjbectInChunk.type === 'Collectible') {
+      renderAtTime(firstOjbectInChunk.position.z - 0.125);
+    } else {
+      renderAtTime(firstOjbectInChunk.position.z - firstOjbectInChunk.dimensions.z / 2);
     }
+  };
+
+  const scrollSideBarToChunk = (n: number) => {
+    const { objects } = level.current.versions[versionId];
+    n = Math.min(Math.max(0, n), Math.floor(objects.length / chunkSize));
+    const child = sideBarRef.current.children[n];
+    sideBarRef.current.scrollTo(0, child.getBoundingClientRect().height * (n - 2));
   };
 
   return (
@@ -404,7 +415,32 @@ const Editor = () => {
       </Canvas>
       <div className="UI">
         <div className="top-bar">
-          <div />
+          <div className="chunk-selection">
+            <button
+              className={activeChunk === 0 ? 'deactivated' : ''}
+              type="button"
+              onClick={() => {
+                selectChunk(activeChunk - 1);
+                scrollSideBarToChunk(activeChunk - 1);
+              }}>
+              <FontAwesomeIcon icon={faCaretLeft} />
+            </button>
+            <button
+              className={
+                activeChunk ===
+                (level.current &&
+                  Math.floor(level.current.versions[versionId].objects.length / chunkSize))
+                  ? 'deactivated'
+                  : ''
+              }
+              type="button"
+              onClick={() => {
+                selectChunk(activeChunk + 1);
+                scrollSideBarToChunk(activeChunk + 1);
+              }}>
+              <FontAwesomeIcon icon={faCaretRight} />
+            </button>
+          </div>
           <div className="others">
             <Link to="/browse">
               <FontAwesomeIcon icon={faHome} />
@@ -432,20 +468,32 @@ const Editor = () => {
             )}
           </div>
         </div>
-        <div className="sidebar">
+        <div className="sidebar" onWheel={(f) => f.stopPropagation()} ref={sideBarRef}>
           {level.current &&
             Array.from(
               { length: Math.ceil(level.current.versions[versionId].objects.length / chunkSize) },
               (e, i) => (
-                <button type="button" className="chunk" onClick={() => selectChunk(i)}>
+                <button
+                  type="button"
+                  className={`chunk ${activeChunk === i ? 'active' : ''}`}
+                  onClick={() => selectChunk(i)}>
                   <p>Chunk #{i}</p>
-                  <button type="button" onClick={(f) => decrementChunkDifficulty(f, i)}>
-                    <FontAwesomeIcon icon={faMinus} />
-                  </button>
-                  <input type="number" value={chunkDifficulties[i]} min="1" max="20" />
-                  <button type="button" onClick={(f) => incrementChunkDifficulty(f, i)}>
-                    <FontAwesomeIcon icon={faPlus} />
-                  </button>
+                  <div className="controls">
+                    <button type="button" onClick={(f) => decrementChunkDifficulty(f, i)}>
+                      <FontAwesomeIcon icon={faMinus} />
+                    </button>
+                    <input
+                      type="text"
+                      value={chunkDifficulties[i]}
+                      min="1"
+                      max="20"
+                      onInput={(f) => handleChunkDifficultyInput(f, i)}
+                      onClick={(f) => f.currentTarget.select()}
+                    />
+                    <button type="button" onClick={(f) => incrementChunkDifficulty(f, i)}>
+                      <FontAwesomeIcon icon={faPlus} />
+                    </button>
+                  </div>
                 </button>
               )
             )}
