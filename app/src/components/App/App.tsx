@@ -13,6 +13,7 @@ import Browse from '../LevelDiscovery/Browse/Browse';
 import Home from '../LevelDiscovery/Home/Home';
 import Profile from '../Others/Profile/Profile';
 import NavBar from '../Others/NavBar/NavBar';
+import CompatibilityNotice from '../Others/CompatibilityNotice/CompatibilityNotice';
 
 const App = () => {
   const [view, setView] = useRecoilState(viewState);
@@ -37,6 +38,7 @@ const App = () => {
 
   return (
     <div className="App" data-testid="App">
+      <CompatibilityNotice />
       <NavBar />
       <Outlet />
     </div>

@@ -1,0 +1,24 @@
+.CompatibilityNotice {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  color: black;
+  padding: 1rem;
+  font-size: 1rem;
+  z-index: 987654321;
+
+  p {
+    max-width: 80ch;
+    margin: auto;
+    margin-top: 1rem;
+  }
+
+  button {
+    float: right;
+    padding: 1rem;
+    border: none;
+    background: none;
+  }
+}
