@@ -148,4 +148,22 @@
       }
     }
   }
+
+  &.disclaimer {
+    background-color: #fff;
+    color: black;
+    padding: 1rem;
+
+    p {
+      width: 100%;
+      max-width: 80ch;
+      margin: auto;
+
+      ul {
+        li {
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
 }

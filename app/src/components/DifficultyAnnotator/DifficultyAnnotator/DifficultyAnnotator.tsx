@@ -91,6 +91,8 @@ const Editor = () => {
   };
   const level = useRef<Level>(null);
   const [chunkDifficulties, setChunkDifficulties] = useState<number[]>([]);
+  const [overallDifficulty, setOverallDifficulty] = useState<number>(1);
+  const [acceptedDisclaimer, setAcceptedDisclaimer] = useState<boolean>(false);
 
   const collectibles = useRef<DifficultyAnnotatorCollectiblesRefAttributes>(null);
   const collectiblesCb = useCallback((node) => {
@@ -254,7 +256,6 @@ const Editor = () => {
     setPlaying(false);
   };
 
-  // todo
   const save = async () => {
     const blob = new Blob([
       JSON.stringify(
@@ -263,6 +264,7 @@ const Editor = () => {
             levelId,
             versionId
           },
+          overallDifficulty,
           chunkSize,
           chunkDifficulties
         },
@@ -363,7 +365,21 @@ const Editor = () => {
       return newVal;
     });
   };
+  const incrementOverallDifficulty = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOverallDifficulty((old) => old + 1);
+  };
 
+  const decrementOverallDifficulty = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOverallDifficulty((old) => old - 1);
+  };
+
+  const handleOverallDifficultyInput = (e: FormEvent<HTMLInputElement>) => {
+    const n = parseInt(e.currentTarget.value, 10);
+    if (Number.isNaN(n)) return;
+    setOverallDifficulty(Math.min(Math.max(1, n), 20));
+  };
   const selectChunk = (n: number) => {
     // Highlight 3D objects
     collectibles.current.deselect(selectedCollectibles.current);
@@ -404,6 +420,78 @@ const Editor = () => {
     const child = sideBarRef.current.children[n];
     sideBarRef.current.scrollTo(0, child.getBoundingClientRect().height * (n - 2));
   };
+
+  if (!acceptedDisclaimer) {
+    return (
+      <div
+        className="DifficultyAnnotator disclaimer"
+        data-testid="DifficultyAnnotator"
+        onWheel={onWheel}>
+        <p>
+          <h2>Important Notice</h2>
+          Hi,
+          <br />
+          thanks for participating in study. In order to achieve meaningful results, I need you to
+          accept and keep in mind a number of things.
+          <ul>
+            <li>
+              Do not participate in this study, if you are not fit enough to play BeatFork in a safe
+              fashion.
+              <br />
+              Do not put yourself into a position in which you could injure yourself.
+              <br />
+              Play in a safe environment.
+              <br />
+              Warum up before playing.
+              <br />
+              You choose to participate at your own risk.
+              <br />
+              (I do not expect anyone to hurt themselves playing BeatFork, but playing BeatFork can
+              be a highly intense cardio workout depending on level and player. Therefore, take any
+              considerations into account, which you would for working out traditionally.)
+            </li>
+            <li>Only rate difficulty of levels, which you have completed.</li>
+            <li>
+              This study aims to find out how to rate difficulty of BeatFork. Therefore there is no
+              guideline on how to rate difficulty. However, the scale ranges from 1-20, because it
+              looks good in level selection.
+              <br />
+              Please orient at{' '}
+              <a href="https://www.wikiwand.com/en/In_the_Groove_(video_game)">
+                In the Groove
+              </a> and <a href="https://scoresaber.com/">ScoreSaber</a> difficulty ratings.
+            </li>
+            <li>
+              You will rate difficulty on chunks of {chunkSize} game objects as well as overall
+              difficulty at the bottom of the chunk list.
+            </li>
+            <li>
+              When you are done, click on the floppy disk icon and send me the file via email to{' '}
+              <a href="mailto:difficulty-estimation@beatfork.com">
+                difficulty-estimation@beatfork.com
+              </a>
+              .
+              <br />
+              This file does not contain any personal identification. You can make sure by opening
+              it in a text editor.
+            </li>
+            <li>
+              You grant every person including me (Luis Scholl) a worldwide, royalty-free,
+              transferable, sub-licensable, and non-exclusive license to use, reproduce, modify,
+              distribute, adapt, publicly display, and publish everything, which you send to
+              <a href="mailto:difficulty-estimation@beatfork.com">
+                difficulty-estimation@beatfork.com
+              </a>
+              .
+            </li>
+          </ul>
+          <button type="button" onClick={() => setAcceptedDisclaimer(true)}>
+            Accept
+          </button>
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="DifficultyAnnotator" data-testid="DifficultyAnnotator" onWheel={onWheel}>
@@ -511,6 +599,25 @@ const Editor = () => {
                 </button>
               )
             )}
+          <button type="button" className="chunk">
+            <p>Overall</p>
+            <div className="controls">
+              <button type="button" onClick={(f) => decrementOverallDifficulty(f)}>
+                <FontAwesomeIcon icon={faMinus} />
+              </button>
+              <input
+                type="text"
+                value={overallDifficulty}
+                min="1"
+                max="20"
+                onInput={(f) => handleOverallDifficultyInput(f)}
+                onClick={(f) => f.currentTarget.select()}
+              />
+              <button type="button" onClick={(f) => incrementOverallDifficulty(f)}>
+                <FontAwesomeIcon icon={faPlus} />
+              </button>
+            </div>
+          </button>
         </div>
         <div className="top-view" />
         <div className="timeline" />
