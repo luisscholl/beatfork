@@ -147,7 +147,7 @@ const Editor = () => {
         obstacles.current.remove(
           Array.from({ length: obstacles.current.getLastIndex() }, (e, i) => i)
         );
-        level.current.versions['1'].objects.forEach((f: Collectible | Obstacle) => {
+        level.current.versions[versionId].objects.forEach((f: Collectible | Obstacle) => {
           if (f.type === 'Collectible') {
             collectibles.current.addCollectible(f);
           } else if (f.type === 'Obstacle') {
