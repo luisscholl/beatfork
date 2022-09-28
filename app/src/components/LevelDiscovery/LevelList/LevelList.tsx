@@ -21,8 +21,8 @@ const LevelList: FC<LevelListProps> = (props) => {
   const auth = useAuth();
   const [view, setView] = useRecoilState(viewState);
   const [levels, setLevels] = useState<LevelPartial[]>([]);
-  const [isNextPageLoading, setIsNextPageLoading] = useState(false);
-  const [hasNextPage, setHasNextPage] = useState(true);
+  const isNextPageLoading = useRef<boolean>(false);
+  const hasNextPage = useRef<boolean>(true);
   const searchCriteria = useRecoilValue(searchCriteriaState);
 
   const lastPage = useRef<number>(0);
@@ -32,7 +32,7 @@ const LevelList: FC<LevelListProps> = (props) => {
   const infiniteLoader = useRef();
 
   const loadNextPage = async () => {
-    setIsNextPageLoading(true);
+    isNextPageLoading.current = true;
     lastPage.current += 1;
     const options = JSON.parse(JSON.stringify(searchCriteria));
     if (options.maxLength === 300) options.maxLength = Infinity;
@@ -41,25 +41,26 @@ const LevelList: FC<LevelListProps> = (props) => {
       options.author = auth.user?.profile.preferred_username;
     }
     LevelService.search(options, lastPage.current).then((results) => {
-      setIsNextPageLoading(false);
+      isNextPageLoading.current = false;
       if (results.length > 0) {
         setLevels((old) => [...old, ...results]);
       } else {
-        setHasNextPage(false);
+        hasNextPage.current = false;
       }
     });
   };
 
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
-  const rowCount = hasNextPage ? levels.length + 1 : levels.length;
+  const rowCount = hasNextPage.current ? levels.length + 1 : levels.length;
 
   // Only load 1 page of items at a time.
   // Pass an empty callback to InfiniteLoader in case it asks us to load more than once.
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const loadMoreRows = isNextPageLoading ? () => {} : loadNextPage;
+  const loadMoreRows = isNextPageLoading.current ? () => {} : loadNextPage;
 
   // Every row is loaded except for our loading indicator row.
-  const isRowLoaded = ({ index }: { index: number }) => !hasNextPage || index < levels.length;
+  const isRowLoaded = ({ index }: { index: number }) =>
+    !hasNextPage.current || index < levels.length;
 
   // Render a list item or a loading indicator.
   const rowRenderer = ({ index, style }: { index: number; style: any }) => {
