@@ -1,5 +1,14 @@
 version: "3.9"
 services:
+  mongo:
+    container_name: mongo
+    image: "mongo:5.0.8-focal"
+    restart: always
+    volumes:
+      - ~/dbdata:/data/db
+      - ~/backup/mongo:/backup
+    ports:
+      - 27017:27017
   keycloak-db:
     container_name: Keycloak_DB
     image: postgres
@@ -52,3 +61,4 @@ services:
 volumes:
   postgres_data:
     driver: local
+  mongodata:
