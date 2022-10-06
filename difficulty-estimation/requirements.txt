@@ -31,6 +31,7 @@ pickleshare==0.7.5
 Pillow==9.2.0
 pox==0.3.1
 ppft==1.7.6.5
+pqdict==1.1.1
 prompt-toolkit==3.0.30
 psutil==5.9.1
 pure-eval==0.2.2
