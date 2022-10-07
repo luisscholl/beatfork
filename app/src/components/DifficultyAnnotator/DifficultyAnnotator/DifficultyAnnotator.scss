@@ -67,6 +67,7 @@
       width: max-content;
       overflow-y: scroll;
       height: 100%;
+      pointer-events: all;
 
       .chunk {
         border: none;
