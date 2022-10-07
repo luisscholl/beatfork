@@ -442,7 +442,7 @@ const Editor = () => {
               <br />
               Play in a safe environment.
               <br />
-              Warum up before playing.
+              Warm up before playing.
               <br />
               You choose to participate at your own risk.
               <br />
