@@ -1,0 +1,17 @@
+{
+  "_id": {
+    "levelId": "634519eca0d9f7852af7379c",
+    "versionId": "1"
+  },
+  "overallDifficulty": 20,
+  "chunkSize": 8,
+  "chunkDifficulties": [
+    4,
+    5,
+    9,
+    8,
+    6,
+    5,
+    20
+  ]
+}
