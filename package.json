@@ -13,7 +13,7 @@
     "deploy": "ssh finsternis \"cd beatfork && git pull && npm i && npm run build && rsync -r --del app/build/ /var/www/html && npm run docker-prod && npm run backend-prod\"",
     "api-doc-viewer": "redocly preview-docs backend/docs/openapi.yaml",
     "docker-prod": "cd docker && docker-compose -f production.yml up -d --remove-orphans && cd ..",
-    "backend-prod": "pm2 stop 'all' ; pm2 kill ; cd backend ; NODE_ENV=production pm2 start app.mjs"
+    "backend-prod": "pm2 stop beatfork ; pm2 delete beatfork ; cd backend ; NODE_ENV=production pm2 start app.mjs --name beatfork"
   },
   "repository": {
     "type": "git",
